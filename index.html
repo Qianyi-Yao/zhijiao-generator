@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>知交圈生成器</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="app">
+    <!-- =========================
+         01. 左侧内容编辑器
+         ========================= -->
+    <aside class="editor">
+      <header class="brand">
+        <div>
+          <p class="eyebrow">Zhijiao Circle Studio</p>
+          <h1>知交圈生成器</h1>
+          <p class="brand-note">选择人物，写下一则属于他们的知交圈。</p>
+        </div>
+        <span class="version">第一版</span>
+      </header>
+
+      <!-- 工程操作工具栏 -->
+      <div class="toolbar">
+        <button class="btn primary" id="exportPng">导出 PNG</button>
+        <button class="btn" id="saveDraft">保存草稿</button>
+        <button class="btn" id="exportProject">导出工程</button>
+        <button class="btn" id="importProject">导入工程</button>
+        <button class="btn danger" id="newProject">清空新建</button>
+        <input class="hidden" id="projectFile" type="file" accept=".zhijiao,.json,application/json" />
+      </div>
+
+      <!-- 人物与主帖 -->
+      <details class="section" open>
+        <summary>人物与主帖 <span class="section-index">01</span></summary>
+        <div class="section-body">
+            <div class="field">
+            <span class="label">发帖人物</span>
+            <input id="characterSearch"
+                   type="search"
+                   placeholder="按姓名、朝代、稀有度或定位筛选" />
+            <div class="character-grid" id="authorCards"></div>
+            </div>
+          <div class="field">
+            <label for="content">正文</label>
+            <textarea id="content" maxlength="3000" placeholder="输入帖子正文，支持手动换行……"></textarea>
+          </div>
+          <div class="toggle-line">
+            <span class="label" style="margin:0">正文展示</span>
+            <div class="segmented" id="collapseMode">
+              <button type="button" data-value="false" class="active">完整展示</button>
+              <button type="button" data-value="true">折叠展示</button>
+            </div>
+          </div>
+          <div class="field">
+            <label for="topic">话题（不必输入 #）</label>
+            <input id="topic" type="text" maxlength="40" placeholder="例如：今日所见" />
+          </div>
+        </div>
+      </details>
+
+      <!-- 图片与附加信息 -->
+      <details class="section" open>
+        <summary>图片与附加信息 <span class="section-index">02</span></summary>
+        <div class="section-body">
+          <div class="field">
+            <span class="label">帖子配图（最多一张）</span>
+            <div class="upload-box" id="uploadBox">
+              <input id="imageInput" type="file" accept="image/*" />
+              <img class="hidden" id="uploadPreview" alt="已上传的帖子图片" />
+              <span class="upload-hint" id="uploadHint">点击或拖入图片</span>
+            </div>
+            <div class="toggle-line hidden" id="imageControls">
+              <div class="segmented" id="imageFit">
+                <button type="button" data-value="contain" class="active">完整显示</button>
+                <button type="button" data-value="cover">填满方格</button>
+              </div>
+              <button class="btn small danger" type="button" id="removeImage">移除图片</button>
+            </div>
+          </div>
+          <div class="field-row">
+            <div class="field"><label for="time">发布时间</label><input id="time" type="text" maxlength="30" placeholder="刚刚 / 2小时前" /></div>
+            <div class="field"><label for="location">定位</label><input id="location" type="text" maxlength="40" placeholder="可留空" /></div>
+          </div>
+          <div class="field"><label for="likes">点赞数（0～10000）</label><input id="likes" type="number" min="0" max="10000" step="1" /></div>
+        </div>
+      </details>
+
+      <!-- 评论与回复 -->
+      <details class="section" open>
+        <summary>评论与回复 <span class="section-index" id="commentSectionCount">03 · 0条</span></summary>
+        <div class="section-body">
+          <div class="comment-editor-list" id="commentEditorList"></div>
+          <button class="btn" style="width:100%;margin-top:10px" id="addComment" type="button">＋ 添加评论</button>
+        </div>
+      </details>
+      <p class="editor-footer">草稿只保存在当前浏览器 · 工程文件会携带帖子配图</p>
+    </aside>
+
+    <!-- =========================
+         02. 右侧实时预览与 PNG 成图
+         ========================= -->
+    <section class="preview-area">
+      <div class="preview-topbar"><strong>实时预览</strong><span id="canvasSize">512 × 自动高度</span></div>
+      <div class="preview-scroll">
+        <article class="capture" id="capture">
+          <div class="paper-wash"></div>
+          <img class="bg-top" src="background/leftupcorner.png" alt="" />
+          <img class="bg-bottom" src="background/rightdowncorner.png" alt="" />
+          <section class="post">
+            <img class="portrait" id="portrait" alt="发帖人物立绘" />
+            <div class="post-content">
+              <div class="author-line">
+                <span class="author-name" id="previewAuthor"></span>
+              </div>
+              <div class="post-text" id="previewContent"></div>
+              <span class="expand-link hidden" id="expandLink">全文</span>
+              <div class="topic-link hidden" id="previewTopic"></div>
+              <div class="post-image-wrap hidden" id="postImageWrap"><img id="postImage" alt="帖子配图" /></div>
+              <div class="meta">
+                <img src="ui/time.png" alt="" /><span id="previewTime"></span>
+                <span class="meta-dot" id="locationDot">·</span>
+                <img id="locationIcon" src="ui/location.png" alt="" /><span id="previewLocation"></span>
+                <span class="counts"><img src="ui/dianzan_after.png" alt="点赞" /><span id="previewLikes"></span><img class="count-gap" src="ui/pinglun.png" alt="评论" /><span id="previewCommentCount"></span></span>
+              </div>
+            </div>
+          </section>
+          <section class="comments" id="previewComments"></section>
+        </article>
+      </div>
+    </section>
+  </div>
+  <div class="toast" id="toast"></div>
+  <!-- 人物资料必须先于功能脚本加载 -->
+  <script src="characters.js"></script>
+  <!-- 第三方 PNG 导出库；必须先于 app.js 加载 -->
+  <script src="html2canvas.min.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>

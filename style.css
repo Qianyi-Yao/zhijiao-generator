@@ -1,0 +1,852 @@
+/* =========================
+   01. 字体与全局变量
+   ========================= */
+@font-face {
+    font-family: "Jinling";
+    src: url("fonts/BWKS.ttf") format("truetype");
+    font-display: swap;
+}
+
+@font-face {
+    font-family: "ShengshiKai";
+    src: url("fonts/FZSHENGSKSJW_CU.ttf") format("truetype");
+    font-display: swap;
+}
+
+:root {
+    --ink: #3f382f;
+    --muted: #8a8072;
+    --line: #ded7c8;
+    --paper: #f8f1df;
+    --panel: #fffdf8;
+    --green: #69816f;
+    --green-dark: #485e50;
+    --gold: #b88749;
+    --danger: #a85d55;
+    --shadow: 0 18px 50px rgba(73, 61, 43, .12);
+}
+
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    color: var(--ink);
+    background: #ece8df;
+    font-family: "ShengshiKai", "Noto Serif SC", serif;
+    min-width: 320px;
+}
+
+button,
+input,
+textarea,
+select {
+    font: inherit;
+    color: inherit;
+}
+
+button {
+    cursor: pointer;
+}
+
+/* =========================
+   02. 整体页面布局
+   ========================= */
+.app {
+    min-height: 100vh;
+    display: grid;
+    grid-template-columns: minmax(380px, 520px) minmax(560px, 1fr);
+}
+
+.editor {
+    height: 100vh;
+    overflow: auto;
+    padding: 28px 28px 80px;
+    background: linear-gradient(155deg, #fffdfa 0%, #f7f3eb 60%, #ede8de 100%);
+    border-right: 1px solid #d8d2c6;
+}
+
+/* =========================
+   03. 编辑器标题与工具栏
+   ========================= */
+
+.brand {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 22px;
+}
+
+.brand-left {
+    display: flex;
+    flex-direction: column; /* 新增：让标题组纵向堆叠 */
+}
+
+.eyebrow {
+    margin: 0 0 5px;
+    color: var(--green);
+    font: 12px/1.4 system-ui, sans-serif;
+    letter-spacing: .2em;
+    text-transform: uppercase;
+}
+
+h1 {
+    margin: 0;
+    font: 34px/1.2 "Jinling", serif;
+    font-weight: 400;
+    letter-spacing: .08em;
+}
+
+.brand-note {
+    margin: 9px 0 0;
+    color: var(--muted);
+    font-size: 15px;
+}
+
+.version {
+    flex: none;
+    padding: 5px 9px;
+    border: 1px solid #cfc6b5;
+    border-radius: 999px;
+    color: #7c6d5a;
+    font: 11px/1 system-ui, sans-serif;
+}
+
+.toolbar {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+    margin-bottom: 17px;
+    padding-bottom: 17px;
+    border-bottom: 1px solid var(--line);
+}
+
+.btn {
+    border: 1px solid #cfc6b5;
+    background: #fffdf8;
+    border-radius: 8px;
+    padding: 8px 12px;
+    transition: .16s;
+    box-shadow: 0 1px 0 rgba(255, 255, 255, .9) inset;
+}
+
+    .btn:hover {
+        border-color: #9eab9f;
+        background: #f5f8f3;
+        transform: translateY(-1px);
+    }
+
+    .btn.primary {
+        color: #fff;
+        background: var(--green-dark);
+        border-color: var(--green-dark);
+    }
+
+    .btn.danger {
+        color: var(--danger);
+    }
+
+    .btn.small {
+        font-size: 13px;
+        padding: 5px 9px;
+    }
+
+/* =========================
+   04. 编辑区通用分区与表单
+   ========================= */
+.section {
+    background: rgba(255, 255, 255, .72);
+    border: 1px solid #ddd5c7;
+    border-radius: 12px;
+    margin: 0 0 12px;
+    overflow: hidden;
+}
+
+.section > summary {
+    list-style: none;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 16px;
+    cursor: pointer;
+    font-size: 17px;
+    user-select: none;
+}
+
+.section > summary::-webkit-details-marker {
+    display: none;
+}
+
+.section > summary::before {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-right: 1.5px solid #71695d;
+    border-bottom: 1.5px solid #71695d;
+    transform: rotate(-45deg);
+    transition: .18s;
+}
+
+.section[open] > summary::before {
+    transform: rotate(45deg) translate(-2px, -2px);
+}
+
+.section-index {
+    margin-left: auto;
+    color: #a49a8c;
+    font: 12px/1 system-ui, sans-serif;
+}
+
+.section-body {
+    padding: 2px 16px 18px;
+    border-top: 1px solid #ebe5d9;
+}
+
+.field {
+    margin-top: 14px;
+}
+
+.field-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+label,
+.label {
+    display: block;
+    margin-bottom: 6px;
+    color: #6f665a;
+    font-size: 13px;
+}
+
+input[type="text"],
+input[type="number"],
+input[type="datetime-local"],
+textarea,
+select {
+    width: 100%;
+    border: 1px solid #d4ccbd;
+    background: #fffefa;
+    border-radius: 8px;
+    padding: 9px 10px;
+    outline: none;
+    transition: .15s;
+}
+
+textarea {
+    resize: vertical;
+    min-height: 104px;
+    line-height: 1.7;
+}
+
+input:focus,
+textarea:focus,
+select:focus {
+    border-color: #829383;
+    box-shadow: 0 0 0 3px rgba(105, 129, 111, .11);
+}
+
+/* =========================
+   05. 人物筛选与人物卡片
+   ========================= */
+.character-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+    margin-top: 10px;
+}
+
+.character-card {
+    position: relative;
+    border: 1px solid #d7d0c4;
+    border-radius: 9px;
+    background: #fffdf8;
+    padding: 9px 7px;
+    text-align: center;
+    overflow: hidden;
+}
+
+.character-card.selected {
+    border-color: #78907e;
+    background: #eef4ed;
+    box-shadow: 0 0 0 2px rgba(105, 129, 111, .16);
+}
+
+.character-card img {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+    margin: 0 auto 5px;
+}
+
+.character-card span {
+    font-size: 14px;
+}
+
+.character-card small {
+    display: block;
+    margin-top: 2px;
+    color: #978b7a;
+    font-size: 11px;
+}
+
+/* =========================
+   06. 切换按钮与图片上传
+   ========================= */
+.toggle-line {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 12px;
+}
+
+.segmented {
+    display: flex;
+    border: 1px solid #d4ccbd;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fffefa;
+}
+
+.segmented button {
+    border: 0;
+    border-right: 1px solid #ded7cb;
+    background: transparent;
+    padding: 7px 11px;
+    font-size: 13px;
+}
+
+.segmented button:last-child {
+    border-right: 0;
+}
+
+.segmented button.active {
+    background: #e7eee6;
+    color: #3f5c48;
+}
+
+.upload-box {
+    position: relative;
+    border: 1px dashed #bcb3a5;
+    border-radius: 10px;
+    min-height: 96px;
+    display: grid;
+    place-items: center;
+    text-align: center;
+    color: #8c8172;
+    background: #fbf9f4;
+    overflow: hidden;
+}
+
+.upload-box input {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+    cursor: pointer;
+}
+
+.upload-box.has-image {
+    min-height: 150px;
+}
+
+.upload-box img {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+}
+
+.upload-hint {
+    position: relative;
+    z-index: 2;
+    padding: 8px 12px;
+    background: rgba(255, 253, 248, .9);
+    border-radius: 7px;
+}
+
+/* =========================
+   07. 评论编辑器
+   ========================= */
+.comment-editor-list {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    margin-top: 12px;
+}
+
+.comment-card {
+    border: 1px solid #ddd5c8;
+    border-radius: 10px;
+    background: #fffefa;
+    padding: 11px;
+    box-shadow: 0 3px 10px rgba(65, 54, 39, .04);
+}
+
+.comment-card.dragging {
+    opacity: .48;
+}
+
+.comment-head {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 9px;
+}
+
+.drag-handle {
+    color: #a69b8d;
+    cursor: grab;
+    font: 16px/1 system-ui, sans-serif;
+    letter-spacing: -2px;
+}
+
+.comment-number {
+    color: #948979;
+    font-size: 12px;
+}
+
+.comment-actions {
+    display: flex;
+    gap: 5px;
+    margin-left: auto;
+}
+
+.comment-actions button {
+    border: 0;
+    background: transparent;
+    color: #776c5e;
+    font-size: 12px;
+    padding: 3px 5px;
+}
+
+.comment-actions button:hover {
+    color: var(--green-dark);
+}
+
+.comment-character-search {
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.comment-character-search::-webkit-search-cancel-button {
+    cursor: pointer;
+}
+
+.comment-fields {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+}
+
+.comment-card textarea {
+    min-height: 64px;
+    margin-top: 8px;
+}
+
+.empty-editor {
+    padding: 20px;
+    border: 1px dashed #d7d0c4;
+    border-radius: 9px;
+    text-align: center;
+    color: #9b9080;
+    font-size: 13px;
+}
+
+/* =========================
+   08. 编辑器页脚与预览工作区
+   ========================= */
+.editor-footer {
+    margin-top: 19px;
+    color: #9a9082;
+    text-align: center;
+    font-size: 12px;
+}
+
+.preview-area {
+    height: 100vh;
+    overflow: auto;
+    padding: 30px;
+    background: #ddd9cf;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.preview-topbar {
+    width: 512px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 12px;
+    color: #6f675b;
+    font: 13px/1.4 system-ui, sans-serif;
+}
+
+.preview-topbar strong {
+    font-weight: 600;
+    color: #49433b;
+}
+
+.preview-scroll {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    overflow: visible;
+}
+
+/* =========================
+   09. PNG 成图画布与背景
+   ========================= */
+.capture {
+    position: relative;
+    width: 512px;
+    min-height: 760px;
+    overflow: hidden;
+    background: var(--paper);
+    box-shadow: var(--shadow);
+    isolation: isolate;
+}
+
+.bg-top {
+    position: absolute;
+    z-index: -1;
+    left: 0;
+    top: 0;
+    width: 100px;
+    height: auto;
+    opacity: .72;
+    pointer-events: none;
+}
+
+.bg-bottom {
+    position: absolute;
+    z-index: -1;
+    right: -25px;
+    bottom: -30px;
+    width: 200px;
+    height: auto;
+    opacity: .58;
+    pointer-events: none;
+}
+
+.paper-wash {
+    position: absolute;
+    z-index: -2;
+    inset: 0;
+    background: radial-gradient(circle at 90% 5%, rgba(255,255,255,.72), transparent 29%), linear-gradient(180deg, rgba(255,255,255,.12), rgba(209,190,150,.08));
+    pointer-events: none;
+}
+
+/* =========================
+   10. 主帖、立绘与正文
+   ========================= */
+.post {
+    position: relative;
+    min-height: 220px;
+    padding: 15px 15px 10px 190px;
+    border-bottom: 1px solid rgba(151, 133, 102, .28);
+}
+
+.portrait {
+    position: absolute;
+    left: -2px;
+    bottom: 0;
+    width: 220px;
+    height: 220px;
+    object-fit: contain;
+    object-position: center bottom;
+    filter: drop-shadow(0 5px 6px rgba(75, 60, 38, .12));
+    pointer-events: none;
+}
+
+.post-content {
+    position: relative;
+    z-index: 1;
+    min-height: 160px;
+}
+
+.author-line {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    min-height: 34px;
+}
+
+.author-name {
+    font: 27px/1.05 "Jinling", serif;
+    color: #6d3f32;
+    letter-spacing: .03em;
+    white-space: nowrap;
+}
+
+.author-badges {
+    display: flex;
+    gap: 3px;
+    flex-wrap: wrap;
+}
+
+.author-badge {
+    padding: 2px 5px;
+    border: 1px solid rgba(137, 111, 71, .55);
+    border-radius: 2px;
+    background: rgba(255, 248, 225, .64);
+    color: #846d4c;
+    font-size: 11px;
+    line-height: 1.25;
+}
+
+.post-text {
+    margin: 10px 0 0;
+    font-size: 19px;
+    line-height: 1.56;
+    letter-spacing: .025em;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+    .post-text.collapsed {
+        display: -webkit-box;
+        -webkit-box-orient: vertical;
+        -webkit-line-clamp: 3;
+        overflow: hidden;
+    }
+
+.expand-link,
+.topic-link {
+    color: #698270;
+    cursor: pointer;
+}
+
+.expand-link {
+    display: inline-block;
+    margin-top: 2px;
+    font-size: 17px;
+}
+
+.topic-link {
+    margin-top: 7px;
+    font-size: 16px;
+}
+
+.post-image-wrap {
+    margin-top: 11px;
+    width: 244px;
+    max-height: 255px;
+    overflow: hidden;
+    border: 1px solid rgba(115, 100, 75, .18);
+    background: #eee7d9;
+}
+
+    .post-image-wrap img {
+        display: block;
+        width: 100%;
+        height: auto;
+        max-height: 255px;
+        object-fit: contain;
+    }
+
+    .post-image-wrap.cover {
+        height: 244px;
+    }
+
+        .post-image-wrap.cover img {
+            height: 100%;
+            object-fit: cover;
+        }
+
+.meta {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    margin-top: 12px;
+    color: #978b7b;
+    font-size: 14px;
+    white-space: nowrap;
+}
+
+    .meta img {
+        width: 16px;
+        height: 16px;
+        object-fit: contain;
+        opacity: .75;
+    }
+
+.meta-dot {
+    opacity: .55;
+}
+
+.counts {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: #7a7165;
+}
+
+    .counts img {
+        width: 18px;
+        height: 18px;
+    }
+
+    .counts .count-gap {
+        margin-left: 8px;
+    }
+
+/* =========================
+   11. 成图评论区
+   ========================= */
+.comments {
+    position: relative;
+    padding: 4px 20px 40px 20px;
+}
+
+.comment-item {
+    position: relative;
+    display: grid;
+    grid-template-columns: 62px 1fr;
+    gap: 10px;
+    padding: 5px 0;
+    border-bottom: 1px solid rgba(151, 133, 102, .26);
+    cursor: pointer;
+}
+
+    .comment-item:last-child {
+        border-bottom: 0;
+    }
+
+.avatar-ring {
+    width: 62px;
+    height: 62px;
+    border-radius: 50%;
+    padding: 4px;
+    border: 1px solid rgba(151, 124, 76, .58);
+    background: rgba(255, 252, 242, .82);
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, .6) inset;
+}
+
+    .avatar-ring img {
+        width: 100%;
+        height: 100%;
+        border-radius: 50%;
+        object-fit: cover;
+        display: block;
+    }
+
+.comment-author {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+    color: #6d3f32;
+    font: 22px/1.2 "Jinling", serif;
+}
+
+.reply-label {
+    font-family: "ShengshiKai", serif;
+    font-size: 14px;
+    color: #998e7d;
+}
+
+.comment-time {
+    margin-top: 3px;
+    color: #9c9183;
+    font-size: 13px;
+}
+
+.comment-body {
+    margin-top: 7px;
+    font-size: 17px;
+    line-height: 1.55;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+}
+
+.no-comments {
+    padding: 38px 0 130px;
+    text-align: center;
+    color: #a79c8e;
+    font-size: 14px;
+}
+
+/* =========================
+   12. 提示、工具类与响应式布局
+   ========================= */
+.toast {
+    position: fixed;
+    left: 50%;
+    bottom: 24px;
+    z-index: 20;
+    transform: translate(-50%, 18px);
+    opacity: 0;
+    pointer-events: none;
+    padding: 9px 15px;
+    border-radius: 999px;
+    background: rgba(49, 45, 39, .92);
+    color: #fff;
+    font: 13px/1.4 system-ui, sans-serif;
+    transition: .22s;
+}
+
+    .toast.show {
+        opacity: 1;
+        transform: translate(-50%, 0);
+    }
+
+.hidden {
+    display: none !important;
+}
+
+@media (max-width: 980px) {
+    .app {
+        display: block;
+    }
+
+    .editor {
+        height: auto;
+        min-height: 100vh;
+        border-right: 0;
+    }
+
+    .preview-area {
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .preview-topbar {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 580px) {
+    .editor {
+        padding: 22px 16px 50px;
+    }
+
+    .field-row {
+        grid-template-columns: 1fr;
+    }
+
+    .preview-area {
+        padding: 20px 0;
+    }
+
+    .preview-scroll {
+        justify-content: flex-start;
+        overflow: auto;
+        padding: 0 14px;
+    }
+
+    .preview-topbar {
+        padding: 0 14px;
+    }
+
+    .character-grid {
+        grid-template-columns: repeat(3, minmax(86px, 1fr));
+    }
+}
