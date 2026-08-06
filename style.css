@@ -3,13 +3,13 @@
    ========================= */
 @font-face {
     font-family: "Jinling";
-    src: url("fonts/BWKS.ttf") format("truetype");
+    src: url("fonts/BWKS.woff2") format("woff2");
     font-display: swap;
 }
 
 @font-face {
     font-family: "ShengshiKai";
-    src: url("fonts/FZSHENGSKSJW_CU.ttf") format("truetype");
+    src: url("fonts/FZSHENGSKSJW_CU.woff2") format("woff2");
     font-display: swap;
 }
 

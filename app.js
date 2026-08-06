@@ -82,7 +82,12 @@ function renderAuthorCards() {
       class="character-card ${c.id === state.authorId ? 'selected' : ''}"
       data-author="${c.id}"
     >
-      <img src="${c.avatar}" alt="${c.name}">
+      <img
+        src="${c.avatar}"
+        alt="${c.name}"
+        loading="lazy"
+        decoding="async"
+      >
       <span>${c.name}</span>
       <small>${c.rarity} · ${c.dynasty} · ${c.role}</small>
     </button>
