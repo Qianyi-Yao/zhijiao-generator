@@ -507,6 +507,8 @@ select:focus {
 .capture {
     position: relative;
     width: 512px;
+    min-width: 512px;
+    flex: 0 0 512px;
     min-height: 760px;
     overflow: hidden;
     background: var(--paper);
