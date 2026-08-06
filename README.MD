@@ -28,7 +28,7 @@
 
 也可以到我的github仓库：[Qianyi-Yao/zhijiao-generator: 忘川风华录知交圈生成器](https://github.com/Qianyi-Yao/zhijiao-generator) 中下载相关的本地资料（包含头像、立绘和字体资源等）在本地部署。
 
-这些都是免费开源的:D 欢迎大家使用，有问题随时和我提，觉得方便也可以给我一个Star~
+这些都是免费的:D 欢迎大家使用，有问题随时和我提，觉得方便也可以给我一个Star~
 
 ### 编辑区与预览区*
 
