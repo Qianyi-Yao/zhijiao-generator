@@ -36,6 +36,42 @@ function esc(text){return String(text??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<
 function showToast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>el.classList.remove('show'),1800)}
 function optionList(selected,allowEmpty,label){return (allowEmpty?`<option value="">${label}</option>`:'')+characters.map(c=>`<option value="${c.id}" ${c.id===selected?'selected':''}>${c.name} · ${c.dynasty}</option>`).join('')}
 
+function getReplyCandidates() {
+    const ids = [...new Set(
+        state.comments.map(item => item.authorId)
+    )].filter(id => id && id !== state.authorId);
+
+    return ids.map(id => character(id));
+}
+
+function replyOptionList(selected) {
+    const candidates = getReplyCandidates();
+
+    return `
+        <option value="">不回复任何人</option>
+        ${candidates.map(c => `
+            <option
+                value="${c.id}"
+                ${c.id === selected ? 'selected' : ''}
+            >
+                ${c.name}
+            </option>
+        `).join('')}
+    `;
+}
+
+function normalizeReplyTargets() {
+    const validIds = new Set(
+        getReplyCandidates().map(c => c.id)
+    );
+
+    state.comments.forEach(item => {
+        if (item.replyTo && !validIds.has(item.replyTo)) {
+            item.replyTo = '';
+        }
+    });
+}
+
 function filteredOptionList(selected,allowEmpty,label,query){
   const keyword=query.trim().toLowerCase();
   const filtered=characters.filter(c=>{
@@ -97,7 +133,16 @@ function renderAuthorCards() {
       document.querySelectorAll('[data-author]').forEach(btn => {
           btn.onclick = () => {
               state.authorId = btn.dataset.author;
-              renderAll();
+
+              document.querySelectorAll('[data-author]').forEach(card => {
+                  card.classList.toggle(
+                      'selected',
+                      card.dataset.author === state.authorId
+                  );
+              });
+
+              renderCommentEditors();
+              renderPreview();
           };
       });
   }  
@@ -107,6 +152,7 @@ function renderAuthorCards() {
    05. 评论编辑器与回复
    ========================= */
 function renderCommentEditors(){
+  normalizeReplyTargets();
   const list=$('commentEditorList');
   $('commentSectionCount').textContent=`03 · ${state.comments.length}条`;
   if(!state.comments.length){list.innerHTML='<div class="empty-editor">还没有评论。点击下方按钮添加第一条互动。</div>';return}
@@ -122,8 +168,7 @@ function renderCommentEditors(){
       <select aria-label="评论者" data-comment-author="${index}">
         ${optionList(item.authorId,false,'')}
       </select>
-      <select aria-label="回复对象" data-comment-reply="${index}">
-        ${optionList(item.replyTo,true,'不回复任何人')}
+      <select aria-label="回复对象" data-comment-reply="${index}">${replyOptionList(item.replyTo)}</select>
       </select>
     </div>
     <textarea aria-label="评论正文" data-comment-text="${index}" placeholder="输入评论内容……">${esc(item.text)}</textarea>
@@ -168,7 +213,13 @@ function renderCommentEditors(){
       },0);
     };
   });
-  list.querySelectorAll('[data-comment-author]').forEach(el=>el.onchange=()=>{state.comments[+el.dataset.commentAuthor].authorId=el.value;renderPreview()});
+  list.querySelectorAll('[data-comment-author]').forEach(el => {
+      el.onchange = () => {
+          state.comments[+el.dataset.commentAuthor].authorId = el.value;
+          renderCommentEditors();
+          renderPreview();
+      };
+  });
   list.querySelectorAll('[data-comment-reply]').forEach(el=>el.onchange=()=>{state.comments[+el.dataset.commentReply].replyTo=el.value;renderPreview()});
   list.querySelectorAll('[data-comment-text]').forEach(el=>el.oninput=()=>{state.comments[+el.dataset.commentText].text=el.value;renderPreview()});
   list.querySelectorAll('[data-comment-time]').forEach(el=>el.oninput=()=>{state.comments[+el.dataset.commentTime].time=el.value;renderPreview()});
@@ -188,6 +239,21 @@ function addReply(index){
   state.comments.splice(index+1,0,{id:uid(),authorId:state.authorId,replyTo:target.authorId,text:'',time:'刚刚'});
   renderAll();
   setTimeout(()=>{const field=document.querySelector(`[data-comment-text="${index+1}"]`);field?.focus()},0);
+}
+
+function addComment() {
+  state.comments.push({
+    id: uid(),
+    authorId: characters[0].id,
+    replyTo: '',
+    text: '',
+    time: '刚刚'
+  });
+  renderAll();
+  setTimeout(() => {
+    const index = state.comments.length - 1;
+    document.querySelector(`[data-comment-text="${index}"]`)?.focus();
+  }, 0);
 }
 
 
@@ -255,7 +321,11 @@ $('collapseMode').onclick=e=>{if(!e.target.dataset.value)return;state.collapsed=
 $('imageFit').onclick=e=>{if(!e.target.dataset.value)return;state.imageFit=e.target.dataset.value;syncInputs();renderPreview()};
 $('imageInput').onchange=e=>readImage(e.target.files[0]);
 $('removeImage').onclick=()=>{state.imageData='';$('imageInput').value='';renderAll()};
-$('addComment').onclick=()=>{state.comments.push({id:uid(),authorId:characters[0].id,replyTo:'',text:'',time:'刚刚'});renderAll();setTimeout(()=>document.querySelector(`[data-comment-text="${state.comments.length-1}"]`)?.focus(),0)};
+$('addComment').onclick = addComment;
+document.querySelector('.post').onclick = e => {
+  if (e.target.closest('#expandLink')) return;
+  addComment();
+};
 $('expandLink').onclick=()=>{state.collapsed=false;syncInputs();renderPreview()};
 $('saveDraft').onclick=()=>{try{localStorage.setItem('zhijiao-draft-v1',JSON.stringify(state));showToast('草稿已保存')}catch(e){showToast('图片过大，浏览器无法保存草稿')}};
 $('exportProject').onclick=()=>{downloadBlob(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),`知交圈工程-${character(state.authorId).name}.zhijiao`);showToast('工程文件已导出')};
