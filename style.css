@@ -252,6 +252,289 @@ select:focus {
 /* =========================
    05. 人物筛选与人物卡片
    ========================= */
+
+.custom-character-entry {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-top: 10px;
+    padding: 10px 11px;
+    border: 1px solid #ddd5c7;
+    border-radius: 9px;
+    background: #f8f5ee;
+}
+
+.custom-character-entry > div {
+    display: flex;
+    align-items: baseline;
+    gap: 7px;
+}
+
+.custom-character-entry strong {
+    font-size: 14px;
+    font-weight: 400;
+}
+
+.custom-character-entry span {
+    color: var(--muted);
+    font: 11px/1 system-ui, sans-serif;
+}
+
+.custom-character-entry .btn:disabled {
+    color: #aaa195;
+    border-color: #ddd6ca;
+    background: #efebe3;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.custom-character-dialog {
+    width: min(580px, calc(100vw - 32px));
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    border: 1px solid #d7cfc1;
+    border-radius: 14px;
+    padding: 20px;
+    color: var(--ink);
+    background: #fffdf8;
+    box-shadow: var(--shadow);
+}
+
+.custom-character-dialog::backdrop {
+    background: rgba(48, 42, 35, .38);
+    backdrop-filter: blur(2px);
+}
+
+.dialog-head {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.dialog-head h2 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 400;
+}
+
+.dialog-close {
+    width: 32px;
+    height: 32px;
+    border: 0;
+    border-radius: 50%;
+    color: #786e61;
+    background: #f2eee6;
+    font: 22px/1 system-ui, sans-serif;
+    cursor: pointer;
+}
+
+.dialog-note {
+    margin: 16px 0 0;
+    color: var(--muted);
+    font-size: 13px;
+    line-height: 1.7;
+}
+
+.custom-character-form {
+    margin-top: 18px;
+}
+
+.custom-form-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.custom-form-field {
+    min-width: 0;
+    margin-top: 14px;
+}
+
+.custom-form-field-full {
+    width: 100%;
+}
+
+.custom-form-field label {
+    display: block;
+    margin-bottom: 6px;
+    color: #6f665a;
+    font-size: 13px;
+}
+
+.required-mark {
+    margin-left: 2px;
+    color: #c54f48;
+    font-family: system-ui, sans-serif;
+    font-weight: 700;
+}
+
+.custom-character-form input[type="text"],
+.custom-character-form select {
+    width: 100%;
+}
+
+.custom-file-box {
+    min-height: 92px;
+    padding: 11px;
+    border: 1px dashed #cfc5b5;
+    border-radius: 9px;
+    background: #faf7f0;
+    transition: .15s;
+}
+
+.custom-file-box input[type="file"] {
+    display: block;
+    width: 100%;
+    color: #746b5f;
+    font: 12px/1.5 system-ui, sans-serif;
+}
+
+.custom-file-box input[type="file"]::file-selector-button {
+    margin-right: 8px;
+    padding: 6px 9px;
+    border: 1px solid #cfc6b5;
+    border-radius: 6px;
+    color: var(--ink);
+    background: #fffdf8;
+    font: inherit;
+    cursor: pointer;
+}
+
+.custom-file-box span {
+    display: block;
+    margin-top: 9px;
+    color: #9a8f80;
+    font-size: 12px;
+    line-height: 1.5;
+}
+
+.custom-image-note {
+    margin: 9px 0 0;
+    color: var(--muted);
+    font-size: 12px;
+    line-height: 1.6;
+}
+
+.custom-character-form .is-invalid {
+    border-color: #c96b62;
+    box-shadow: 0 0 0 3px rgba(201, 107, 98, .1);
+}
+
+.custom-file-box:has(input.is-invalid) {
+    border-color: #c96b62;
+    background: #fff8f6;
+    box-shadow: 0 0 0 3px rgba(201, 107, 98, .08);
+}
+
+.custom-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 9px;
+    margin-top: 20px;
+    padding-top: 15px;
+    border-top: 1px solid #ebe4d8;
+}
+
+.custom-delete-button {
+    margin-right: auto;
+}
+
+.custom-crop-dialog {
+    width: min(620px, calc(100vw - 32px));
+}
+
+.custom-crop-stage {
+    position: relative;
+    width: min(100%, 500px);
+    margin: 18px auto 0;
+    overflow: hidden;
+    border: 1px solid #cfc5b5;
+    border-radius: 10px;
+    background-color: #ded8cd;
+    background-image:
+        linear-gradient(45deg, #cec7bb 25%, transparent 25%),
+        linear-gradient(-45deg, #cec7bb 25%, transparent 25%),
+        linear-gradient(45deg, transparent 75%, #cec7bb 75%),
+        linear-gradient(-45deg, transparent 75%, #cec7bb 75%);
+    background-position:
+        0 0,
+        0 10px,
+        10px -10px,
+        -10px 0;
+    background-size: 20px 20px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, .35);
+}
+
+.custom-crop-stage::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    z-index: 2;
+    border: 1px solid rgba(255, 255, 255, .65);
+    box-shadow:
+        inset 0 0 0 1px rgba(80, 69, 55, .18),
+        inset 0 0 36px rgba(32, 27, 22, .18);
+    pointer-events: none;
+}
+
+#customCropCanvas {
+    display: block;
+    width: 100%;
+    height: auto;
+    cursor: grab;
+    touch-action: none;
+    user-select: none;
+}
+
+#customCropCanvas.is-dragging {
+    cursor: grabbing;
+}
+
+.custom-crop-controls {
+    display: grid;
+    grid-template-columns: auto 32px minmax(0, 1fr) 32px 48px;
+    align-items: center;
+    gap: 9px;
+    width: min(100%, 500px);
+    margin: 16px auto 0;
+}
+
+.custom-crop-control-label {
+    color: #6f665a;
+    font-size: 13px;
+}
+
+.custom-crop-controls input[type="range"] {
+    width: 100%;
+    accent-color: #86755e;
+    cursor: pointer;
+}
+
+.custom-crop-scale-button {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid #d3cabb;
+    border-radius: 7px;
+    color: #655c51;
+    background: #faf7f0;
+    font: 18px/1 system-ui, sans-serif;
+    cursor: pointer;
+}
+
+.custom-crop-scale-button:hover {
+    border-color: #bdb19f;
+    background: #f2ede4;
+}
+
+#customCropZoomValue {
+    color: var(--muted);
+    font: 12px/1 system-ui, sans-serif;
+    text-align: right;
+}
+
 .character-grid {
     display: grid;
     grid-template-columns: repeat(3, 1fr);
@@ -287,6 +570,37 @@ select:focus {
     padding: 9px 7px;
     text-align: center;
     overflow: hidden;
+}
+
+.character-card-shell {
+    position: relative;
+    min-width: 0;
+    height: 106px;
+}
+
+.character-card-shell .character-card {
+    width: 100%;
+    height: 100%;
+}
+
+.manage-custom-character {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    z-index: 2;
+    width: 25px;
+    height: 25px;
+    padding: 0;
+    border: 1px solid #d7cfc1;
+    border-radius: 7px;
+    background: rgba(255, 253, 248, .92);
+    font: 14px/1 system-ui, sans-serif;
+    box-shadow: 0 2px 8px rgba(73, 61, 43, .12);
+}
+
+.manage-custom-character:hover {
+    border-color: #9eab9f;
+    background: #f5f8f3;
 }
 
 .character-card.selected {
@@ -870,6 +1184,29 @@ select:focus {
 
     .preview-topbar {
         padding: 0 14px;
+    }
+
+    .custom-form-grid {
+        grid-template-columns: 1fr;
+        gap: 0;
+    }
+
+    .custom-character-dialog {
+        padding: 17px;
+    }
+
+        .custom-crop-dialog {
+        width: calc(100vw - 20px);
+        padding: 15px;
+    }
+
+    .custom-crop-controls {
+        grid-template-columns: 32px minmax(0, 1fr) 32px 42px;
+        gap: 7px;
+    }
+
+    .custom-crop-control-label {
+        display: none;
     }
 
     .character-grid {

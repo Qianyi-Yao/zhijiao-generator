@@ -50,6 +50,15 @@
             <input id="characterSearch"
                    type="search"
                    placeholder="按姓名、朝代、稀有度或定位筛选" />
+            <div class="custom-character-entry">
+              <div>
+                <strong>自定义人物</strong>
+                <span id="customCharacterCount">0/10</span>
+              </div>
+              <button class="btn small" id="openCustomCharacterDialog" type="button">
+                ＋ 创建人物
+              </button>
+            </div>
             <div class="character-grid" id="authorCards"></div>
             </div>
           <div class="field">
@@ -142,6 +151,197 @@
     </section>
   </div>
   <div class="toast" id="toast"></div>
+  <dialog class="custom-character-dialog" id="customCharacterDialog">
+    <div class="dialog-head">
+      <div>
+        <p class="eyebrow" id="customCharacterDialogEyebrow">
+          Custom Character
+        </p>
+        <h2 id="customCharacterDialogTitle">
+          创建自定义人物
+        </h2>
+      </div>
+      <button
+        class="dialog-close"
+        id="closeCustomCharacterDialog"
+        type="button"
+        aria-label="关闭"
+      >
+        ×
+      </button>
+    </div>
+    <p class="dialog-note" id="customCharacterDialogNote">
+      每个浏览器最多同时保存 10 位自定义人物；删除已有自定义人物后可继续创建。
+    </p>
+    <form class="custom-character-form" id="customCharacterForm" novalidate>
+    <div class="custom-form-field custom-form-field-full">
+      <label for="customCharacterName">
+        姓名
+        <span class="required-mark" aria-hidden="true">*</span>
+      </label>
+      <input
+        id="customCharacterName"
+        type="text"
+        maxlength="12"
+        placeholder="请输入人物姓名"
+        autocomplete="off"
+        aria-required="true"
+      />
+    </div>
+
+    <div class="custom-form-grid">
+      <div class="custom-form-field">
+        <label for="customCharacterDynasty">朝代</label>
+        <input
+          id="customCharacterDynasty"
+          type="text"
+          maxlength="12"
+          placeholder="留空则为不详"
+          autocomplete="off"
+        />
+      </div>
+
+      <div class="custom-form-field">
+        <label for="customCharacterRarity">稀有度</label>
+        <select id="customCharacterRarity">
+          <option value="">不详</option>
+          <option value="天">天</option>
+          <option value="地">地</option>
+          <option value="玄">玄</option>
+          <option value="黄">黄</option>
+        </select>
+      </div>
+
+      <div class="custom-form-field">
+        <label for="customCharacterRole">定位</label>
+        <select id="customCharacterRole">
+          <option value="">不详</option>
+          <option value="输出">输出</option>
+          <option value="防御">防御</option>
+          <option value="治疗">治疗</option>
+          <option value="控制">控制</option>
+          <option value="辅助">辅助</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="custom-form-field">
+      <label for="customCharacterImage">
+        人物图片
+        <span
+          class="required-mark"
+          id="customCharacterImageRequired"
+          aria-hidden="true"
+        >*</span>
+      </label>
+      <div class="custom-file-box">
+        <input
+          id="customCharacterImage"
+          type="file"
+          accept="image/png,image/jpeg,image/webp"
+          aria-required="true"
+        />
+        <span id="customCharacterImageHint">
+          上传一张人物图片，随后将分别裁切头像和立绘。
+        </span>
+      </div>
+    </div>
+
+    <p class="custom-image-note">
+      支持 PNG、JPG、WebP 格式；图片大小不超过 8 MB。
+    </p>
+
+    <div class="custom-form-actions">
+      <button
+        class="btn danger custom-delete-button hidden"
+        id="deleteCustomCharacter"
+        type="button"
+      >
+        删除人物
+      </button>
+
+      <button class="btn" id="cancelCustomCharacter" type="button">
+        取消
+      </button>
+
+      <button
+        class="btn primary"
+        id="startCustomCrop"
+        type="submit"
+      >
+        下一步：裁切图片
+      </button>
+    </div>
+  </form>
+  </dialog>
+
+  <dialog
+    class="custom-character-dialog custom-crop-dialog"
+    id="customCropDialog"
+  >
+    <div class="dialog-head">
+      <div>
+        <p class="eyebrow" id="customCropStep">第 1 步，共 2 步</p>
+        <h2 id="customCropTitle">裁切头像</h2>
+      </div>
+    </div>
+
+    <p class="dialog-note" id="customCropNote">
+      拖动图片调整位置，使用下方滑杆放大或缩小。
+    </p>
+
+    <div class="custom-crop-stage">
+      <canvas
+        id="customCropCanvas"
+        width="600"
+        height="600"
+        aria-label="图片裁切区域"
+      ></canvas>
+    </div>
+
+    <div class="custom-crop-controls">
+      <span class="custom-crop-control-label">缩放</span>
+
+      <button
+        class="custom-crop-scale-button"
+        id="customCropZoomOut"
+        type="button"
+        aria-label="缩小图片"
+      >
+        −
+      </button>
+
+      <input
+        id="customCropZoom"
+        type="range"
+        min="1"
+        max="6"
+        step="0.01"
+        value="1"
+      />
+
+      <button
+        class="custom-crop-scale-button"
+        id="customCropZoomIn"
+        type="button"
+        aria-label="放大图片"
+      >
+        ＋
+      </button>
+
+      <output id="customCropZoomValue">100%</output>
+    </div>
+
+    <div class="custom-form-actions">
+      <button class="btn" id="cancelCustomCrop" type="button">
+        返回填写
+      </button>
+      <button class="btn primary" id="confirmCustomCrop" type="button">
+        确认头像
+      </button>
+    </div>
+  </dialog>
+
   <!-- 人物资料必须先于功能脚本加载 -->
   <script src="characters.js"></script>
   <!-- 第三方 PNG 导出库；必须先于 app.js 加载 -->
