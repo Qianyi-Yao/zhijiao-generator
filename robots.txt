@@ -1,4 +1,4 @@
 User-agent: *
 Allow: /
 
-Sitemap: https://zhijiao-generator-d3drf17e2a3e78-1465700373.ap-shanghai.app.tcloudbase.com/sitemap.XML
+Sitemap: https://zhijiao-generator-zhijiao-generator-d3drf17e2a3e78.webapps.tcloudbase.com/sitemap.xml

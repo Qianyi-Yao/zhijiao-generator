@@ -14,7 +14,7 @@
 
 ## 在线使用
 
-[打开忘川风华录知交圈生成器](https://zhijiao-generator-d3drf17e2a3e78-1465700373.ap-shanghai.app.tcloudbase.com/)
+[打开忘川风华录知交圈生成器](https://zhijiao-generator-zhijiao-generator-d3drf17e2a3e78.webapps.tcloudbase.com/)
 
 这个是国内方便使用的地址（不过你都找到这里来了……应该也不需要吧？）（大雾）
 
