@@ -99,6 +99,25 @@ h1 {
     letter-spacing: .08em;
 }
 
+.library-link {
+    display: inline-block;
+    margin-left: 12px;
+    padding: 4px 12px;
+    border: 1px solid #b9c9ba;
+    border-radius: 999px;
+    color: var(--green-dark);
+    background: #f4f7f2;
+    font: 13px/1.2 "ShengshiKai", "Noto Serif SC", serif;
+    text-decoration: none;
+    vertical-align: middle;
+    white-space: nowrap;
+    transition: background .16s;
+}
+
+.library-link:hover {
+    background: #e0e9dd;
+}
+
 .brand-note {
     margin: 9px 0 0;
     color: var(--muted);
@@ -130,6 +149,12 @@ h1 {
     padding: 8px 12px;
     transition: .16s;
     box-shadow: 0 1px 0 rgba(255, 255, 255, .9) inset;
+}
+
+a.btn {
+    display: inline-block;
+    text-decoration: none;
+    color: inherit;
 }
 
     .btn:hover {
@@ -1228,6 +1253,22 @@ select:focus {
     .custom-form-grid {
         grid-template-columns: 1fr;
         gap: 0;
+    }
+
+    .library-link {
+        margin-left: 0;
+        margin-top: 8px;
+        display: table;
+    }
+
+    .skin-thumb-group .skin-thumb {
+        width: 36px;
+        height: 36px;
+    }
+
+    .comment-skin-group .skin-thumb {
+        width: 30px;
+        height: 30px;
     }
 
     .custom-character-dialog {
