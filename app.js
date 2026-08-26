@@ -2,14 +2,14 @@
    02. 默认工程与空白工程
    ========================= */
 const defaultState = () => ({
-  version:1,authorId:'yuanhong',content:'山河辽阔，四时各有意趣。今日偶得半日清闲，便与诸君共记眼前风物。',collapsed:false,topic:'故人闲话',time:'刚刚',location:'平城',likes:128,imageData:'',imageFit:'contain',comments:[
+  version:2,authorId:'yuanhong',content:'山河辽阔，四时各有意趣。今日偶得半日清闲，便与诸君共记眼前风物。',collapsed:false,topic:'故人闲话',time:'刚刚',location:'平城',likes:128,imageData:'',imageFit:'contain',skinMap:{},bgColor:'',corner:'',comments:[
     {id:uid(),authorId:'jieyougongzhu',replyTo:'',text:'如此清景，确宜与故人同赏。',time:'1分钟前'},
     {id:uid(),authorId:'yuefei',replyTo:'yuanhong',text:'他日若有闲暇，也愿亲往一观。',time:'刚刚'}
   ]
 });
 
 const blankState = () => ({
-    version: 1,
+    version: 2,
     authorId: 'yuanhong',
     content: '',
     collapsed: false,
@@ -19,6 +19,9 @@ const blankState = () => ({
     likes: 0,
     imageData: '',
     imageFit: 'contain',
+    skinMap: {},
+    bgColor: '',
+    corner: '',
     comments: []
  });
 
@@ -60,6 +63,13 @@ const customCropState = {
 
 const $ = id => document.getElementById(id);
 const character = id => characters.find(item=>item.id===id) || characters[0];
+const skinOf = (c, map) => {
+  const sid = map && map[c.id];
+  const skin = sid && c.skins && c.skins.find(s => s.id === sid);
+  return skin
+    ? { avatar: skin.avatar || c.avatar, portrait: skin.portrait || c.portrait }
+    : { avatar: c.avatar, portrait: c.portrait };
+};
 function uid(){return 'c_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7)}
 function esc(text){return String(text??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
 function showToast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>el.classList.remove('show'),1800)}
@@ -100,6 +110,16 @@ function replyOptionList(selected) {
             </option>
         `).join('')}
     `;
+}
+
+function commentSkinSelect(authorId, index) {
+  const c = character(authorId);
+  if (!c.skins || !c.skins.length) return '';
+  const current = state.skinMap[authorId] || '';
+  return `<div class="skin-thumb-group comment-skin-group" data-comment-skin="${index}" title="皮肤（全局生效）">
+    <button type="button" class="skin-thumb ${current===''?'active':''}" data-skin="" title="默认"><img src="${c.avatar}" alt=""></button>
+    ${c.skins.map(s => `<button type="button" class="skin-thumb ${s.id===current?'active':''}" data-skin="${s.id}" title="皮肤${s.id.toUpperCase()}"><img src="${s.avatar||c.avatar}" alt=""></button>`).join('')}
+  </div>`;
 }
 
 function normalizeReplyTargets() {
@@ -201,6 +221,7 @@ function renderAuthorCards() {
         );
       });
 
+      renderAuthorSkinPicker();
       renderCommentEditors();
       renderPreview();
     };
@@ -238,6 +259,7 @@ function renderCommentEditors(){
       <select aria-label="评论者" data-comment-author="${index}">
         ${optionList(item.authorId,false,'')}
       </select>
+      ${commentSkinSelect(item.authorId,index)}
       <select aria-label="回复对象" data-comment-reply="${index}">${replyOptionList(item.replyTo)}</select>
     </div>
     <textarea aria-label="评论正文" data-comment-text="${index}" placeholder="输入评论内容……">${esc(item.text)}</textarea>
@@ -290,6 +312,7 @@ function renderCommentEditors(){
       };
   });
   list.querySelectorAll('[data-comment-reply]').forEach(el=>el.onchange=()=>{state.comments[+el.dataset.commentReply].replyTo=el.value;renderPreview()});
+  list.querySelectorAll('[data-comment-skin]').forEach(group=>group.querySelectorAll('[data-skin]').forEach(btn=>btn.onclick=()=>{const i=+group.dataset.commentSkin;const id=state.comments[i].authorId;const v=btn.dataset.skin;if(v)state.skinMap[id]=v;else delete state.skinMap[id];renderAll()}));
   list.querySelectorAll('[data-comment-text]').forEach(el=>el.oninput=()=>{state.comments[+el.dataset.commentText].text=el.value;renderPreview()});
   list.querySelectorAll('[data-comment-time]').forEach(el=>el.oninput=()=>{state.comments[+el.dataset.commentTime].time=el.value;renderPreview()});
   list.querySelectorAll('[data-delete]').forEach(el=>el.onclick=()=>{state.comments.splice(+el.dataset.delete,1);renderAll()});
@@ -331,7 +354,8 @@ function addComment() {
    ========================= */
 function renderPreview(){
   const c=character(state.authorId);
-  $('portrait').src=c.portrait;$('previewAuthor').textContent=c.name;
+  const cs=skinOf(c,state.skinMap);
+  $('portrait').src=cs.portrait;$('previewAuthor').textContent=c.name;
   $('previewContent').textContent = state.content;
   $('previewContent').classList.toggle('collapsed',!!state.collapsed);
   $('expandLink').classList.toggle('hidden',!state.collapsed||!state.content);$('expandLink').textContent='全文';
@@ -342,7 +366,7 @@ function renderPreview(){
   const imageWrap=$('postImageWrap');imageWrap.classList.toggle('hidden',!state.imageData);imageWrap.classList.toggle('cover',state.imageFit==='cover');if(state.imageData)$('postImage').src=state.imageData;
   const comments=$('previewComments');
   if(!state.comments.length){ comments.innerHTML = '' }
-  else comments.innerHTML=state.comments.map((item,index)=>{const a=character(item.authorId);const r=item.replyTo?character(item.replyTo):null;return `<article class="comment-item" data-preview-comment="${index}" title="点击回复 ${a.name}"><div class="avatar-ring"><img src="${a.avatar}" alt="${a.name}"></div><div><div class="comment-author"><span>${a.name}</span>${r?`<span class="reply-label">回复 ${r.name}</span>`:''}</div><div class="comment-time">${esc(item.time||'刚刚')}</div><div class="comment-body">${esc(item.text||'（尚未填写评论）')}</div></div></article>`}).join('');
+  else comments.innerHTML=state.comments.map((item,index)=>{const a=character(item.authorId);const as=skinOf(a,state.skinMap);const r=item.replyTo?character(item.replyTo):null;return `<article class="comment-item" data-preview-comment="${index}" title="点击回复 ${a.name}"><div class="avatar-ring"><img src="${as.avatar}" alt="${a.name}"></div><div><div class="comment-author"><span>${a.name}</span>${r?`<span class="reply-label">回复 ${r.name}</span>`:''}</div><div class="comment-time">${esc(item.time||'刚刚')}</div><div class="comment-body">${esc(item.text||'（尚未填写评论）')}</div></div></article>`}).join('');
   comments.querySelectorAll('[data-preview-comment]').forEach(el=>el.onclick=()=>addReply(+el.dataset.previewComment));
   requestAnimationFrame(()=>$('canvasSize').textContent=`512 × ${$('capture').offsetHeight}px`);
 }
@@ -356,13 +380,59 @@ function syncInputs(){
   document.querySelectorAll('#collapseMode button').forEach(btn=>btn.classList.toggle('active',btn.dataset.value===String(!!state.collapsed)));
   document.querySelectorAll('#imageFit button').forEach(btn=>btn.classList.toggle('active',btn.dataset.value===state.imageFit));
   const has=!!state.imageData;$('uploadBox').classList.toggle('has-image',has);$('uploadPreview').classList.toggle('hidden',!has);$('uploadHint').textContent=has?'点击以替换图片':'点击或拖入图片';$('imageControls').classList.toggle('hidden',!has);if(has)$('uploadPreview').src=state.imageData;
+  const bgSel=$('bgColorSelect');if(bgSel)bgSel.value=state.bgColor||'';
 }
 
 function renderAll(){
   renderAuthorCards();
+  renderAuthorSkinPicker();
   syncInputs();
   renderCommentEditors();
-  renderPreview()
+  renderPreview();
+  applyBgColor();
+}
+
+function renderAuthorSkinPicker() {
+  const box = $('authorSkinPicker');
+  if (!box) return;
+  const c = character(state.authorId);
+  if (!c.skins || !c.skins.length) { box.classList.add('hidden'); box.innerHTML = ''; return; }
+  const current = state.skinMap[state.authorId] || '';
+  box.classList.remove('hidden');
+  box.innerHTML = '<span class="label">皮肤</span><div class="skin-thumb-group">'
+    + [{id:'',avatar:c.avatar}, ...c.skins.map(s => ({id:s.id, avatar:(s.avatar||c.avatar)}))].map(s => `
+      <button type="button" class="skin-thumb ${s.id===current?'active':''}" data-skin="${s.id}" title="${s.id?('皮肤'+s.id.toUpperCase()):'默认'}">
+        <img src="${s.avatar}" alt="">
+      </button>`).join('')
+    + '</div>';
+  box.querySelectorAll('[data-skin]').forEach(btn => btn.onclick = () => {
+    const v = btn.dataset.skin;
+    if (v) state.skinMap[state.authorId] = v; else delete state.skinMap[state.authorId];
+    renderAll();
+  });
+}
+
+function applyBgColor() {
+  const cap = $('capture');
+  if (cap) cap.style.background = state.bgColor || '';
+}
+
+let paletteColors = [];
+async function loadPalette() {
+  try {
+    const res = await fetch('backgrounds/palette.txt');
+    const text = await res.text();
+    paletteColors = text.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#'))
+      .map(l => { const i = l.indexOf('='); return { name: l.slice(0, i).trim(), value: l.slice(i + 1).trim() }; })
+      .filter(c => c.name && /^#[0-9a-fA-F]{6}$/.test(c.value));
+  } catch (e) { paletteColors = []; }
+}
+function renderBgColorSelect() {
+  const sel = $('bgColorSelect');
+  if (!sel) return;
+  sel.innerHTML = '<option value="">纸纹</option>' + paletteColors.map(c => `<option value="${c.value}">${esc(c.name)}</option>`).join('');
+  sel.value = state.bgColor || '';
+  sel.onchange = () => { state.bgColor = sel.value; applyBgColor(); };
 }
 
 function renderCustomCharacterEntry() {
@@ -967,7 +1037,14 @@ function safeState(raw){
   const base=defaultState();
   const authorId=characters.some(c=>c.id===raw.authorId)?raw.authorId:base.authorId;
   const comments=Array.isArray(raw.comments)?raw.comments.slice(0,100).map(item=>({id:String(item.id||uid()),authorId:characters.some(c=>c.id===item.authorId)?item.authorId:characters[0].id,replyTo:characters.some(c=>c.id===item.replyTo)?item.replyTo:'',text:String(item.text||'').slice(0,3000),time:String(item.time||'刚刚').slice(0,30)})):[];
-  return {...base,...raw,authorId,content:String(raw.content||'').slice(0,3000),topic:String(raw.topic||'').slice(0,40),time:String(raw.time||'刚刚').slice(0,30),location:String(raw.location||'').slice(0,40),likes:Math.max(0,Math.min(10000,Number(raw.likes)||0)),collapsed:!!raw.collapsed,imageFit:raw.imageFit==='cover'?'cover':'contain',imageData:typeof raw.imageData==='string'?raw.imageData:'',comments};
+  const skinMapRaw = (raw.skinMap && typeof raw.skinMap === 'object' && !Array.isArray(raw.skinMap)) ? raw.skinMap : {};
+  const skinMap = {};
+  Object.keys(skinMapRaw).forEach(k => {
+    if (characters.some(c => c.id === k) && typeof skinMapRaw[k] === 'string' && /^[a-z]$/.test(skinMapRaw[k])) skinMap[k] = skinMapRaw[k];
+  });
+  const bgColor = typeof raw.bgColor === 'string' && /^#[0-9a-fA-F]{6}$/.test(raw.bgColor) ? raw.bgColor : '';
+  const corner = typeof raw.corner === 'string' ? raw.corner : '';
+  return {...base,...raw,authorId,skinMap,bgColor,corner,content:String(raw.content||'').slice(0,3000),topic:String(raw.topic||'').slice(0,40),time:String(raw.time||'刚刚').slice(0,30),location:String(raw.location||'').slice(0,40),likes:Math.max(0,Math.min(10000,Number(raw.likes)||0)),collapsed:!!raw.collapsed,imageFit:raw.imageFit==='cover'?'cover':'contain',imageData:typeof raw.imageData==='string'?raw.imageData:'',comments};
 }
 function downloadBlob(blob,name){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200)}
 
@@ -1349,7 +1426,9 @@ async function initializeApp() {
     }
   } catch (error) {}
 
+  await loadPalette();
   renderCustomCharacterEntry();
+  renderBgColorSelect();
   renderAll();
 }
 
