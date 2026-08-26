@@ -352,64 +352,138 @@ function addComment() {
 /* =========================
    06. PNG 成图预览
    ========================= */
-function renderPreview(){
-  const c=character(state.authorId);
-  const cs=skinOf(c,state.skinMap);
-  $('portrait').src=cs.portrait;$('previewAuthor').textContent=c.name;
-  $('previewContent').textContent = state.content;
-  $('previewContent').classList.toggle('collapsed',!!state.collapsed);
-  $('expandLink').classList.toggle('hidden',!state.collapsed||!state.content);$('expandLink').textContent='全文';
-  $('previewTopic').textContent=state.topic?`# ${state.topic} #`:'';$('previewTopic').classList.toggle('hidden',!state.topic);
-  $('previewTime').textContent=state.time||'刚刚';$('previewLocation').textContent=state.location;
-  $('locationDot').classList.toggle('hidden',!state.location);$('locationIcon').classList.toggle('hidden',!state.location);$('previewLocation').classList.toggle('hidden',!state.location);
-  $('previewLikes').textContent=Math.max(0,Math.min(10000,Number(state.likes)||0));$('previewCommentCount').textContent=state.comments.length;
-  const imageWrap=$('postImageWrap');imageWrap.classList.toggle('hidden',!state.imageData);imageWrap.classList.toggle('cover',state.imageFit==='cover');if(state.imageData)$('postImage').src=state.imageData;
-  const comments=$('previewComments');
-  if(!state.comments.length){ comments.innerHTML = '' }
-  else comments.innerHTML=state.comments.map((item,index)=>{const a=character(item.authorId);const as=skinOf(a,state.skinMap);const r=item.replyTo?character(item.replyTo):null;return `<article class="comment-item" data-preview-comment="${index}" title="点击回复 ${a.name}"><div class="avatar-ring"><img src="${as.avatar}" alt="${a.name}"></div><div><div class="comment-author"><span>${a.name}</span>${r?`<span class="reply-label">回复 ${r.name}</span>`:''}</div><div class="comment-time">${esc(item.time||'刚刚')}</div><div class="comment-body">${esc(item.text||'（尚未填写评论）')}</div></div></article>`}).join('');
-  comments.querySelectorAll('[data-preview-comment]').forEach(el=>el.onclick=()=>addReply(+el.dataset.previewComment));
-  requestAnimationFrame(()=>$('canvasSize').textContent=`512 × ${$('capture').offsetHeight}px`);
+function renderPreview() {
+    const c = character(state.authorId);
+    const cs = skinOf(c, state.skinMap);
+
+    $('portrait').src = cs.portrait;
+    $('previewAuthor').textContent = c.name;
+
+    $('previewContent').textContent = state.content;
+    $('previewContent').classList.toggle('collapsed', !!state.collapsed);
+
+    $('expandLink').classList.toggle('hidden', !state.collapsed || !state.content);
+    $('expandLink').textContent = '全文';
+
+    $('previewTopic').textContent = state.topic ? `# ${state.topic} #` : '';
+    $('previewTopic').classList.toggle('hidden', !state.topic);
+
+    $('previewTime').textContent = state.time || '刚刚';
+    $('previewLocation').textContent = state.location;
+
+    $('locationDot').classList.toggle('hidden', !state.location);
+    $('locationIcon').classList.toggle('hidden', !state.location);
+    $('previewLocation').classList.toggle('hidden', !state.location);
+
+    $('previewLikes').textContent = Math.max(0, Math.min(10000, Number(state.likes) || 0));
+    $('previewCommentCount').textContent = state.comments.length;
+
+    const imageWrap = $('postImageWrap');
+    imageWrap.classList.toggle('hidden', !state.imageData);
+    imageWrap.classList.toggle('cover', state.imageFit === 'cover');
+    if (state.imageData) $('postImage').src = state.imageData;
+
+    const comments = $('previewComments');
+
+    if (!state.comments.length) {
+        comments.innerHTML = '';
+    } else {
+        comments.innerHTML = state.comments.map((item, index) => {
+            const a = character(item.authorId);
+            const as = skinOf(a, state.skinMap);
+            const r = item.replyTo ? character(item.replyTo) : null;
+            return `<article class="comment-item" data-preview-comment="${index}" title="点击回复 ${a.name}">
+                        <div class="avatar-ring"><img src="${as.avatar}" alt="${a.name}"></div>
+                        <div>
+                            <div class="comment-author"><span>${a.name}</span>${r ? `<span class="reply-label">回复 ${r.name}</span>` : ''}</div>
+                            <div class="comment-time">${esc(item.time || '刚刚')}</div>
+                            <div class="comment-body">${esc(item.text || '（尚未填写评论）')}</div>
+                        </div>
+                    </article>`;
+        }).join('');
+    }
+
+    comments.querySelectorAll('[data-preview-comment]').forEach(el =>
+        el.onclick = () => addReply(+el.dataset.previewComment)
+    );
+
+    requestAnimationFrame(() =>
+        $('canvasSize').textContent = `512 × ${$('capture').offsetHeight}px`
+    );
 }
 
 
 /* =========================
    07. 编辑器状态同步
    ========================= */
-function syncInputs(){
-  $('content').value=state.content;$('topic').value=state.topic;$('time').value=state.time;$('location').value=state.location;$('likes').value=state.likes;
-  document.querySelectorAll('#collapseMode button').forEach(btn=>btn.classList.toggle('active',btn.dataset.value===String(!!state.collapsed)));
-  document.querySelectorAll('#imageFit button').forEach(btn=>btn.classList.toggle('active',btn.dataset.value===state.imageFit));
-  const has=!!state.imageData;$('uploadBox').classList.toggle('has-image',has);$('uploadPreview').classList.toggle('hidden',!has);$('uploadHint').textContent=has?'点击以替换图片':'点击或拖入图片';$('imageControls').classList.toggle('hidden',!has);if(has)$('uploadPreview').src=state.imageData;
-  const bgSel=$('bgColorSelect');if(bgSel)bgSel.value=state.bgColor||'';
+function syncInputs() {
+    $('content').value = state.content;
+    $('topic').value = state.topic;
+    $('time').value = state.time;
+    $('location').value = state.location;
+    $('likes').value = state.likes;
+
+    document.querySelectorAll('#collapseMode button').forEach(btn =>
+        btn.classList.toggle('active', btn.dataset.value === String(!!state.collapsed))
+    );
+    document.querySelectorAll('#imageFit button').forEach(btn =>
+        btn.classList.toggle('active', btn.dataset.value === state.imageFit)
+    );
+
+    const has = !!state.imageData;
+    $('uploadBox').classList.toggle('has-image', has);
+    $('uploadPreview').classList.toggle('hidden', !has);
+    $('uploadHint').textContent = has ? '点击以替换图片' : '点击或拖入图片';
+    $('imageControls').classList.toggle('hidden', !has);
+    if (has) $('uploadPreview').src = state.imageData;
+
+    const bgSel = $('bgColorSelect');
+    if (bgSel) bgSel.value = state.bgColor || '';
 }
 
-function renderAll(){
-  renderAuthorCards();
-  renderAuthorSkinPicker();
-  syncInputs();
-  renderCommentEditors();
-  renderPreview();
-  applyBgColor();
+function renderAll() {
+    renderAuthorCards();
+    renderAuthorSkinPicker();
+    syncInputs();
+    renderCommentEditors();
+    renderPreview();
+    applyBgColor();
 }
 
 function renderAuthorSkinPicker() {
-  const box = $('authorSkinPicker');
-  if (!box) return;
-  const c = character(state.authorId);
-  if (!c.skins || !c.skins.length) { box.classList.add('hidden'); box.innerHTML = ''; return; }
-  const current = state.skinMap[state.authorId] || '';
-  box.classList.remove('hidden');
-  box.innerHTML = '<span class="label">皮肤</span><div class="skin-thumb-group">'
-    + [{id:'',avatar:c.avatar}, ...c.skins.map(s => ({id:s.id, avatar:(s.avatar||c.avatar)}))].map(s => `
-      <button type="button" class="skin-thumb ${s.id===current?'active':''}" data-skin="${s.id}" title="${s.id?('皮肤'+s.id.toUpperCase()):'默认'}">
-        <img src="${s.avatar}" alt="">
-      </button>`).join('')
-    + '</div>';
-  box.querySelectorAll('[data-skin]').forEach(btn => btn.onclick = () => {
-    const v = btn.dataset.skin;
-    if (v) state.skinMap[state.authorId] = v; else delete state.skinMap[state.authorId];
-    renderAll();
-  });
+    const box = $('authorSkinPicker');
+    if (!box) return;
+
+    const c = character(state.authorId);
+    if (!c.skins || !c.skins.length) {
+        box.classList.add('hidden');
+        box.innerHTML = '';
+        return;
+    }
+
+    const current = state.skinMap[state.authorId] || '';
+    box.classList.remove('hidden');
+
+    const skinItems = [{ id: '', avatar: c.avatar }, ...c.skins.map(s => ({ id: s.id, avatar: (s.avatar || c.avatar) }))];
+    box.innerHTML = '<span class="label">皮肤</span><div class="skin-thumb-group">' +
+        skinItems.map(s => `
+            <button type="button" class="skin-thumb ${s.id === current ? 'active' : ''}" data-skin="${s.id}" title="${s.id ? ('皮肤' + s.id.toUpperCase()) : '默认'}">
+                <img src="${s.avatar}" alt="">
+            </button>
+        `).join('') +
+        '</div>';
+
+    box.querySelectorAll('[data-skin]').forEach(btn => {
+        btn.onclick = () => {
+            const v = btn.dataset.skin;
+            if (v) {
+                state.skinMap[state.authorId] = v;
+            } else {
+                delete state.skinMap[state.authorId];
+            }
+            renderAll();
+        };
+    });
 }
 
 function applyBgColor() {
@@ -418,21 +492,34 @@ function applyBgColor() {
 }
 
 let paletteColors = [];
+
 async function loadPalette() {
   try {
     const res = await fetch('backgrounds/palette.txt');
     const text = await res.text();
-    paletteColors = text.split(/\r?\n/).map(l => l.trim()).filter(l => l && !l.startsWith('#'))
-      .map(l => { const i = l.indexOf('='); return { name: l.slice(0, i).trim(), value: l.slice(i + 1).trim() }; })
+    paletteColors = text.split(/\r?\n/)
+      .map(l => l.trim())
+      .filter(l => l && !l.startsWith('#'))
+      .map(l => {
+        const i = l.indexOf('=');
+        return { name: l.slice(0, i).trim(), value: l.slice(i + 1).trim() };
+      })
       .filter(c => c.name && /^#[0-9a-fA-F]{6}$/.test(c.value));
-  } catch (e) { paletteColors = []; }
+  } catch (e) {
+    paletteColors = [];
+  }
 }
+
 function renderBgColorSelect() {
   const sel = $('bgColorSelect');
   if (!sel) return;
-  sel.innerHTML = '<option value="">纸纹</option>' + paletteColors.map(c => `<option value="${c.value}">${esc(c.name)}</option>`).join('');
+  sel.innerHTML = '<option value="">纸纹</option>' +
+    paletteColors.map(c => `<option value="${c.value}">${esc(c.name)}</option>`).join('');
   sel.value = state.bgColor || '';
-  sel.onchange = () => { state.bgColor = sel.value; applyBgColor(); };
+  sel.onchange = () => {
+    state.bgColor = sel.value;
+    applyBgColor();
+  };
 }
 
 function renderCustomCharacterEntry() {
@@ -1027,62 +1114,233 @@ function cancelCustomCrop() {
 /* =========================
    08. 图片、工程校验与下载
    ========================= */
-function readImage(file){
-  if(!file||!file.type.startsWith('image/'))return;
-  if(file.size>12*1024*1024){showToast('图片请控制在 12MB 以内');return}
-  const reader=new FileReader();reader.onload=()=>{state.imageData=reader.result;renderAll();showToast('配图已载入')};reader.readAsDataURL(file);
+function readImage(file) {
+    if (!file || !file.type.startsWith('image/')) return;
+    if (file.size > 12 * 1024 * 1024) {
+        showToast('图片请控制在 12MB 以内');
+        return;
+    }
+    const reader = new FileReader();
+    reader.onload = () => {
+        state.imageData = reader.result;
+        renderAll();
+        showToast('配图已载入');
+    };
+    reader.readAsDataURL(file);
 }
-function safeState(raw){
-  if(!raw||typeof raw!=='object')throw new Error('工程数据格式不正确');
-  const base=defaultState();
-  const authorId=characters.some(c=>c.id===raw.authorId)?raw.authorId:base.authorId;
-  const comments=Array.isArray(raw.comments)?raw.comments.slice(0,100).map(item=>({id:String(item.id||uid()),authorId:characters.some(c=>c.id===item.authorId)?item.authorId:characters[0].id,replyTo:characters.some(c=>c.id===item.replyTo)?item.replyTo:'',text:String(item.text||'').slice(0,3000),time:String(item.time||'刚刚').slice(0,30)})):[];
-  const skinMapRaw = (raw.skinMap && typeof raw.skinMap === 'object' && !Array.isArray(raw.skinMap)) ? raw.skinMap : {};
-  const skinMap = {};
-  Object.keys(skinMapRaw).forEach(k => {
-    if (characters.some(c => c.id === k) && typeof skinMapRaw[k] === 'string' && /^[a-z]$/.test(skinMapRaw[k])) skinMap[k] = skinMapRaw[k];
-  });
-  const bgColor = typeof raw.bgColor === 'string' && /^#[0-9a-fA-F]{6}$/.test(raw.bgColor) ? raw.bgColor : '';
-  const corner = typeof raw.corner === 'string' ? raw.corner : '';
-  return {...base,...raw,authorId,skinMap,bgColor,corner,content:String(raw.content||'').slice(0,3000),topic:String(raw.topic||'').slice(0,40),time:String(raw.time||'刚刚').slice(0,30),location:String(raw.location||'').slice(0,40),likes:Math.max(0,Math.min(10000,Number(raw.likes)||0)),collapsed:!!raw.collapsed,imageFit:raw.imageFit==='cover'?'cover':'contain',imageData:typeof raw.imageData==='string'?raw.imageData:'',comments};
+
+function safeState(raw) {
+    if (!raw || typeof raw !== 'object') throw new Error('工程数据格式不正确');
+    const base = defaultState();
+    const authorId = characters.some(c => c.id === raw.authorId) ? raw.authorId : base.authorId;
+    const comments = Array.isArray(raw.comments)
+        ? raw.comments.slice(0, 100).map(item => ({
+            id: String(item.id || uid()),
+            authorId: characters.some(c => c.id === item.authorId) ? item.authorId : characters[0].id,
+            replyTo: characters.some(c => c.id === item.replyTo) ? item.replyTo : '',
+            text: String(item.text || '').slice(0, 3000),
+            time: String(item.time || '刚刚').slice(0, 30)
+        }))
+        : [];
+    const skinMapRaw = (raw.skinMap && typeof raw.skinMap === 'object' && !Array.isArray(raw.skinMap))
+        ? raw.skinMap
+        : {};
+    const skinMap = {};
+    Object.keys(skinMapRaw).forEach(k => {
+        if (characters.some(c => c.id === k) && typeof skinMapRaw[k] === 'string' && /^[a-z]$/.test(skinMapRaw[k])) {
+            skinMap[k] = skinMapRaw[k];
+        }
+    });
+    const bgColor = typeof raw.bgColor === 'string' && /^#[0-9a-fA-F]{6}$/.test(raw.bgColor)
+        ? raw.bgColor
+        : '';
+    const corner = typeof raw.corner === 'string' ? raw.corner : '';
+    return {
+        ...base,
+        ...raw,
+        authorId,
+        skinMap,
+        bgColor,
+        corner,
+        content: String(raw.content || '').slice(0, 3000),
+        topic: String(raw.topic || '').slice(0, 40),
+        time: String(raw.time || '刚刚').slice(0, 30),
+        location: String(raw.location || '').slice(0, 40),
+        likes: Math.max(0, Math.min(10000, Number(raw.likes) || 0)),
+        collapsed: !!raw.collapsed,
+        imageFit: raw.imageFit === 'cover' ? 'cover' : 'contain',
+        imageData: typeof raw.imageData === 'string' ? raw.imageData : '',
+        comments
+    };
 }
-function downloadBlob(blob,name){const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=name;document.body.appendChild(a);a.click();a.remove();setTimeout(()=>URL.revokeObjectURL(url),1200)}
+
+function downloadBlob(blob, name) {
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = name;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1200);
+}
 
 
 /* =========================
    09. 控件事件绑定
    ========================= */
-$('content').oninput=e=>{state.content=e.target.value;renderPreview()};
-$('topic').oninput=e=>{state.topic=e.target.value.replace(/^#+|#+$/g,'').trim();renderPreview()};
-$('time').oninput=e=>{state.time=e.target.value;renderPreview()};
-$('location').oninput=e=>{state.location=e.target.value;renderPreview()};
-$('likes').oninput=e=>{state.likes=Math.max(0,Math.min(10000,Number(e.target.value)||0));renderPreview()};
-$('collapseMode').onclick=e=>{if(!e.target.dataset.value)return;state.collapsed=e.target.dataset.value==='true';syncInputs();renderPreview()};
-$('imageFit').onclick=e=>{if(!e.target.dataset.value)return;state.imageFit=e.target.dataset.value;syncInputs();renderPreview()};
-$('imageInput').onchange=e=>readImage(e.target.files[0]);
-$('removeImage').onclick=()=>{state.imageData='';$('imageInput').value='';renderAll()};
+$('content').oninput = e => {
+    state.content = e.target.value;
+    renderPreview();
+};
+
+$('topic').oninput = e => {
+    state.topic = e.target.value.replace(/^#+|#+$/g, '').trim();
+    renderPreview();
+};
+
+$('time').oninput = e => {
+    state.time = e.target.value;
+    renderPreview();
+};
+
+$('location').oninput = e => {
+    state.location = e.target.value;
+    renderPreview();
+};
+
+$('likes').oninput = e => {
+    state.likes = Math.max(0, Math.min(10000, Number(e.target.value) || 0));
+    renderPreview();
+};
+
+$('collapseMode').onclick = e => {
+    if (!e.target.dataset.value) return;
+    state.collapsed = e.target.dataset.value === 'true';
+    syncInputs();
+    renderPreview();
+};
+
+$('imageFit').onclick = e => {
+    if (!e.target.dataset.value) return;
+    state.imageFit = e.target.dataset.value;
+    syncInputs();
+    renderPreview();
+};
+
+$('imageInput').onchange = e => readImage(e.target.files[0]);
+
+$('removeImage').onclick = () => {
+    state.imageData = '';
+    $('imageInput').value = '';
+    renderAll();
+};
+
 $('addComment').onclick = addComment;
+
 document.querySelector('.post').onclick = e => {
-  if (e.target.closest('#expandLink')) return;
-  addComment();
+    if (e.target.closest('#expandLink')) return;
+    addComment();
 };
-$('expandLink').onclick=()=>{state.collapsed=false;syncInputs();renderPreview()};
-$('saveDraft').onclick=()=>{try{localStorage.setItem('zhijiao-draft-v1',JSON.stringify(state));showToast('草稿已保存')}catch(e){showToast('图片过大，浏览器无法保存草稿')}};
-$('exportProject').onclick=()=>{downloadBlob(new Blob([JSON.stringify(state,null,2)],{type:'application/json'}),`知交圈工程-${character(state.authorId).name}.zhijiao`);showToast('工程文件已导出')};
-$('importProject').onclick=()=>$('projectFile').click();
-$('projectFile').onchange=e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{state=safeState(JSON.parse(reader.result));renderAll();showToast('工程已恢复')}catch(err){showToast(err.message||'无法读取工程文件')}};reader.readAsText(file,'utf-8');e.target.value=''};
-$('newProject').onclick = () => { if (!confirm('确定清空当前内容并新建吗？已保存的浏览器草稿不会被删除。')) return; state = blankState();renderAll();showToast('已新建空白作品')};
-let exportFormat='png';
-$('exportFormat').onclick=e=>{if(!e.target.dataset.value)return;exportFormat=e.target.dataset.value;document.querySelectorAll('#exportFormat button').forEach(btn=>btn.classList.toggle('active',btn.dataset.value===exportFormat))};
-$('exportPng').onclick=async()=>{
-  const button=$('exportPng');const old=button.textContent;button.disabled=true;button.textContent='正在生成…';
-  try{await document.fonts.ready;const canvas=await html2canvas($('capture'),{scale:3,useCORS:true,backgroundColor:null,logging:false,imageTimeout:0});const isJpg=exportFormat==='jpg';canvas.toBlob(blob=>{if(blob){downloadBlob(blob,`知交圈-${character(state.authorId).name}.${isJpg?'jpg':'png'}`);showToast(isJpg?'高清 JPG 已导出':'高清 PNG 已导出')}},isJpg?'image/jpeg':'image/png',isJpg?0.92:undefined)}
-  catch(e){showToast('导出失败，请用浏览器方式打开后重试')}
-  finally{button.disabled=false;button.textContent=old}
+
+$('expandLink').onclick = () => {
+    state.collapsed = false;
+    syncInputs();
+    renderPreview();
 };
+
+$('saveDraft').onclick = () => {
+    try {
+        localStorage.setItem('zhijiao-draft-v1', JSON.stringify(state));
+        showToast('草稿已保存');
+    } catch (e) {
+        showToast('图片过大，浏览器无法保存草稿');
+    }
+};
+
+$('exportProject').onclick = () => {
+    downloadBlob(
+        new Blob([JSON.stringify(state, null, 2)], { type: 'application/json' }),
+        `知交圈工程-${character(state.authorId).name}.zhijiao`
+    );
+    showToast('工程文件已导出');
+};
+
+$('importProject').onclick = () => $('projectFile').click();
+
+$('projectFile').onchange = e => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+        try {
+            state = safeState(JSON.parse(reader.result));
+            renderAll();
+            showToast('工程已恢复');
+        } catch (err) {
+            showToast(err.message || '无法读取工程文件');
+        }
+    };
+    reader.readAsText(file, 'utf-8');
+    e.target.value = '';
+};
+
+$('newProject').onclick = () => {
+    if (!confirm('确定清空当前内容并新建吗？已保存的浏览器草稿不会被删除。')) return;
+    state = blankState();
+    renderAll();
+    showToast('已新建空白作品');
+};
+
+let exportFormat = 'png';
+
+$('exportFormat').onclick = e => {
+    if (!e.target.dataset.value) return;
+    exportFormat = e.target.dataset.value;
+    document.querySelectorAll('#exportFormat button').forEach(btn =>
+        btn.classList.toggle('active', btn.dataset.value === exportFormat)
+    );
+};
+
+$('exportPng').onclick = async () => {
+    const button = $('exportPng');
+    const old = button.textContent;
+    button.disabled = true;
+    button.textContent = '正在生成…';
+    try {
+        await document.fonts.ready;
+        const canvas = await html2canvas($('capture'), {
+            scale: 3,
+            useCORS: true,
+            backgroundColor: null,
+            logging: false,
+            imageTimeout: 0
+        });
+        const isJpg = exportFormat === 'jpg';
+        canvas.toBlob(
+            blob => {
+                if (blob) {
+                    downloadBlob(
+                        blob,
+                        `知交圈-${character(state.authorId).name}.${isJpg ? 'jpg' : 'png'}`
+                    );
+                    showToast(isJpg ? '高清 JPG 已导出' : '高清 PNG 已导出');
+                }
+            },
+            isJpg ? 'image/jpeg' : 'image/png',
+            isJpg ? 0.92 : undefined
+        );
+    } catch (e) {
+        showToast('导出失败，请用浏览器方式打开后重试');
+    } finally {
+        button.disabled = false;
+        button.textContent = old;
+    }
+};
+
 $('characterSearch').oninput = e => {
-      characterQuery = e.target.value;
-      renderAuthorCards();
+    characterQuery = e.target.value;
+    renderAuthorCards();
 };
 
 $('openCustomCharacterDialog').onclick = () => {
