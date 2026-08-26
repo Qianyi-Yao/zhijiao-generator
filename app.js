@@ -81,7 +81,7 @@ function optionList(selected, allowEmpty, label) {
 function getReplyCandidates() {
     const ids = [...new Set(
         state.comments.map(item => item.authorId)
-    )].filter(id => id && id !== state.authorId);
+    )].filter(Boolean);
 
     return ids.map(id => character(id));
 }
@@ -239,7 +239,6 @@ function renderCommentEditors(){
         ${optionList(item.authorId,false,'')}
       </select>
       <select aria-label="回复对象" data-comment-reply="${index}">${replyOptionList(item.replyTo)}</select>
-      </select>
     </div>
     <textarea aria-label="评论正文" data-comment-text="${index}" placeholder="输入评论内容……">${esc(item.text)}</textarea>
     <div class="field" style="margin-top:7px"><input type="text" aria-label="评论时间" data-comment-time="${index}" value="${esc(item.time||'')}" placeholder="刚刚" /></div>
@@ -996,9 +995,11 @@ $('exportProject').onclick=()=>{downloadBlob(new Blob([JSON.stringify(state,null
 $('importProject').onclick=()=>$('projectFile').click();
 $('projectFile').onchange=e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{state=safeState(JSON.parse(reader.result));renderAll();showToast('工程已恢复')}catch(err){showToast(err.message||'无法读取工程文件')}};reader.readAsText(file,'utf-8');e.target.value=''};
 $('newProject').onclick = () => { if (!confirm('确定清空当前内容并新建吗？已保存的浏览器草稿不会被删除。')) return; state = blankState();renderAll();showToast('已新建空白作品')};
+let exportFormat='png';
+$('exportFormat').onclick=e=>{if(!e.target.dataset.value)return;exportFormat=e.target.dataset.value;document.querySelectorAll('#exportFormat button').forEach(btn=>btn.classList.toggle('active',btn.dataset.value===exportFormat))};
 $('exportPng').onclick=async()=>{
   const button=$('exportPng');const old=button.textContent;button.disabled=true;button.textContent='正在生成…';
-  try{await document.fonts.ready;const canvas=await html2canvas($('capture'),{scale:3,useCORS:true,backgroundColor:null,logging:false,imageTimeout:0});canvas.toBlob(blob=>{if(blob){downloadBlob(blob,`知交圈-${character(state.authorId).name}.png`);showToast('高清 PNG 已导出')}},'image/png')}
+  try{await document.fonts.ready;const canvas=await html2canvas($('capture'),{scale:3,useCORS:true,backgroundColor:null,logging:false,imageTimeout:0});const isJpg=exportFormat==='jpg';canvas.toBlob(blob=>{if(blob){downloadBlob(blob,`知交圈-${character(state.authorId).name}.${isJpg?'jpg':'png'}`);showToast(isJpg?'高清 JPG 已导出':'高清 PNG 已导出')}},isJpg?'image/jpeg':'image/png',isJpg?0.92:undefined)}
   catch(e){showToast('导出失败，请用浏览器方式打开后重试')}
   finally{button.disabled=false;button.textContent=old}
 };

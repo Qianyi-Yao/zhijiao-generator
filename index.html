@@ -6,7 +6,7 @@
   <title>知交圈生成器｜忘川风华录知交圈图片制作工具</title>
   <meta
     name="description"
-    content="玩家自制的忘川风华录知交圈生成器，可选择人物、编辑主帖与评论、设置回复关系并导出PNG图片。"
+    content="玩家自制的忘川风华录知交圈生成器，可选择人物、编辑主帖与评论、设置回复关系并导出图片。"
   >
   <meta name="robots" content="index, follow">
   <meta name="google-site-verification" content="sEt94-DiuXia6HsTJDsZnHEGuqFOovivbnhlL562dAg" />
@@ -17,6 +17,14 @@
     rel="canonical"
     href="https://zhijiao-generator-zhijiao-generator-d3drf17e2a3e78.webapps.tcloudbase.com/"
   >
+  <link rel="icon" type="image/png" href="ui/zhijiaoquan-icon.png" />
+  <meta property="og:title" content="知交圈生成器｜忘川风华录知交圈图片制作工具" />
+  <meta property="og:description" content="玩家自制的忘川风华录知交圈生成器，可选择人物、编辑主帖与评论、设置回复关系并导出图片。" />
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://zhijiao-generator-zhijiao-generator-d3drf17e2a3e78.webapps.tcloudbase.com/" />
+  <meta property="og:image" content="https://zhijiao-generator-zhijiao-generator-d3drf17e2a3e78.webapps.tcloudbase.com/ui/example.png" />
+  <meta property="og:site_name" content="知交圈生成器" />
+  <meta property="og:locale" content="zh_CN" />
 </head>
 <body>
   <div class="app">
@@ -30,12 +38,16 @@
           <h1>知交圈生成器</h1>
           <p class="brand-note">选择人物，写下一则属于他们的知交圈。</p>
         </div>
-        <span class="version">第一版</span>
+        <span class="version">v1.1.1</span>
       </header>
 
       <!-- 工程操作工具栏 -->
       <div class="toolbar">
-        <button class="btn primary" id="exportPng">导出 PNG</button>
+        <div class="segmented" id="exportFormat" style="margin:0">
+          <button type="button" data-value="png" class="active">PNG</button>
+          <button type="button" data-value="jpg">JPG</button>
+        </div>
+        <button class="btn primary" id="exportPng">导出图片</button>
         <button class="btn" id="saveDraft">保存草稿</button>
         <button class="btn" id="exportProject">导出工程</button>
         <button class="btn" id="importProject">导入工程</button>

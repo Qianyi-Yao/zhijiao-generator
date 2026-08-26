@@ -161,5 +161,6 @@ const characters = [
   {id:"qilin",cardId:2500,name:"麒麟",dynasty:"不详",rarity:"天",role:"不详",avatar:"avatars/qilin_a.png",portrait:"portraits/qilin_a.png"},
   {id:"liuma",cardId:2669,name:"流马",dynasty:"不详",rarity:"黄",role:"不详",avatar:"avatars/liuma_a.png",portrait:"portraits/liuma_a.png"},
   {id:"muniu",cardId:2769,name:"木牛",dynasty:"不详",rarity:"黄",role:"不详",avatar:"avatars/muniu_a.png",portrait:"portraits/muniu_a.png"},
-  {id:"zhuqiyu",cardId:2587,name:"朱祁钰",dynasty:"明",rarity:"地",role:"辅助",avatar:"avatars/zhuqiyu_a.png",portrait:"portraits/zhuqiyu_a.png"}
+  {id:"zhuqiyu",cardId:2587,name:"朱祁钰",dynasty:"明",rarity:"地",role:"辅助",avatar:"avatars/zhuqiyu_a.png",portrait:"portraits/zhuqiyu_a.png"},
+  {id:"bage",cardId:5045,name:"小芳",dynasty:"唐",rarity:"黄",role:"输出",avatar:"avatars/bage_a.png",portrait:"portraits/bage_a.png"}
 ];
