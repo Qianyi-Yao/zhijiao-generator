@@ -50099,7 +50099,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -50131,7 +50131,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -50235,7 +50235,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50251,7 +50251,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -50259,7 +50259,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -50267,7 +50267,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -50275,7 +50275,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50283,7 +50283,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50291,7 +50291,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50299,7 +50299,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50315,7 +50315,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50331,7 +50331,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -50339,7 +50339,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -50347,7 +50347,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -50355,7 +50355,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50363,7 +50363,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50371,7 +50371,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50387,7 +50387,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             }
           ],
@@ -50455,7 +50455,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -50511,7 +50511,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50527,7 +50527,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50543,7 +50543,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -50551,7 +50551,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -50567,11 +50567,19 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
-              "text": "破军杀将之符，长九寸；",
+              "text": "破军杀将之符，长九寸",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "；",
               "bold": false,
               "italic": false,
               "strike": false,
@@ -50583,7 +50591,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -50591,7 +50599,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -50599,7 +50607,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -50607,7 +50615,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -50615,7 +50623,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -50623,7 +50631,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50631,7 +50639,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50639,7 +50647,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50647,7 +50655,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50655,7 +50663,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50663,7 +50671,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50679,7 +50687,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50687,7 +50695,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50695,7 +50703,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50703,7 +50711,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50711,7 +50719,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50727,7 +50735,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50735,7 +50743,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50743,7 +50751,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -50751,7 +50759,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50759,7 +50767,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50767,7 +50775,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -50775,7 +50783,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -50783,7 +50791,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             }
           ],
@@ -50860,7 +50868,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -50940,7 +50948,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -50956,7 +50964,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -50980,7 +50988,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -50996,7 +51004,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51012,7 +51020,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51028,7 +51036,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -51036,7 +51044,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51052,7 +51060,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51068,7 +51076,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51076,7 +51084,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51092,7 +51100,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51100,7 +51108,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51108,7 +51116,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51116,7 +51124,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51124,7 +51132,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51132,7 +51140,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51140,7 +51148,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -51148,7 +51156,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51156,7 +51164,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51164,7 +51172,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             }
           ],
@@ -51179,7 +51187,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51195,7 +51203,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51211,7 +51219,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -51219,7 +51227,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51235,7 +51243,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51251,7 +51259,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51267,7 +51275,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51275,7 +51283,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51283,7 +51291,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51299,7 +51307,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51315,7 +51323,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51323,7 +51331,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -51331,7 +51339,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51339,7 +51347,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51355,7 +51363,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51363,7 +51371,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -51371,7 +51379,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51387,7 +51395,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51403,7 +51411,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51411,7 +51419,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -51419,7 +51427,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51435,7 +51443,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51443,7 +51451,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51451,7 +51459,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51467,7 +51475,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             }
           ],
@@ -51519,7 +51527,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -51535,7 +51543,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -51551,7 +51559,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -51615,7 +51623,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51623,7 +51631,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51639,7 +51647,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51647,7 +51655,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -51655,7 +51663,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51663,7 +51671,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51671,7 +51679,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51679,7 +51687,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51687,7 +51695,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51695,7 +51703,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51703,7 +51711,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51711,7 +51719,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51727,7 +51735,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51743,7 +51751,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -51751,7 +51759,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51759,7 +51767,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51767,7 +51775,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51775,7 +51783,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51783,7 +51791,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51791,7 +51799,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51799,7 +51807,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51807,7 +51815,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51815,7 +51823,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51831,7 +51839,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51847,7 +51855,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -51855,7 +51863,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51863,7 +51871,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51871,7 +51879,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51879,7 +51887,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51887,7 +51895,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51895,7 +51903,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51903,7 +51911,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51919,7 +51927,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -51935,7 +51943,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -51943,7 +51951,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -51951,7 +51959,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             }
           ],
@@ -51986,7 +51994,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -52026,7 +52034,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -52042,7 +52050,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -52082,7 +52090,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52098,7 +52106,7 @@
               "bold": true,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52106,7 +52114,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52122,7 +52130,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -52130,7 +52138,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -52138,7 +52146,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52146,7 +52154,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52162,7 +52170,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52170,7 +52178,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52178,7 +52186,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52186,7 +52194,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52194,7 +52202,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52202,7 +52210,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52210,7 +52218,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52226,7 +52234,7 @@
               "bold": true,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52234,7 +52242,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52250,7 +52258,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -52266,7 +52274,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -52274,7 +52282,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52282,7 +52290,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52298,7 +52306,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52306,7 +52314,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -52314,7 +52322,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             }
           ],
@@ -52329,7 +52337,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52345,7 +52353,7 @@
               "bold": true,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52353,7 +52361,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52361,7 +52369,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52377,7 +52385,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -52385,7 +52393,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -52393,7 +52401,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -52401,7 +52409,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52409,7 +52417,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52425,7 +52433,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52441,7 +52449,7 @@
               "bold": true,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52449,7 +52457,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52465,7 +52473,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -52473,7 +52481,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -52481,7 +52489,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -52489,7 +52497,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52497,7 +52505,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52513,7 +52521,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52521,7 +52529,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52529,7 +52537,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52537,7 +52545,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -52545,7 +52553,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             }
           ],
@@ -52588,7 +52596,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -52636,7 +52644,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -52700,7 +52708,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -52740,7 +52748,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -52748,7 +52756,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -52756,7 +52764,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -52764,7 +52772,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -52832,7 +52840,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52840,7 +52848,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52856,7 +52864,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -52864,7 +52872,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -52872,7 +52880,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -52880,7 +52888,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52888,7 +52896,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52896,7 +52904,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -52904,7 +52912,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52912,7 +52920,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52920,7 +52928,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52928,7 +52936,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52936,7 +52944,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52944,7 +52952,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52952,7 +52960,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52960,7 +52968,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52968,7 +52976,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52976,7 +52984,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -52984,7 +52992,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -52992,7 +53000,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53000,7 +53008,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53008,7 +53016,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53016,7 +53024,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53024,7 +53032,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53032,7 +53040,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53040,7 +53048,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53048,7 +53056,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53056,7 +53064,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -53064,7 +53072,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53072,7 +53080,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53080,7 +53088,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -53088,7 +53096,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -53096,7 +53104,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -53104,7 +53112,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53120,7 +53128,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53136,7 +53144,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -53144,7 +53152,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -53152,7 +53160,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -53160,7 +53168,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53168,7 +53176,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53176,7 +53184,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53184,7 +53192,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53192,7 +53200,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53200,7 +53208,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53216,7 +53224,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53232,7 +53240,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53240,7 +53248,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53248,7 +53256,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53256,7 +53264,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53264,7 +53272,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53272,7 +53280,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53280,7 +53288,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53288,7 +53296,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -53296,7 +53304,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -53304,7 +53312,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -53312,7 +53320,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53328,7 +53336,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53344,7 +53352,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53352,7 +53360,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53360,7 +53368,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53368,7 +53376,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -53384,7 +53392,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -53392,7 +53400,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -53400,7 +53408,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             }
           ],
@@ -53447,7 +53455,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53463,7 +53471,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53471,7 +53479,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -53479,7 +53487,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53487,7 +53495,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53495,7 +53503,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53503,7 +53511,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53511,7 +53519,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53519,7 +53527,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53535,7 +53543,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53551,7 +53559,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53559,7 +53567,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -53567,7 +53575,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53575,7 +53583,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53583,7 +53591,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53591,7 +53599,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53607,7 +53615,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53623,7 +53631,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -53631,7 +53639,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -53639,7 +53647,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53655,23 +53663,15 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
-              "font": "方正楷体简体"
-            },
-            {
-              "text": "坐以笏击其仆，误折其齿罢",
-              "bold": false,
-              "italic": false,
-              "strike": false,
               "color": null,
               "font": "方正楷体简体"
             },
             {
-              "text": "。",
+              "text": "坐以笏击其仆，误折其齿罢。",
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -53679,7 +53679,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53695,7 +53695,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53711,7 +53711,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53719,7 +53719,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53731,7 +53731,15 @@
               "font": null
             },
             {
-              "text": "欧阳公在翰林时，常与同院出游。有奔马毙犬，",
+              "text": "欧阳公在翰林时，常与同院出游。有奔马毙犬",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "，",
               "bold": false,
               "italic": false,
               "strike": false,
@@ -53743,7 +53751,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -53751,7 +53759,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -53759,7 +53767,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -53767,7 +53775,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53775,7 +53783,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53783,7 +53791,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53791,7 +53799,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53799,7 +53807,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53807,7 +53815,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             }
           ],
@@ -53850,7 +53858,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53866,7 +53874,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -53882,7 +53890,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -53890,7 +53898,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -53898,7 +53906,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53914,7 +53922,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53930,7 +53938,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -53938,7 +53946,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -53954,7 +53962,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -53962,7 +53970,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53970,7 +53978,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -53986,7 +53994,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -54002,7 +54010,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -54010,7 +54018,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -54018,7 +54026,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -54026,7 +54034,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -54042,7 +54050,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -54365,7 +54373,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -54397,7 +54405,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -54446,7 +54454,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -54526,7 +54534,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -54534,7 +54542,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -54542,7 +54550,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -54550,7 +54558,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -54558,7 +54566,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -54582,7 +54590,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -54598,7 +54606,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -54614,7 +54622,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -54622,7 +54630,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -54630,7 +54638,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -54694,7 +54702,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -54710,11 +54718,19 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
-              "text": "天子不可强为，必先知道。",
+              "text": "天子不可强为，必先知道",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "。",
               "bold": false,
               "italic": false,
               "strike": false,
@@ -54726,7 +54742,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -54912,7 +54928,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -55000,7 +55016,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -55072,7 +55088,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55088,7 +55104,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -55096,7 +55112,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -55104,7 +55120,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -55112,7 +55128,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55120,7 +55136,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55128,7 +55144,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55144,7 +55160,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55160,7 +55176,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -55168,7 +55184,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -55207,7 +55223,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55223,7 +55239,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55239,7 +55255,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -55247,7 +55263,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -55287,7 +55303,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55303,7 +55319,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55311,7 +55327,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -55319,7 +55335,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55335,7 +55351,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55351,7 +55367,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55359,7 +55375,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -55367,7 +55383,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55375,7 +55391,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -55383,7 +55399,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -55391,7 +55407,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -55407,7 +55423,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55423,7 +55439,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -55431,7 +55447,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -55439,7 +55455,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -55455,7 +55471,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -55463,7 +55479,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55471,7 +55487,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55479,7 +55495,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55487,7 +55503,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55495,7 +55511,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55503,7 +55519,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55519,7 +55535,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -55527,7 +55543,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55586,7 +55602,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -55594,7 +55610,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -55602,7 +55618,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -55610,7 +55626,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -55618,7 +55634,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -55634,7 +55650,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -55726,19 +55742,11 @@
               "font": "方正楷体简体"
             },
             {
-              "text": "凶年粟少，可以当食",
+              "text": "凶年粟少，可以当食。",
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
-              "font": "方正楷体简体"
-            },
-            {
-              "text": "。",
-              "bold": false,
-              "italic": false,
-              "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -55810,7 +55818,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -55858,7 +55866,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -55914,7 +55922,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -55930,7 +55938,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -55938,7 +55946,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -55946,7 +55954,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -56010,7 +56018,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -56018,7 +56026,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -56026,7 +56034,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             }
           ],
@@ -56086,7 +56094,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -56222,7 +56230,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -56246,7 +56254,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -56374,7 +56382,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -56455,7 +56463,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": null
             },
             {
@@ -56479,7 +56487,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -56495,7 +56503,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -56503,7 +56511,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": null,
+              "color": "#00B050",
               "font": "方正楷体简体"
             },
             {
@@ -56511,7 +56519,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": "方正楷体简体"
             },
             {
@@ -56519,7 +56527,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -56527,7 +56535,7 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             },
             {
@@ -56543,12 +56551,2645 @@
               "bold": false,
               "italic": false,
               "strike": false,
-              "color": "#002060",
+              "color": null,
               "font": null
             }
           ],
           "images": [
             "images/816_p21_1.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-08-23-1",
+      "title": "关于茶与鸭",
+      "date_start": "2026-08-23",
+      "date_end": "2026-08-29",
+      "episode": 823,
+      "characters": [],
+      "paragraphs": [
+        {
+          "runs": [
+            {
+              "text": "先讲讲雪梨无花果和陈皮乌梅：",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "雪梨",
+              "bold": true,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "&",
+              "bold": true,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "无花果",
+              "bold": true,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "首先是",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "“",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "雪梨",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "，在医书里记载为",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "乳梨，即雪梨",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "；鹅梨，即绵梨；消梨，即香水梨也。俱为上品，可以治病。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "……",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "热嗽，止渴。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "……",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "润肺凉心，消痰降火",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "，解疮毒、酒毒。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "（明）李时珍《本草纲目",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "果部（二）",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "梨》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "其次是",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "“",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "无花果",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "主治：开胃，止泄痢。治五痔，",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "咽喉痛",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "（明）李时珍《本草纲目",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "果部（三）",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "无花果》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "也就是两者均有相近的治咽喉的功能，合煮不无道理。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "陈皮",
+              "bold": true,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "&",
+              "bold": true,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "乌梅",
+              "bold": true,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "二者的确有不少同煎的方剂，比如",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "半夏（汤洗七次）",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "橘红（各五两）",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "白茯苓（三两）甘草（炙，一两半）上为咀。每服四钱，用水一钱，生姜七片，",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "乌梅一个",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "，同煎六分，去滓，热服，不拘时候。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "（南宋）《太平惠民和剂局方",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "二陈方》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "这里用的是“橘红”，即橘皮去掉内层白色部分后留下的外层。一般是用来治呕吐恶心或者心悸的。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            }
+          ],
+          "images": [
+            "images/823_p1_1.png"
+          ]
+        },
+        {
+          "runs": [
+            {
+              "text": "再讲讲食鸭：",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "南京确实之前有报道处暑吃鸭的传统，如",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "要是有老人在家的话，",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "多半会炖上个“萝卜老鸭煲”或者来个“红烧鸭块”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "，并首先端上一碗送给邻居。这是南京的一个老习俗，叫做“",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "处暑送鸭，无病各家",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "”。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "人民网",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "170821",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "《处暑吃鸭肉：润肺健脾，无病各家》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "烤鸭作为一道菜，成型很早",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "及沿门歌叫熟食：熝肉、",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "炙鸭",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "、熝鹅、熟羊、鸡鸭等类",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "……",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "就门供卖，可以应仓卒之需。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "（南宋）《梦梁录",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "卷十六",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "荤素从食店诸色点心事件附》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "烧鸂鶒、",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "烧鸭子等同",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "。雁一个，去毛、肠、肚，净；羊肚一个，退洗净，包雁；葱二两，芫荽末一两。上件，用盐同调，入雁腹内烧之。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "（元）《饮膳正要",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "卷一",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": " ",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "聚珍异馔",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "烧雁》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "至于民间传说朱元璋喜食烤鸭、烤鸭创始于南京王府膳房等",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "那就是民间传说咯。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "再备注：关于处暑喝药茶的习惯，虽然网上普遍说法是",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "煎药茶这一习俗自唐代以来已盛行",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "。每当处暑期间，家家户户有煎药茶的习惯，先去药店配制药方，然后在家煎茶备饮，意谓入秋要吃点苦。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "新京报",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "190823",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "《药食同源 ，处暑“煎药茶”如此有来头》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "但是却找不到相关文献（不建议文案看太多营销号",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "yysy",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            }
+          ],
+          "images": [
+            "images/823_p2_1.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-08-23-2",
+      "title": "关于鸭梨",
+      "date_start": "2026-08-23",
+      "date_end": "2026-08-29",
+      "episode": 823,
+      "characters": [
+        "曹丕"
+      ],
+      "paragraphs": [
+        {
+          "runs": [
+            {
+              "text": "讲讲梨，古籍记载有",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "鹅梨，",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "出近京州郡及北都，皮薄而浆多，味差短于乳梨，香则过之。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "……",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "愚按：今魏府多产鹅梨。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "（元）《王祯农书",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "果属",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "梨》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "“魏府”大致是今河北南部、河南北部一带。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "而对于鸭梨，一般认为命名来源于：",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "因果实呈倒卵圆形，",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "近果柄处有一鸭头状突起",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "，形似鸭头，故名“鸭梨”。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "新华网",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "230912",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "《晋州鸭梨｜大若拳，色若金，瓤若蜜，脆若菱》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "而从这个标题正好能看出曹丕引用那句的出处：",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "魏文帝诏：正定郡梨大如拳，",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "甘若蜜，脆若菱",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "，可以解烦释悁。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "（清）《畿辅通志·卷五十六",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": " ",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "物产",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "梨》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "这句在前朝的一些通志书（如《太平御览》等）也都有提及，这里是和鸭梨关系最近的一条。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            }
+          ],
+          "images": [
+            "images/823_p3_1.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-08-23-3",
+      "title": "关于鲶鱼菝葜",
+      "date_start": "2026-08-23",
+      "date_end": "2026-08-29",
+      "episode": 823,
+      "characters": [],
+      "paragraphs": [
+        {
+          "runs": [
+            {
+              "text": "应该指的是",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "“",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "鲶鱼须菝葜",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "：一种菝葜科的攀援藤本植物，与普通菝葜、土茯苓属于近缘植物。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "“鲇鱼须”是形态性命名",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": null
+            },
+            {
+              "text": "，主要形容它细长如鱼须的结构。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "而前两句则出自之前提到过的《龙文鞭影》（所以是连续剧）：",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "纯仁助麦，丁固梦松。 ",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "韩琦芍药，李固芙蓉。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "《龙文鞭影",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "二冬》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "概括了两个预示科第、拜相的故事。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "韩琦芍药",
+              "bold": true,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "韩魏公庆历中以资政殿学士帅淮南。一日，后园中有芍药一榦，分四岐，岐各一花，上下红，中间黄蕊间之。当时扬州芍药未有此一品，今谓之金缠腰者是也。公异之，开一会，",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "欲招四客以赏之，以应四花之瑞",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "……至中筵，剪四花，四客各簪一枝，甚为盛集。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "后三十年间，四人",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "皆为宰相。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "（北宋）沈括《梦溪笔谈·补笔谈",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "卷三·异事》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "韩琦认为这芍药是祥瑞，便设宴赏花，最终由韩琦、王珪、",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "王安石",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "、陈升之四人各簪一花；",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "后来四人果然先后都做了宰相",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": null
+            },
+            {
+              "text": "，因而形成“四相簪花”的典故。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            }
+          ],
+          "images": [
+            "images/823_p4_1.jpg"
+          ]
+        },
+        {
+          "runs": [],
+          "images": [
+            "images/823_p4_1_att.png",
+            "images/823_p4_2_att.png"
+          ]
+        },
+        {
+          "runs": [
+            {
+              "text": "而前两句则出自之前提到过的《龙文鞭影》（所以是连续剧）：",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "李固芙蓉",
+              "bold": true,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "相国李固言，元和六年，下第游蜀。遇一姥，言：“",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "郎君明年芙蓉镜下及第",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "，后二纪拜相，当镇蜀土，某已不复见郎君出将之荣也，愿以季女为托。”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "明年，果状头及第，诗赋有人镜芙蓉之目。后二十年，李公登庸。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "《太平广记·定数十·李固言》引《酉阳杂殂》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "此指李固言落第后得到芙蓉镜预言，翌年考中状头，后来又拜相的故事。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            }
+          ],
+          "images": [
+            "images/823_p6_1.jpg"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-08-23-4",
+      "title": "关于述病",
+      "date_start": "2026-08-23",
+      "date_end": "2026-08-29",
+      "episode": 823,
+      "characters": [
+        "刘禹锡",
+        "上官婉儿"
+      ],
+      "paragraphs": [
+        {
+          "runs": [
+            {
+              "text": "婉儿引用那一句，出自刘禹锡散文",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "予喟然叹曰：始予有是仆也，",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "命之理畦则蔬荒",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "，主庖则味乖，颛厩则马瘠，常谓其无适能适。乃今以兀然而贤我远甚，利与钝果相长哉！",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "……",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "刘子遂言曰：",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "乐于用则豫章贵，厚其生则社栎贤。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "（唐）刘禹锡《述病》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "原文大概是说刘禹锡和他一个愚钝的仆人害病，而后者因为",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "“",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "兀然",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "无知，没有心理负担，因此痊愈地更快；由此生发出感慨：善于使用，那么像豫章那样（生长缓慢）的树木就显得珍贵；",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "重视其生存，那么像社栎那样（被认为无用）的树木就能成为良材",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": null
+            },
+            {
+              "text": "。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "此外，还暗含上官婉儿",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "“",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "彩楼评诗",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": null
+            },
+            {
+              "text": "”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "典故，有",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "中宗正月晦日，幸昆明池赋，得群臣应制百余篇。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "帐殿前结彩楼，命上官昭容选一首为新翻御制曲。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "从臣悉集其下，",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "须臾纸落如飞，惟沈、宋二诗不下。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "又移一时，一纸飞坠，乃沈诗也。及阅其评曰：“二诗工力悉敌。沈诗落句云：‘微臣雕朽质，羞睹豫章材’，盖词气已竭；宋云：‘不愁明月尽，自有夜珠来’，犹陡健骞举。”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "（北宋）《诗话总龟·卷十七·纪实门上》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "也就是上官婉儿将未入选的诗稿从楼上扔下，仅留一首作为新翻御制曲。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            }
+          ],
+          "images": [
+            "images/823_p7_1.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-08-23-5",
+      "title": "关于“三大士”",
+      "date_start": "2026-08-23",
+      "date_end": "2026-08-29",
+      "episode": 823,
+      "characters": [
+        "玄奘"
+      ],
+      "paragraphs": [
+        {
+          "runs": [
+            {
+              "text": "“大士”在佛教语境中通常是菩萨的尊称，对应梵语 ",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "Mah",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "ā",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "sattva，",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "意为“大有情”“伟大的众生”。一般的",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "“",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "三大士",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "为",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "东偏为“智严之殿”，奉",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "文殊、普贤、观音",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "三大士。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "（元）赵孟頫《松雪斋文集",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "大元大普庆寺碑铭奉  敕撰》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "文殊菩萨，象征智慧；普贤菩萨，象征行愿；观音菩萨，象征慈悲。这一组合主要是汉地寺院造像与名山信仰（五台山、峨眉山、普陀山）发展形成的。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "不过如果考虑和玄奘有关的话，确实有",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "“",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "三天人",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "的说法，分别是文殊、观音和弥勒菩萨，见于",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "于夜中梦三天人，一黄金色，二留璃色，三白银色，形貌端正，仪服轻明，来问和尚曰",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "……",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "其金色人指碧色者语和尚曰：‘汝识不？此是",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "观自在菩萨",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "。’又指银色曰： ‘此是",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "慈氏菩萨",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "。’",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "……",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "金色者自言：‘我是",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "曼殊室利菩萨",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "……",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "有支那国僧",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "（此指玄奘）",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "乐通大法，欲就汝学，汝可待教之。’",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "（唐）《大唐大慈恩寺三藏法师传",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "卷三》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "这是在说玄奘抵达那烂陀寺，拜戒贤为师。后者听说他从中国来，于是讲述自己曾经的一个梦：梦里",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "三位菩萨劝诫他不要因病痛绝食而死",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": null
+            },
+            {
+              "text": "，三年后将会有一个乐于学习佛法的中国僧人抵达",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "而正好就是玄奘。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            }
+          ],
+          "images": [
+            "images/823_p8_1.png"
+          ]
+        },
+        {
+          "runs": [
+            {
+              "text": "关于后续木鱼的部分，也有其出处：",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "斋粥二时长击二通",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "，普请僧众长击一通，普请请行者二通。相传云：鱼昼夜常醒。刻木象形击之，所以警昏惰也。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "（元）《敕修百丈清规",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "第八卷",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "木鱼》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "引用部分的意思是：早粥和午斋这两个时段，",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "都要敲击木鱼两通",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": null
+            },
+            {
+              "text": "，作为召集僧众、传达进食时刻的信号。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "其中",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "“",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "一通",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "一般不是敲一下就足够了，要连续敲击一段时间，统称为",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "“",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "一通",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "这里的木鱼也不是平常那种团形的小东西，而是",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "寺庙会悬挂的大型木鱼",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": null
+            },
+            {
+              "text": "，如下图",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            }
+          ],
+          "images": [
+            "images/823_p9_1.png",
+            "images/823_p9_2.png"
           ]
         }
       ]
