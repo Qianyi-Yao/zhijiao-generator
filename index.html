@@ -38,12 +38,12 @@
           <h1>知交圈生成器 <a class="library-link" href="library.html">📚 微考据图书馆</a></h1>
           <p class="brand-note">选择人物，写下一则属于他们的知交圈。</p>
         </div>
-        <span class="version">v1.3.0</span>
+        <span class="version">v1.4.0</span>
       </header>
 
       <!-- 工程操作工具栏 -->
       <div class="toolbar">
-        <div class="segmented" id="exportFormat" style="margin:0">
+        <div class="segmented" id="exportFormat">
           <button type="button" data-value="png" class="active">PNG</button>
           <button type="button" data-value="jpg">JPG</button>
         </div>
@@ -81,7 +81,7 @@
             <textarea id="content" maxlength="3000" placeholder="输入帖子正文，支持手动换行……"></textarea>
           </div>
           <div class="toggle-line">
-            <span class="label" style="margin:0">正文展示</span>
+            <span class="label">正文展示</span>
             <div class="segmented" id="collapseMode">
               <button type="button" data-value="false" class="active">完整展示</button>
               <button type="button" data-value="true">折叠展示</button>
@@ -127,7 +127,7 @@
         <summary>评论与回复 <span class="section-index" id="commentSectionCount">03 · 0条</span></summary>
         <div class="section-body">
           <div class="comment-editor-list" id="commentEditorList"></div>
-          <button class="btn" style="width:100%;margin-top:10px" id="addComment" type="button">＋ 添加评论</button>
+          <button class="btn add-comment-button" id="addComment" type="button">＋ 添加评论</button>
         </div>
       </details>
       <p class="editor-footer">草稿只保存在当前浏览器 · 工程文件会携带帖子配图</p>
@@ -190,7 +190,7 @@
       每个浏览器最多同时保存 10 位自定义人物；删除已有自定义人物后可继续创建。
     </p>
     <form class="custom-character-form" id="customCharacterForm" novalidate>
-    <div class="custom-form-field custom-form-field-full">
+    <div class="custom-form-field">
       <label for="customCharacterName">
         姓名
         <span class="required-mark" aria-hidden="true">*</span>

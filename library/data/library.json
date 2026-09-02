@@ -2927,35 +2927,9 @@
             "images/531_p10_1.jpg",
             "images/531_p10_2.png"
           ]
-        }
-      ]
-    },
-    {
-      "id": "2026-05-31-11",
-      "title": "战斗策划真是这么想的吗？",
-      "date_start": "2026-05-31",
-      "date_end": "2026-06-06",
-      "episode": 531,
-      "characters": [],
-      "paragraphs": [
+        },
         {
           "runs": [
-            {
-              "text": "碎碎念，一些和社友的闲聊",
-              "bold": false,
-              "italic": false,
-              "strike": false,
-              "color": null,
-              "font": null
-            },
-            {
-              "text": "\n\n",
-              "bold": false,
-              "italic": false,
-              "strike": false,
-              "color": null,
-              "font": null
-            },
             {
               "text": "《预言家》（没有嘲讽任何一位的意思，我是垃圾👎）",
               "bold": false,
@@ -2968,7 +2942,7 @@
           "images": [
             "images/531_p11_1.jpg",
             "images/531_p11_2.jpg",
-            "images/531_p11_3.jpg"
+            "images/531_p11_3.png"
           ]
         }
       ]
@@ -6781,7 +6755,7 @@
     },
     {
       "id": "2026-06-14-1",
-      "title": "柴荣来了||ヽ(*￣▽￣*)ノ",
+      "title": "关于柴荣",
       "date_start": "2026-06-14",
       "date_end": "2026-06-20",
       "episode": 614,
@@ -29307,7 +29281,7 @@
     },
     {
       "id": "2026-07-12-10",
-      "title": "张仪来了(ﾉﾟ▽ﾟ)ﾉ",
+      "title": "关于张仪",
       "date_start": "2026-07-12",
       "date_end": "2026-07-18",
       "episode": 712,
@@ -32966,7 +32940,7 @@
     },
     {
       "id": "2026-07-19-5",
-      "title": "苏秦来了(๑╹◡╹)ﾉ\"\"\"",
+      "title": "关于苏秦",
       "date_start": "2026-07-19",
       "date_end": "2026-07-25",
       "episode": 719,
@@ -50398,7 +50372,7 @@
         {
           "runs": [
             {
-              "text": "题外话：这个医生的字还挺亲切:D",
+              "text": "题外话：这个医生的字还挺萌",
               "bold": false,
               "italic": false,
               "strike": false,
@@ -50407,7 +50381,8 @@
             }
           ],
           "images": [
-            "images/816_p2_1.png"
+            "images/816_p2_1.png",
+            "images/816_p2_2.png"
           ]
         }
       ]
@@ -54889,8 +54864,8 @@
         {
           "runs": [],
           "images": [
-            "images/816_p14_1_att.png",
-            "images/816_p14_2_att.png"
+            "images/816_p15_1.png",
+            "images/816_p15_2.png"
           ]
         }
       ]
@@ -56407,9 +56382,19 @@
           ]
         },
         {
-          "runs": [],
+          "runs": [
+            {
+              "text": "参考结构如下图",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            }
+          ],
           "images": [
-            "images/816_p19_1_att.png"
+            "images/816_p20_1.png",
+            "images/816_p20_2.png"
           ]
         }
       ]
@@ -58132,10 +58117,20 @@
           ]
         },
         {
-          "runs": [],
+          "runs": [
+            {
+              "text": "鲶鱼须菝葜的实物图",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            }
+          ],
           "images": [
-            "images/823_p4_1_att.png",
-            "images/823_p4_2_att.png"
+            "images/823_p5_1.jpg",
+            "images/823_p5_2.png",
+            "images/823_p5_3.png"
           ]
         },
         {
@@ -59190,6 +59185,522 @@
           "images": [
             "images/823_p9_1.png",
             "images/823_p9_2.png"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "2026-08-30-1",
+      "title": "关于“朕”作为自称【有谬误】",
+      "date_start": "2026-08-30",
+      "date_end": "2026-09-05",
+      "episode": 830,
+      "characters": [
+        "嬴政",
+        "李斯"
+      ],
+      "paragraphs": [
+        {
+          "runs": [
+            {
+              "text": "关于",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "“",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "朕",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "的转变，始于秦始皇（虽然大家都知道了，但还是讲讲）：",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "丞相绾、御史大夫劫、廷尉",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "斯",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "等皆曰：",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "“……",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "臣等昧死上尊号，王为‘泰皇’。命为‘制’，令为‘诏’，",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "天子自称曰‘朕’",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "王曰：“去‘泰’，著‘皇’，采上古‘帝’位号，号曰‘皇帝’。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "他如议。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "（西汉）司马迁《史记",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "秦始皇本纪第六》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "因此，前221年可以视为“朕”成为帝王专称的明确制度节点。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "后人对此有系统性的总结为",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "朕：我也。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "古者尊卑共之，贵贱不嫌，则可同号之义也。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "尧曰朕在位七十载，皋陶与帝舜言曰朕言惠可底行，屈原曰朕皇考，此其义也。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "至秦天子独以为称，汉因而不改也。",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "（东汉）蔡邕《独断",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "卷上",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "天子正号之别名》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "其中除了",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "屈原",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "典型的",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "“",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "朕皇考曰伯庸",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "，另一个提及的案例就是皋陶",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "皋陶曰：“",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "朕言惠，可厎行？",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": "#00B050",
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "”禹曰：“俞！乃言厎可绩。”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": "方正楷体简体"
+            },
+            {
+              "text": "——",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "《尚书",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "虞书",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "·",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "皋陶",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "谟》",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "\n",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "这里皋陶自称",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "“",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "朕",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "”",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            },
+            {
+              "text": "，意思是询问禹：我的这些话还算合宜吗？可以贯彻实行吗？",
+              "bold": false,
+              "italic": false,
+              "strike": false,
+              "color": null,
+              "font": null
+            }
+          ],
+          "images": [
+            "images/830_p1_1.png"
           ]
         }
       ]

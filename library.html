@@ -97,6 +97,12 @@
     .page-btn:hover { background: #f0ead9; }
     .page-num { font-family: "Jinling", serif; font-weight: bold; font-size: 15px; }
     .page-num.active { background: var(--green-dark); color: #fff; border-color: var(--green-dark); }
+    .page-ellipsis {
+      padding: 4px 2px;
+      color: var(--muted);
+      font-family: "Jinling", serif;
+      font-weight: bold;
+    }
     .expand-btn { margin: 6px auto 0; display: block; font-size: 15px; padding: 8px 22px; }
 
     .foot-note { text-align: center; font-size: 12px; color: #a89a82; margin-top: 30px; }
@@ -128,8 +134,8 @@
       <input id="characterSearch" type="search" placeholder="搜索人物（输入后回车选择）……" />
       <select id="characterSelect" class="hidden" aria-label="人物候选"></select>
       <select id="weekYear" class="week-select" aria-label="年"><option value="">年</option></select>
-      <select id="weekMonth" class="week-select" aria-label="月"><option value="">月</option></select>
-      <select id="weekDay" class="week-select" aria-label="日"><option value="">日</option></select>
+      <select id="weekMonth" class="week-select" aria-label="月" disabled><option value="">月</option></select>
+      <select id="weekDay" class="week-select" aria-label="日" disabled><option value="">日</option></select>
       <span id="weekLabel" class="filter-label"></span>
       <button id="clearFilters" class="clear-btn hidden" type="button">清除筛选</button>
     </div>
@@ -143,12 +149,14 @@
     let articles = [];
     let mode = 'preview';      // 'preview' 预览3篇 | 'paged' 分页浏览
     let page = 1;
+    let pageCount = 0;
     let selectedChar = '';     // 当前人物筛选
     let selectedYear = '';     // 年
     let selectedMonth = '';    // 月
     let selectedWeek = '';     // 完整周（date_start 的周日）
     const PAGE_SIZE = 10;
     const PREVIEW_COUNT = 3;
+    const MAX_PAGE_BUTTONS = 10;
     const list = document.getElementById('articleList');
     const searchInput = document.getElementById('searchInput');
     const characterSearch = document.getElementById('characterSearch');
@@ -163,12 +171,14 @@
       return String(text ?? '').replace(/[&<>"]/g, m => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[m]));
     }
 
-    function episodeCode(a) {
-      if (a.date_start) {
-        const d = a.date_start.replace(/-/g, '');
-        return d.length >= 6 ? d.slice(2) : d;
+    function episodeLabel(a) {
+      if (!a.date_start || !a.date_end) {
+        throw new Error(
+          `文章日期不完整：${a.title || a.id || '未知文章'}`
+        );
       }
-      return a.episode ? '第' + a.episode + '期' : '';
+
+      return a.date_start.replace(/-/g, '').slice(2) + '期';
     }
 
     function renderRuns(runs) {
@@ -197,46 +207,110 @@
       return '<p>' + textHtml + '</p>';
     }
 
-    function filtered() {
-      const q = searchInput.value.trim().toLowerCase();
-      const ym = selectedMonth ? selectedYear + '-' + String(selectedMonth).padStart(2, '0') : '';
+    function getFilterState() {
+      const titleInput = searchInput.value;
+
+      return {
+        titleInput,
+        titleQuery: titleInput.trim().toLowerCase(),
+        character: selectedChar,
+        year: selectedYear,
+        month: selectedMonth,
+        monthPrefix: selectedYear && selectedMonth
+          ? selectedYear + '-' + String(selectedMonth).padStart(2, '0')
+          : '',
+        week: selectedWeek
+      };
+    }
+
+    function filtered(filters) {
       return articles.filter(a => {
-        if (q && !a.title.toLowerCase().includes(q)) return false;
-        if (selectedChar && !(a.characters || []).includes(selectedChar)) return false;
-        if (selectedYear && !(a.date_start || '').startsWith(selectedYear)) return false;
-        if (ym && !(a.date_start || '').startsWith(ym)) return false;
-        if (selectedWeek && a.date_start !== selectedWeek) return false;
+        if (
+          filters.titleQuery &&
+          !a.title.toLowerCase().includes(filters.titleQuery)
+        ) return false;
+
+        if (
+          filters.character &&
+          !(a.characters || []).includes(filters.character)
+        ) return false;
+
+        if (filters.week) {
+          if (a.date_start !== filters.week) return false;
+        } else {
+          if (
+            filters.year &&
+            !(a.date_start || '').startsWith(filters.year)
+          ) return false;
+
+          if (
+            filters.monthPrefix &&
+            !(a.date_start || '').startsWith(filters.monthPrefix)
+          ) return false;
+        }
+
         return true;
       });
+    }
+
+    function renderFromFirstPage() {
+      page = 1;
+      render();
     }
 
     // 人物筛选：搜索 → 回车 → 候选列表（全部 161 角色）
     characterSearch.onkeydown = e => {
       if (e.key !== 'Enter') return;
       e.preventDefault();
+
       const kw = characterSearch.value.trim().toLowerCase();
-      setTimeout(() => {
-        if (!kw) return;
-        characterSelect.innerHTML = '<option value="" selected disabled>请选择人物</option>' +
-          characters.filter(c =>
-            [c.name, c.dynasty, c.rarity, c.role, c.id].join(' ').toLowerCase().includes(kw))
-          .map(c => `<option value="${esc(c.name)}">${esc(c.name)} · ${esc(c.dynasty)}</option>`).join('');
-        characterSelect.focus();
-        if (typeof characterSelect.showPicker === 'function') {
-          try { characterSelect.showPicker(); } catch (err) { characterSelect.click(); }
-        } else { characterSelect.click(); }
-      }, 0);
+
+      if (!kw) {
+        characterSelect.classList.add('hidden');
+        return;
+      }
+
+      const matches = characters.filter(c =>
+        [c.name, c.dynasty, c.rarity, c.role, c.id]
+          .join(' ')
+          .toLowerCase()
+          .includes(kw)
+      );
+
+      characterSelect.innerHTML =
+        '<option value="" selected disabled>请选择人物</option>' +
+        matches.map(c =>
+          `<option value="${esc(c.name)}">${esc(c.name)} · ${esc(c.dynasty)}</option>`
+        ).join('');
+
+      characterSelect.classList.remove('hidden');
+      characterSelect.focus();
+
+      if (typeof characterSelect.showPicker === 'function') {
+        try {
+          characterSelect.showPicker();
+        } catch (err) {
+          characterSelect.click();
+        }
+      } else {
+        characterSelect.click();
+      }
     };
     characterSelect.onchange = () => {
       if (characterSelect.value) {
         selectedChar = characterSelect.value;
         characterSearch.value = selectedChar;
-        page = 1;
-        render();
+        characterSelect.classList.add('hidden');
+        renderFromFirstPage();
       }
     };
     characterSearch.oninput = () => {
-      if (!characterSearch.value.trim()) { selectedChar = ''; page = 1; render(); }
+      characterSelect.classList.add('hidden');
+
+      if (!characterSearch.value.trim()) {
+        selectedChar = '';
+        renderFromFirstPage();
+      }
     };
 
     // 周筛选：年/月/日 下拉（中文）→ 选完自动归到该周（周日~周六）
@@ -250,6 +324,10 @@
       const days = new Date(y, m, 0).getDate();
       weekDay.innerHTML = '<option value="">日</option>' +
         Array.from({ length: days }, (_, i) => `<option value="${i + 1}">${i + 1}日</option>`).join('');
+    }
+    function updateDateControls() {
+      weekMonth.disabled = !weekYear.value;
+      weekDay.disabled = !weekYear.value || !weekMonth.value;
     }
     function onWeekChange() {
       const y = weekYear.value, m = weekMonth.value, d = weekDay.value;
@@ -268,14 +346,26 @@
         selectedWeek = '';
         weekLabel.textContent = (y ? y + '年' : '') + (m ? ' ' + m + '月' : '');
       }
-      page = 1;
-      render();
+      renderFromFirstPage();
     }
-    weekYear.onchange = () => { fillDayOptions(); onWeekChange(); };
-    weekMonth.onchange = () => { fillDayOptions(); onWeekChange(); };
+    weekYear.onchange = () => {
+      if (!weekYear.value) {
+        weekMonth.value = '';
+      }
+
+      fillDayOptions();
+      updateDateControls();
+      onWeekChange();
+    };
+    weekMonth.onchange = () => {
+      fillDayOptions();
+      updateDateControls();
+      onWeekChange();
+    };
     weekDay.onchange = onWeekChange;
     fillMonthOptions();
     fillDayOptions();
+    updateDateControls();
 
     clearFilters.onclick = () => {
       searchInput.value = '';
@@ -288,50 +378,111 @@
       selectedMonth = '';
       selectedWeek = '';
       weekLabel.textContent = '';
-      page = 1;
-      render();
+      updateDateControls();
+      renderFromFirstPage();
     };
 
-    function updateFilterBar() {
-      const active = searchInput.value || selectedChar || selectedWeek;
+    function updateFilterBar(filters) {
+      const active =
+        filters.titleInput ||
+        filters.character ||
+        filters.year ||
+        filters.month ||
+        filters.week;
+
       clearFilters.classList.toggle('hidden', !active);
     }
 
-    function buildPager(totalPages) {
-      let html = '<button class="page-btn" data-page="prev" aria-label="上一页">‹</button>';
-      for (let i = 1; i <= totalPages; i++) {
-        html += `<button class="page-btn page-num ${i === page ? 'active' : ''}" data-page="${i}">${i}</button>`;
+    function visiblePageNumbers(totalPages) {
+      if (totalPages <= MAX_PAGE_BUTTONS) {
+        return Array.from({ length: totalPages }, (_, index) => index + 1);
       }
+
+      const currentPageNeedsOwnButton =
+        page > MAX_PAGE_BUTTONS - 1 &&
+        page < totalPages;
+
+      const leadingPageCount = currentPageNeedsOwnButton
+        ? MAX_PAGE_BUTTONS - 2
+        : MAX_PAGE_BUTTONS - 1;
+
+      const pages = Array.from(
+        { length: leadingPageCount },
+        (_, index) => index + 1
+      );
+
+      if (currentPageNeedsOwnButton) {
+        pages.push(page);
+      }
+
+      pages.push(totalPages);
+      return pages;
+    }
+
+    function buildPager(totalPages) {
+      const pageNumbers = visiblePageNumbers(totalPages);
+      let html = '<button class="page-btn" data-page="prev" aria-label="上一页">‹</button>';
+      let previousPage = 0;
+
+      pageNumbers.forEach(pageNumber => {
+        if (previousPage && pageNumber - previousPage > 1) {
+          html += '<span class="page-ellipsis" aria-hidden="true">…</span>';
+        }
+
+        html += `
+          <button
+            class="page-btn page-num ${pageNumber === page ? 'active' : ''}"
+            data-page="${pageNumber}"
+          >${pageNumber}</button>`;
+
+        previousPage = pageNumber;
+      });
+
       html += '<button class="page-btn" data-page="next" aria-label="下一页">›</button>';
       return '<div class="pager">' + html + '</div>';
     }
 
+    function getPageView(items) {
+      if (mode === 'preview') {
+        return {
+          shown: items.slice(0, PREVIEW_COUNT),
+          pager: items.length > PREVIEW_COUNT
+            ? `<div class="pager"><button class="page-btn expand-btn" id="expandAll">展开全部（共${items.length}篇）</button></div>`
+            : '',
+          totalPages: 0
+        };
+      }
+
+      const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
+      if (page > totalPages) page = totalPages;
+
+      const start = (page - 1) * PAGE_SIZE;
+
+      return {
+        shown: items.slice(start, start + PAGE_SIZE),
+        pager: buildPager(totalPages),
+        totalPages
+      };
+    }
+
     function render() {
-      const items = filtered();
-      updateFilterBar();
+      const filters = getFilterState();
+      const items = filtered(filters);
+      updateFilterBar(filters);
+
       if (!items.length) {
+        pageCount = 0;
         list.innerHTML = '<div class="empty-tip">没有符合条件的考据。</div>';
         return;
       }
-      let shown, pager = '';
-      if (mode === 'preview') {
-        shown = items.slice(0, PREVIEW_COUNT);
-        if (items.length > PREVIEW_COUNT) {
-          pager = `<div class="pager"><button class="page-btn expand-btn" id="expandAll">展开全部（共${items.length}篇）</button></div>`;
-        }
-      } else {
-        const totalPages = Math.max(1, Math.ceil(items.length / PAGE_SIZE));
-        if (page > totalPages) page = totalPages;
-        const start = (page - 1) * PAGE_SIZE;
-        shown = items.slice(start, start + PAGE_SIZE);
-        pager = buildPager(totalPages);
-      }
-      list.innerHTML = shown.map(a => {
+
+      const pageView = getPageView(items);
+      pageCount = pageView.totalPages;
+
+      list.innerHTML = pageView.shown.map(a => {
         const tags = (a.characters || []).map(c =>
           `<span class="tag" data-tag="${esc(c)}">${esc(c)}</span>`).join('');
-        const code = episodeCode(a);
-        const meta = [a.date_start, a.date_end ? '~' + a.date_end : ''].filter(Boolean).join(' ') +
-          (code ? ' · ' + code + '期' : '');
+        const meta = `${a.date_start} ~${a.date_end} · ${episodeLabel(a)}`;
         const body = a.paragraphs.map(renderParagraph).join('');
         return `<article class="article-card">
           <div class="article-head">
@@ -341,35 +492,52 @@
           </div>
           <div class="article-body">${body}</div>
         </article>`;
-      }).join('') + pager;
-
-      const expandBtn = document.getElementById('expandAll');
-      if (expandBtn) expandBtn.onclick = () => { mode = 'paged'; page = 1; render(); };
-      const totalPages = mode === 'paged' ? Math.max(1, Math.ceil(items.length / PAGE_SIZE)) : 0;
-      list.querySelectorAll('[data-page]').forEach(btn => {
-        btn.onclick = () => {
-          const v = btn.dataset.page;
-          if (v === 'prev') page = Math.max(1, page - 1);
-          else if (v === 'next') page = Math.min(totalPages, page + 1);
-          else page = +v;
-          render();
-        };
-      });
-      list.querySelectorAll('.article-head').forEach(head => {
-        head.onclick = () => head.parentElement.classList.toggle('open');
-      });
-      list.querySelectorAll('[data-tag]').forEach(tag => {
-        tag.onclick = e => {
-          e.stopPropagation();
-          selectedChar = tag.dataset.tag;
-          characterSearch.value = selectedChar;
-          page = 1;
-          render();
-        };
-      });
+      }).join('') + pageView.pager;
     }
 
-    searchInput.oninput = () => { page = 1; render(); };
+    list.onclick = event => {
+      if (!(event.target instanceof Element)) return;
+
+      const tag = event.target.closest('[data-tag]');
+      if (tag) {
+        event.stopPropagation();
+        selectedChar = tag.dataset.tag;
+        characterSearch.value = selectedChar;
+        renderFromFirstPage();
+        return;
+      }
+
+      const expandBtn = event.target.closest('#expandAll');
+      if (expandBtn) {
+        mode = 'paged';
+        page = 1;
+        render();
+        return;
+      }
+
+      const pageBtn = event.target.closest('[data-page]');
+      if (pageBtn) {
+        const value = pageBtn.dataset.page;
+
+        if (value === 'prev') {
+          page = Math.max(1, page - 1);
+        } else if (value === 'next') {
+          page = Math.min(pageCount, page + 1);
+        } else {
+          page = +value;
+        }
+
+        render();
+        return;
+      }
+
+      const articleHead = event.target.closest('.article-head');
+      if (articleHead) {
+        articleHead.parentElement.classList.toggle('open');
+      }
+    };
+
+    searchInput.oninput = renderFromFirstPage;
 
     fetch('library/data/library.json')
       .then(r => r.json())

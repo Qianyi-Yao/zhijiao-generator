@@ -1,14 +1,8 @@
 /* =========================
    02. 默认工程与空白工程
    ========================= */
-const defaultState = () => ({
-  version:2,authorId:'yuanhong',content:'山河辽阔，四时各有意趣。今日偶得半日清闲，便与诸君共记眼前风物。',collapsed:false,topic:'故人闲话',time:'刚刚',location:'平城',likes:128,imageData:'',imageFit:'contain',skinMap:{},bgColor:'',corner:'',comments:[
-    {id:uid(),authorId:'jieyougongzhu',replyTo:'',text:'如此清景，确宜与故人同赏。',time:'1分钟前'},
-    {id:uid(),authorId:'yuefei',replyTo:'yuanhong',text:'他日若有闲暇，也愿亲往一观。',time:'刚刚'}
-  ]
-});
-
-const blankState = () => ({
+function createState(overrides = {}) {
+  return {
     version: 2,
     authorId: 'yuanhong',
     content: '',
@@ -22,8 +16,37 @@ const blankState = () => ({
     skinMap: {},
     bgColor: '',
     corner: '',
-    comments: []
- });
+    comments: [],
+    ...overrides
+  };
+}
+
+const defaultState = () => createState({
+  content:
+    '山河辽阔，四时各有意趣。今日偶得半日清闲，便与诸君共记眼前风物。',
+  topic: '故人闲话',
+  time: '刚刚',
+  location: '平城',
+  likes: 128,
+  comments: [
+    {
+      id: uid(),
+      authorId: 'jieyougongzhu',
+      replyTo: '',
+      text: '如此清景，确宜与故人同赏。',
+      time: '1分钟前'
+    },
+    {
+      id: uid(),
+      authorId: 'yuefei',
+      replyTo: 'yuanhong',
+      text: '他日若有闲暇，也愿亲往一观。',
+      time: '刚刚'
+    }
+  ]
+});
+
+const blankState = () => createState();
 
 
 /* =========================
@@ -73,12 +96,31 @@ const skinOf = (c, map) => {
 function uid(){return 'c_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,7)}
 function esc(text){return String(text??'').replace(/[&<>"]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[m]))}
 function showToast(message){const el=$('toast');el.textContent=message;el.classList.add('show');clearTimeout(showToast.t);showToast.t=setTimeout(()=>el.classList.remove('show'),1800)}
-function optionList(selected, allowEmpty, label) {
+function characterSearchText(c) {
+  return [
+    c.name,
+    c.dynasty,
+    c.rarity,
+    c.role
+  ].join(' ').toLowerCase();
+}
+
+function filterCharacters(query = '', selected = '') {
+  const keyword = query.trim().toLowerCase();
+
+  return characters.filter(c =>
+    !keyword ||
+    characterSearchText(c).includes(keyword) ||
+    c.id === selected
+  );
+}
+
+function optionList(selected, allowEmpty, label, query = '') {
   return (
     allowEmpty
       ? `<option value="">${esc(label)}</option>`
       : ''
-  ) + characters.map(c => `
+  ) + filterCharacters(query, selected).map(c => `
     <option
       value="${c.id}"
       ${c.id === selected ? 'selected' : ''}
@@ -112,13 +154,29 @@ function replyOptionList(selected) {
     `;
 }
 
+function skinButtonList(c, current) {
+  const skins = [
+    { id: '', avatar: c.avatar },
+    ...c.skins.map(s => ({
+      id: s.id,
+      avatar: s.avatar || c.avatar
+    }))
+  ];
+
+  return skins.map(s => `
+    <button type="button" class="skin-thumb ${s.id === current ? 'active' : ''}"
+      data-skin="${s.id}" title="${s.id ? '皮肤' + s.id.toUpperCase() : '默认'}">
+      <img src="${s.avatar}" alt="">
+    </button>
+  `).join('');
+}
+
 function commentSkinSelect(authorId, index) {
   const c = character(authorId);
   if (!c.skins || !c.skins.length) return '';
   const current = state.skinMap[authorId] || '';
   return `<div class="skin-thumb-group comment-skin-group" data-comment-skin="${index}" title="皮肤（全局生效）">
-    <button type="button" class="skin-thumb ${current===''?'active':''}" data-skin="" title="默认"><img src="${c.avatar}" alt=""></button>
-    ${c.skins.map(s => `<button type="button" class="skin-thumb ${s.id===current?'active':''}" data-skin="${s.id}" title="皮肤${s.id.toUpperCase()}"><img src="${s.avatar||c.avatar}" alt=""></button>`).join('')}
+    ${skinButtonList(c, current)}
   </div>`;
 }
 
@@ -134,44 +192,11 @@ function normalizeReplyTargets() {
     });
 }
 
-function filteredOptionList(selected,allowEmpty,label,query){
-  const keyword=query.trim().toLowerCase();
-  const filtered=characters.filter(c=>{
-    const searchableText=[
-      c.id,
-      c.name,
-      c.dynasty,
-      c.rarity,
-      c.role
-    ].join(' ').toLowerCase();
-
-    return !keyword||searchableText.includes(keyword)||c.id===selected;
-  });
-
-  return (allowEmpty?`<option value="">${label}</option>`:'')
-    +filtered.map(c=>`
-      <option value="${c.id}" ${c.id===selected?'selected':''}>
-        ${esc(c.name)} · ${esc(c.dynasty)}
-      </option>
-    `).join('');
-}
-
 /* =========================
    04. 人物选择区渲染
    ========================= */
 function renderAuthorCards() {
-  const query = characterQuery.trim().toLowerCase();
-
-  const filteredCharacters = characters.filter(c => {
-    const searchableText = [
-      c.name,
-      c.dynasty,
-      c.rarity,
-      c.role
-    ].join(' ').toLowerCase();
-
-    return searchableText.includes(query);
-  });
+  const filteredCharacters = filterCharacters(characterQuery);
 
   $('authorCards').innerHTML = filteredCharacters.length
     ? filteredCharacters.map(c => `
@@ -242,13 +267,9 @@ function renderAuthorCards() {
 /* =========================
    05. 评论编辑器与回复
    ========================= */
-function renderCommentEditors(){
-  normalizeReplyTargets();
-  const list=$('commentEditorList');
-  $('commentSectionCount').textContent=`03 · ${state.comments.length}条`;
-  if(!state.comments.length){list.innerHTML='<div class="empty-editor">还没有评论。点击下方按钮添加第一条互动。</div>';return}
-  list.innerHTML=state.comments.map((item,index)=>`<div class="comment-card" draggable="true" data-index="${index}">
-    <div class="comment-head"><span class="drag-handle" title="拖拽排序">⠿</span><span class="comment-number">评论 ${index+1}</span><div class="comment-actions"><button type="button" data-copy="${index}">复制</button><button type="button" data-reply="${index}">回复</button><button type="button" data-delete="${index}">删除</button></div></div>
+function commentEditorHtml(item, index) {
+  return `<div class="comment-card" draggable="true" data-index="${index}">
+    <div class="comment-head"><span class="drag-handle" title="拖拽排序">⠿</span><span class="comment-number">评论 ${index + 1}</span><div class="comment-actions"><button type="button" data-copy="${index}">复制</button><button type="button" data-reply="${index}">回复</button><button type="button" data-delete="${index}">删除</button></div></div>
     <input
       type="search"
       class="comment-character-search"
@@ -257,73 +278,177 @@ function renderCommentEditors(){
     />
     <div class="comment-fields">
       <select aria-label="评论者" data-comment-author="${index}">
-        ${optionList(item.authorId,false,'')}
+        ${optionList(item.authorId, false, '')}
       </select>
-      ${commentSkinSelect(item.authorId,index)}
+      ${commentSkinSelect(item.authorId, index)}
       <select aria-label="回复对象" data-comment-reply="${index}">${replyOptionList(item.replyTo)}</select>
     </div>
     <textarea aria-label="评论正文" data-comment-text="${index}" placeholder="输入评论内容……">${esc(item.text)}</textarea>
-    <div class="field" style="margin-top:7px"><input type="text" aria-label="评论时间" data-comment-time="${index}" value="${esc(item.time||'')}" placeholder="刚刚" /></div>
-  </div>`).join('');
-  list.querySelectorAll('[data-comment-character-search]').forEach(el=>{
-    el.oninput=()=>{
-      // 这里保留刚才写好的搜索筛选代码
-    };
+    <div class="field comment-time-field"><input type="text" aria-label="评论时间" data-comment-time="${index}" value="${esc(item.time || '')}" placeholder="刚刚" /></div>
+  </div>`;
+}
 
-    el.onkeydown=event=>{
-      if(event.key!=='Enter') return;
+function bindCommentCharacterSearch(list) {
+  list.querySelectorAll('[data-comment-character-search]').forEach(input => {
+    input.onkeydown = event => {
+      if (event.key !== 'Enter') return;
 
       event.preventDefault();
 
-      const index=+el.dataset.commentCharacterSearch;
-      const authorSelect=list.querySelector(
+      const index = +input.dataset.commentCharacterSearch;
+      const authorSelect = list.querySelector(
         `[data-comment-author="${index}"]`
       );
 
       // 等待中文输入法完成上屏，再读取搜索框中的完整内容
-      setTimeout(()=>{
-        const keyword=el.value.trim();
-        if(!keyword) return;
+      setTimeout(() => {
+        const keyword = input.value.trim();
+        if (!keyword) return;
 
         // 按照当前搜索内容重新生成匹配项
-        authorSelect.innerHTML=
+        authorSelect.innerHTML =
           `<option value="" selected disabled>请选择评论者</option>`
-          +filteredOptionList('',false,'',keyword);
+          + optionList('', false, '', keyword);
 
         authorSelect.focus();
 
-        if(typeof authorSelect.showPicker==='function'){
-          try{
+        if (typeof authorSelect.showPicker === 'function') {
+          try {
             authorSelect.showPicker();
-          }catch(error){
+          } catch (error) {
             authorSelect.click();
           }
-        }else{
+        } else {
           authorSelect.click();
         }
-      },0);
+      }, 0);
     };
   });
-  list.querySelectorAll('[data-comment-author]').forEach(el => {
-      el.onchange = () => {
-          state.comments[+el.dataset.commentAuthor].authorId = el.value;
-          renderCommentEditors();
-          renderPreview();
+}
+
+function bindCommentFields(list) {
+  list.querySelectorAll('[data-comment-author]').forEach(select => {
+    select.onchange = () => {
+      const index = +select.dataset.commentAuthor;
+      state.comments[index].authorId = select.value;
+      renderCommentEditors();
+      renderPreview();
+    };
+  });
+
+  list.querySelectorAll('[data-comment-reply]').forEach(select => {
+    select.onchange = () => {
+      const index = +select.dataset.commentReply;
+      state.comments[index].replyTo = select.value;
+      renderPreview();
+    };
+  });
+
+  list.querySelectorAll('[data-comment-skin]').forEach(group => {
+    group.querySelectorAll('[data-skin]').forEach(button => {
+      button.onclick = () => {
+        const index = +group.dataset.commentSkin;
+        const authorId = state.comments[index].authorId;
+        const skinId = button.dataset.skin;
+
+        if (skinId) {
+          state.skinMap[authorId] = skinId;
+        } else {
+          delete state.skinMap[authorId];
+        }
+
+        renderAll();
       };
+    });
   });
-  list.querySelectorAll('[data-comment-reply]').forEach(el=>el.onchange=()=>{state.comments[+el.dataset.commentReply].replyTo=el.value;renderPreview()});
-  list.querySelectorAll('[data-comment-skin]').forEach(group=>group.querySelectorAll('[data-skin]').forEach(btn=>btn.onclick=()=>{const i=+group.dataset.commentSkin;const id=state.comments[i].authorId;const v=btn.dataset.skin;if(v)state.skinMap[id]=v;else delete state.skinMap[id];renderAll()}));
-  list.querySelectorAll('[data-comment-text]').forEach(el=>el.oninput=()=>{state.comments[+el.dataset.commentText].text=el.value;renderPreview()});
-  list.querySelectorAll('[data-comment-time]').forEach(el=>el.oninput=()=>{state.comments[+el.dataset.commentTime].time=el.value;renderPreview()});
-  list.querySelectorAll('[data-delete]').forEach(el=>el.onclick=()=>{state.comments.splice(+el.dataset.delete,1);renderAll()});
-  list.querySelectorAll('[data-copy]').forEach(el=>el.onclick=()=>{const old=state.comments[+el.dataset.copy];state.comments.splice(+el.dataset.copy+1,0,{...old,id:uid()});renderAll()});
-  list.querySelectorAll('[data-reply]').forEach(el=>{el.onclick=()=>addReply(+el.dataset.reply)});
-  list.querySelectorAll('.comment-card').forEach(card=>{
-    card.ondragstart=()=>{dragIndex=+card.dataset.index;card.classList.add('dragging')};
-    card.ondragend=()=>{dragIndex=null;card.classList.remove('dragging')};
-    card.ondragover=e=>e.preventDefault();
-    card.ondrop=e=>{e.preventDefault();const target=+card.dataset.index;if(dragIndex===null||dragIndex===target)return;const [moved]=state.comments.splice(dragIndex,1);state.comments.splice(target,0,moved);renderAll()};
+
+  list.querySelectorAll('[data-comment-text]').forEach(input => {
+    input.oninput = () => {
+      const index = +input.dataset.commentText;
+      state.comments[index].text = input.value;
+      renderPreview();
+    };
   });
+
+  list.querySelectorAll('[data-comment-time]').forEach(input => {
+    input.oninput = () => {
+      const index = +input.dataset.commentTime;
+      state.comments[index].time = input.value;
+      renderPreview();
+    };
+  });
+}
+
+function bindCommentActions(list) {
+  list.querySelectorAll('[data-delete]').forEach(button => {
+    button.onclick = () => {
+      state.comments.splice(+button.dataset.delete, 1);
+      renderAll();
+    };
+  });
+
+  list.querySelectorAll('[data-copy]').forEach(button => {
+    button.onclick = () => {
+      const index = +button.dataset.copy;
+      const old = state.comments[index];
+      state.comments.splice(index + 1, 0, { ...old, id: uid() });
+      renderAll();
+    };
+  });
+
+  list.querySelectorAll('[data-reply]').forEach(button => {
+    button.onclick = () => addReply(+button.dataset.reply);
+  });
+}
+
+function bindCommentDragAndDrop(list) {
+  list.querySelectorAll('.comment-card').forEach(card => {
+    card.ondragstart = () => {
+      dragIndex = +card.dataset.index;
+      card.classList.add('dragging');
+    };
+
+    card.ondragend = () => {
+      dragIndex = null;
+      card.classList.remove('dragging');
+    };
+
+    card.ondragover = event => event.preventDefault();
+
+    card.ondrop = event => {
+      event.preventDefault();
+
+      const target = +card.dataset.index;
+      if (dragIndex === null || dragIndex === target) return;
+
+      const [moved] = state.comments.splice(dragIndex, 1);
+      state.comments.splice(target, 0, moved);
+      renderAll();
+    };
+  });
+}
+
+function renderCommentEditors() {
+  normalizeReplyTargets();
+
+  const list = $('commentEditorList');
+  $('commentSectionCount').textContent =
+    `03 · ${state.comments.length}条`;
+
+  if (!state.comments.length) {
+    list.innerHTML =
+      '<div class="empty-editor">还没有评论。点击下方按钮添加第一条互动。</div>';
+    return;
+  }
+
+  list.innerHTML = state.comments
+    .map((item, index) => commentEditorHtml(item, index))
+    .join('');
+
+  bindCommentCharacterSearch(list);
+  bindCommentFields(list);
+  bindCommentActions(list);
+  bindCommentDragAndDrop(list);
 }
 
 function addReply(index){
@@ -392,10 +517,12 @@ function renderPreview() {
             const a = character(item.authorId);
             const as = skinOf(a, state.skinMap);
             const r = item.replyTo ? character(item.replyTo) : null;
-            return `<article class="comment-item" data-preview-comment="${index}" title="点击回复 ${a.name}">
-                        <div class="avatar-ring"><img src="${as.avatar}" alt="${a.name}"></div>
+            const authorName = esc(a.name);
+            const replyName = r ? esc(r.name) : '';
+            return `<article class="comment-item" data-preview-comment="${index}" title="点击回复 ${authorName}">
+                        <div class="avatar-ring"><img src="${as.avatar}" alt="${authorName}"></div>
                         <div>
-                            <div class="comment-author"><span>${a.name}</span>${r ? `<span class="reply-label">回复 ${r.name}</span>` : ''}</div>
+                            <div class="comment-author"><span>${authorName}</span>${r ? `<span class="reply-label">回复 ${replyName}</span>` : ''}</div>
                             <div class="comment-time">${esc(item.time || '刚刚')}</div>
                             <div class="comment-body">${esc(item.text || '（尚未填写评论）')}</div>
                         </div>
@@ -464,13 +591,8 @@ function renderAuthorSkinPicker() {
     const current = state.skinMap[state.authorId] || '';
     box.classList.remove('hidden');
 
-    const skinItems = [{ id: '', avatar: c.avatar }, ...c.skins.map(s => ({ id: s.id, avatar: (s.avatar || c.avatar) }))];
     box.innerHTML = '<span class="label">皮肤</span><div class="skin-thumb-group">' +
-        skinItems.map(s => `
-            <button type="button" class="skin-thumb ${s.id === current ? 'active' : ''}" data-skin="${s.id}" title="${s.id ? ('皮肤' + s.id.toUpperCase()) : '默认'}">
-                <img src="${s.avatar}" alt="">
-            </button>
-        `).join('') +
+        skinButtonList(c, current) +
         '</div>';
 
     box.querySelectorAll('[data-skin]').forEach(btn => {
@@ -572,79 +694,78 @@ function openCustomCharacterDatabase() {
   });
 }
 
-async function loadCustomCharacters() {
-  const database = await openCustomCharacterDatabase();
-
+function requestResult(request) {
   return new Promise((resolve, reject) => {
-    const transaction = database.transaction(
-      CUSTOM_CHARACTER_STORE_NAME,
-      'readonly'
-    );
-
-    const request = transaction
-      .objectStore(CUSTOM_CHARACTER_STORE_NAME)
-      .getAll();
-
     request.onsuccess = () => {
-      database.close();
       resolve(request.result);
     };
 
     request.onerror = () => {
-      database.close();
       reject(request.error);
     };
   });
 }
 
-async function putCustomCharacter(customCharacter) {
-  const database = await openCustomCharacterDatabase();
-
+function transactionDone(transaction) {
   return new Promise((resolve, reject) => {
-    const transaction = database.transaction(
-      CUSTOM_CHARACTER_STORE_NAME,
-      'readwrite'
-    );
-
-    transaction
-      .objectStore(CUSTOM_CHARACTER_STORE_NAME)
-      .put(customCharacter);
-
     transaction.oncomplete = () => {
-      database.close();
       resolve();
     };
 
     transaction.onerror = () => {
-      database.close();
       reject(transaction.error);
     };
   });
 }
 
-async function removeCustomCharacterFromDatabase(id) {
-  const database = await openCustomCharacterDatabase();
+async function withCustomCharacterStore(
+  mode,
+  operation
+) {
+  const database =
+    await openCustomCharacterDatabase();
 
-  return new Promise((resolve, reject) => {
+  try {
     const transaction = database.transaction(
       CUSTOM_CHARACTER_STORE_NAME,
-      'readwrite'
+      mode
     );
 
-    transaction
-      .objectStore(CUSTOM_CHARACTER_STORE_NAME)
-      .delete(id);
+    const store = transaction.objectStore(
+      CUSTOM_CHARACTER_STORE_NAME
+    );
 
-    transaction.oncomplete = () => {
-      database.close();
-      resolve();
-    };
+    return await operation(store, transaction);
+  } finally {
+    database.close();
+  }
+}
 
-    transaction.onerror = () => {
-      database.close();
-      reject(transaction.error);
-    };
-  });
+async function loadCustomCharacters() {
+  return withCustomCharacterStore(
+    'readonly',
+    store => requestResult(store.getAll())
+  );
+}
+
+async function putCustomCharacter(customCharacter) {
+  return withCustomCharacterStore(
+    'readwrite',
+    (store, transaction) => {
+      store.put(customCharacter);
+      return transactionDone(transaction);
+    }
+  );
+}
+
+async function removeCustomCharacterFromDatabase(id) {
+  return withCustomCharacterStore(
+    'readwrite',
+    (store, transaction) => {
+      store.delete(id);
+      return transactionDone(transaction);
+    }
+  );
 }
 
 function syncCustomCharactersIntoCharacterList() {
@@ -859,6 +980,8 @@ async function deleteCurrentCustomCharacter() {
     );
 
     syncCustomCharactersIntoCharacterList();
+
+    delete state.skinMap[customCharacter.id];
 
     state.comments = state.comments.filter(
       item => item.authorId !== customCharacter.id
@@ -1174,6 +1297,22 @@ function safeState(raw) {
     };
 }
 
+function canvasToBlob(canvas, type, quality) {
+    return new Promise((resolve, reject) => {
+        canvas.toBlob(
+            blob => {
+                if (blob) {
+                    resolve(blob);
+                } else {
+                    reject(new Error('图片编码失败'));
+                }
+            },
+            type,
+            quality
+        );
+    });
+}
+
 function downloadBlob(blob, name) {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
@@ -1189,30 +1328,33 @@ function downloadBlob(blob, name) {
 /* =========================
    09. 控件事件绑定
    ========================= */
-$('content').oninput = e => {
-    state.content = e.target.value;
+function bindPreviewInput(
+  id,
+  normalize = value => value
+) {
+  $(id).oninput = e => {
+    state[id] = normalize(e.target.value);
     renderPreview();
-};
+  };
+}
 
-$('topic').oninput = e => {
-    state.topic = e.target.value.replace(/^#+|#+$/g, '').trim();
-    renderPreview();
-};
+bindPreviewInput('content');
 
-$('time').oninput = e => {
-    state.time = e.target.value;
-    renderPreview();
-};
+bindPreviewInput(
+  'topic',
+  value => value.replace(/^#+|#+$/g, '').trim()
+);
 
-$('location').oninput = e => {
-    state.location = e.target.value;
-    renderPreview();
-};
+bindPreviewInput('time');
+bindPreviewInput('location');
 
-$('likes').oninput = e => {
-    state.likes = Math.max(0, Math.min(10000, Number(e.target.value) || 0));
-    renderPreview();
-};
+bindPreviewInput(
+  'likes',
+  value => Math.max(
+    0,
+    Math.min(10000, Number(value) || 0)
+  )
+);
 
 $('collapseMode').onclick = e => {
     if (!e.target.dataset.value) return;
@@ -1317,18 +1459,21 @@ $('exportPng').onclick = async () => {
             imageTimeout: 0
         });
         const isJpg = exportFormat === 'jpg';
-        canvas.toBlob(
-            blob => {
-                if (blob) {
-                    downloadBlob(
-                        blob,
-                        `知交圈-${character(state.authorId).name}.${isJpg ? 'jpg' : 'png'}`
-                    );
-                    showToast(isJpg ? '高清 JPG 已导出' : '高清 PNG 已导出');
-                }
-            },
+        const blob = await canvasToBlob(
+            canvas,
             isJpg ? 'image/jpeg' : 'image/png',
             isJpg ? 0.92 : undefined
+        );
+
+        downloadBlob(
+            blob,
+            `知交圈-${character(state.authorId).name}.${isJpg ? 'jpg' : 'png'}`
+        );
+
+        showToast(
+            isJpg
+                ? '高清 JPG 已导出'
+                : '高清 PNG 已导出'
         );
     } catch (e) {
         showToast('导出失败，请用浏览器方式打开后重试');
@@ -1357,28 +1502,24 @@ $('openCustomCharacterDialog').onclick = () => {
   openNewCustomCharacterForm();
 };
 
-$('closeCustomCharacterDialog').onclick = () => {
+function dismissCustomCharacterDialog() {
   editingCustomCharacterId = '';
   pendingCustomCharacterData = null;
   resetCustomCharacterForm();
   $('customCharacterDialog').close();
-};
+}
+
+$('closeCustomCharacterDialog').onclick =
+  dismissCustomCharacterDialog;
 
 $('customCharacterDialog').onclick = e => {
   if (e.target === $('customCharacterDialog')) {
-    editingCustomCharacterId = '';
-    pendingCustomCharacterData = null;
-    resetCustomCharacterForm();
-    $('customCharacterDialog').close();
+    dismissCustomCharacterDialog();
   }
 };
 
-$('cancelCustomCharacter').onclick = () => {
-  editingCustomCharacterId = '';
-  pendingCustomCharacterData = null;
-  resetCustomCharacterForm();
-  $('customCharacterDialog').close();
-};
+$('cancelCustomCharacter').onclick =
+  dismissCustomCharacterDialog;
 
 $('deleteCustomCharacter').onclick =
   deleteCurrentCustomCharacter;

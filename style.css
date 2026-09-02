@@ -79,11 +79,6 @@ button {
     margin-bottom: 22px;
 }
 
-.brand-left {
-    display: flex;
-    flex-direction: column; /* 新增：让标题组纵向堆叠 */
-}
-
 .eyebrow {
     margin: 0 0 5px;
     color: var(--green);
@@ -157,26 +152,26 @@ a.btn {
     color: inherit;
 }
 
-    .btn:hover {
-        border-color: #9eab9f;
-        background: #f5f8f3;
-        transform: translateY(-1px);
-    }
+.btn:hover {
+    border-color: #9eab9f;
+    background: #f5f8f3;
+    transform: translateY(-1px);
+}
 
-    .btn.primary {
-        color: #fff;
-        background: var(--green-dark);
-        border-color: var(--green-dark);
-    }
+.btn.primary {
+    color: #fff;
+    background: var(--green-dark);
+    border-color: var(--green-dark);
+}
 
-    .btn.danger {
-        color: var(--danger);
-    }
+.btn.danger {
+    color: var(--danger);
+}
 
-    .btn.small {
-        font-size: 13px;
-        padding: 5px 9px;
-    }
+.btn.small {
+    font-size: 13px;
+    padding: 5px 9px;
+}
 
 /* =========================
    04. 编辑区通用分区与表单
@@ -377,27 +372,11 @@ select:focus {
     margin-top: 14px;
 }
 
-.custom-form-field-full {
-    width: 100%;
-}
-
-.custom-form-field label {
-    display: block;
-    margin-bottom: 6px;
-    color: #6f665a;
-    font-size: 13px;
-}
-
 .required-mark {
     margin-left: 2px;
     color: #c54f48;
     font-family: system-ui, sans-serif;
     font-weight: 700;
-}
-
-.custom-character-form input[type="text"],
-.custom-character-form select {
-    width: 100%;
 }
 
 .custom-file-box {
@@ -665,6 +644,10 @@ select:focus {
     margin-top: 12px;
 }
 
+.toggle-line > .label {
+    margin-bottom: 0;
+}
+
 .segmented {
     display: flex;
     border: 1px solid #d4ccbd;
@@ -779,6 +762,11 @@ select:focus {
     margin-top: 12px;
 }
 
+.add-comment-button {
+    width: 100%;
+    margin-top: 10px;
+}
+
 .comment-card {
     border: 1px solid #ddd5c8;
     border-radius: 10px;
@@ -841,6 +829,10 @@ select:focus {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 8px;
+}
+
+.comment-time-field {
+    margin-top: 7px;
 }
 
 .comment-card textarea {
@@ -990,22 +982,6 @@ select:focus {
     white-space: nowrap;
 }
 
-.author-badges {
-    display: flex;
-    gap: 3px;
-    flex-wrap: wrap;
-}
-
-.author-badge {
-    padding: 2px 5px;
-    border: 1px solid rgba(137, 111, 71, .55);
-    border-radius: 2px;
-    background: rgba(255, 248, 225, .64);
-    color: #846d4c;
-    font-size: 11px;
-    line-height: 1.25;
-}
-
 .post-text {
     margin: 10px 0 0;
     font-size: 19px;
@@ -1015,12 +991,12 @@ select:focus {
     overflow-wrap: anywhere;
 }
 
-    .post-text.collapsed {
-        display: -webkit-box;
-        -webkit-box-orient: vertical;
-        -webkit-line-clamp: 3;
-        overflow: hidden;
-    }
+.post-text.collapsed {
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    overflow: hidden;
+}
 
 .expand-link,
 .topic-link {
@@ -1048,22 +1024,22 @@ select:focus {
     background: #eee7d9;
 }
 
-    .post-image-wrap img {
-        display: block;
-        width: 100%;
-        height: auto;
-        max-height: 255px;
-        object-fit: contain;
-    }
+.post-image-wrap img {
+    display: block;
+    width: 100%;
+    height: auto;
+    max-height: 255px;
+    object-fit: contain;
+}
 
-    .post-image-wrap.cover {
-        height: 244px;
-    }
+.post-image-wrap.cover {
+    height: 244px;
+}
 
-        .post-image-wrap.cover img {
-            height: 100%;
-            object-fit: cover;
-        }
+.post-image-wrap.cover img {
+    height: 100%;
+    object-fit: cover;
+}
 
 .meta {
     display: flex;
@@ -1075,12 +1051,12 @@ select:focus {
     white-space: nowrap;
 }
 
-    .meta img {
-        width: 16px;
-        height: 16px;
-        object-fit: contain;
-        opacity: .75;
-    }
+.meta img {
+    width: 16px;
+    height: 16px;
+    object-fit: contain;
+    opacity: .75;
+}
 
 .meta-dot {
     opacity: .55;
@@ -1094,14 +1070,14 @@ select:focus {
     color: #7a7165;
 }
 
-    .counts img {
-        width: 18px;
-        height: 18px;
-    }
+.counts img {
+    width: 18px;
+    height: 18px;
+}
 
-    .counts .count-gap {
-        margin-left: 8px;
-    }
+.counts .count-gap {
+    margin-left: 8px;
+}
 
 /* =========================
    11. 成图评论区
@@ -1121,9 +1097,9 @@ select:focus {
     cursor: pointer;
 }
 
-    .comment-item:last-child {
-        border-bottom: 0;
-    }
+.comment-item:last-child {
+    border-bottom: 0;
+}
 
 .avatar-ring {
     width: 62px;
@@ -1135,13 +1111,13 @@ select:focus {
     box-shadow: 0 0 0 2px rgba(255, 255, 255, .6) inset;
 }
 
-    .avatar-ring img {
-        width: 100%;
-        height: 100%;
-        border-radius: 50%;
-        object-fit: cover;
-        display: block;
-    }
+.avatar-ring img {
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+    display: block;
+}
 
 .comment-author {
     display: flex;
@@ -1171,13 +1147,6 @@ select:focus {
     overflow-wrap: anywhere;
 }
 
-.no-comments {
-    padding: 38px 0 130px;
-    text-align: center;
-    color: #a79c8e;
-    font-size: 14px;
-}
-
 /* =========================
    12. 提示、工具类与响应式布局
    ========================= */
@@ -1197,10 +1166,10 @@ select:focus {
     transition: .22s;
 }
 
-    .toast.show {
-        opacity: 1;
-        transform: translate(-50%, 0);
-    }
+.toast.show {
+    opacity: 1;
+    transform: translate(-50%, 0);
+}
 
 .hidden {
     display: none !important;
