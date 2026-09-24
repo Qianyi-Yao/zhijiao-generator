@@ -18,6 +18,8 @@
 富文本：runs 保留粗体/斜体/删除线/颜色/字体名；页面映射：正文宋体、带字体 run 楷体。
 """
 import sys, re, json
+import tempfile
+import shutil
 from datetime import date, timedelta
 from pathlib import Path
 from pptx import Presentation
@@ -149,20 +151,20 @@ def classify_page_content(texts, paras, lefts, right_x):
     return body_paras, characters
 
 
-def write_images(images, episode, page_no):
+def write_images(images, episode, page_no, output_dir):
     """写出普通 PPT 图片，返回 library.json 使用的相对路径。"""
     image_names = []
 
     for index, image in enumerate(images, 1):
         ext = (image.ext or "png").lower()
-        name = f"{episode}_p{page_no}_{index}.{ext}"
-        (IMAGES_DIR / name).write_bytes(image.blob)
+        name = f"{YEAR}_{episode}_p{page_no}_{index}.{ext}"
+        (output_dir / name).write_bytes(image.blob)
         image_names.append(f"images/{name}")
 
     return image_names
 
 
-def process_one(ppt_path, confirm_lines):
+def process_one(ppt_path, confirm_lines, image_output_dir):
     """处理单个 PPT，返回该期文章列表。"""
     episode = extract_episode(ppt_path.stem)
     md = parse_month_day(episode) if episode is not None else None
@@ -230,7 +232,9 @@ def process_one(ppt_path, confirm_lines):
         aid = f"{date_start.isoformat() if date_start else 'unknown'}-{ai}"
         pages_out = []
         for p in a["pages"]:
-            img_names = write_images(p["images"], ep, p["page_no"])
+            img_names = write_images(
+                p["images"], ep, p["page_no"], image_output_dir
+            )
             all_runs = []
             for ri, pr in enumerate(p["body"]):
                 if ri > 0:
@@ -255,66 +259,290 @@ def main():
     except Exception:
         pass
 
-    if len(sys.argv) > 1 and sys.argv[1]:
-        paths = [Path(sys.argv[1])]
-    else:
-        candidates = list(BASE_DIR.glob("*.pptx"))
-        in_dir = BASE_DIR / "输入PPT"
-        if in_dir.exists():
-            candidates += list(in_dir.glob("*.pptx"))
-        task_dir = BASE_DIR / "任务书"
-        if task_dir.exists():
-            candidates += list(task_dir.glob("*.pptx"))
-        if not candidates:
-            print("没有找到 PPT 文件。请把 PPT 拖到 运行.bat 上，或放到工作区根目录/输入PPT 文件夹。")
-            input("按回车退出...")
-            return
-        # 按开始日期排序（文件名数字≠日期顺序，如 531 是 5月31日）
-        def date_key(p):
-            ep = extract_episode(p.stem)
-            md = parse_month_day(ep) if ep is not None else None
-            if md is None:
-                return (1, 0, p.name)
-            return (0, date(YEAR, md[0], md[1]).toordinal(), p.name)
-        paths = sorted(candidates, key=date_key)
+    # 每次只接收一个PPT：支持拖入启动器，或启动后输入路径
+    if len(sys.argv) > 2:
+        print("每次只能处理一个 PPT，请只提供一个文件。")
+        input("按回车退出...")
+        return
 
-    # 先读旧数据中的手工人物（Excel 回填等），避免重跑丢失（必须在清空目录之前）
+    if len(sys.argv) == 2:
+        raw_path = sys.argv[1]
+    else:
+        raw_path = input("请输入或拖入一个 PPT 文件，然后按回车：")
+
+    # 去掉路径两端的空白和双引号
+    raw_path = raw_path.strip().strip('"')
+
+    if not raw_path:
+        print("没有提供文件，已退出。")
+        input("按回车退出...")
+        return
+
+    ppt_path = Path(raw_path)
+
+    if not ppt_path.is_file():
+        print(f"找不到文件：{ppt_path}")
+        input("按回车退出...")
+        return
+
+    if ppt_path.suffix.lower() != ".pptx":
+        print("请选择 .pptx 文件。")
+        input("按回车退出...")
+        return
+
+    # 提前检查文件名中的日期，避免无法确定要更新哪一期
+    try:
+        episode = extract_episode(ppt_path.stem)
+        if episode is None:
+            raise ValueError("文件名末尾缺少日期数字，例如 89 或 816")
+
+        month_day = parse_month_day(episode)
+        if month_day is None:
+            raise ValueError("文件名末尾的数字无法解析为月日")
+
+        # 验证真实日期，例如 2 月 30 日会在这里报错
+        date(YEAR, month_day[0], month_day[1])
+
+    except ValueError as e:
+        print(f"日期检查失败，已停止转换：{e}")
+        input("按回车退出...")
+        return
+
+    # 读取旧文章和人物标签，供后续增量更新使用
+    old_articles = []
     old_chars = {}
     old_json = DATA_DIR / "library.json"
+
     if old_json.exists():
         try:
             old = json.loads(old_json.read_text(encoding="utf-8"))
-            old_chars = {(str(a.get("episode")), a.get("title")): a.get("characters", [])
-                         for a in old.get("articles", []) if a.get("characters")}
-        except Exception:
-            old_chars = {}
+            old_articles = old["articles"]
 
-    # 全量重建输出目录（避免旧数据残留）
-    for d in (IMAGES_DIR, DATA_DIR):
-        if d.exists():
-            for f in d.iterdir():
-                if f.is_file():
-                    f.unlink()
+            # 检查文章列表，避免把异常数据用于后续更新
+            if not isinstance(old_articles, list):
+                raise ValueError("articles 应该是一个文章列表")
+
+            old_chars = {
+                (
+                    (a.get("date_start") or "")[:4],
+                    str(a.get("episode")),
+                    a.get("title")
+                ): a.get("characters", [])
+                for a in old_articles
+                if a.get("characters")
+            }
+
+        except Exception as e:
+            print(f"读取旧数据失败，已停止转换：{e}")
+            input("按回车退出...")
+            return
+
+    # 确保输出目录存在，保留已有文件
     IMAGES_DIR.mkdir(parents=True, exist_ok=True)
     DATA_DIR.mkdir(parents=True, exist_ok=True)
 
     confirm_lines = []
-    all_articles = []
-    for p in paths:
-        try:
-            all_articles.extend(process_one(p, confirm_lines))
-        except Exception as e:
-            confirm_lines.append(f"⚠️ {p.name} 处理失败: {e}")
+    staging = None
+
+    try:
+        # 在 library 下面创建一个独立的临时工作目录
+        staging = tempfile.TemporaryDirectory(
+            prefix="ppt-import-",
+            dir=LIBRARY_DIR
+        )
+        staging_dir = Path(staging.name)
+
+        # 本次提取的图片先存放在这里
+        staging_images = staging_dir / "images"
+        staging_images.mkdir()
+
+        all_articles = process_one(
+            ppt_path, confirm_lines, staging_images
+        )
+
+        if not all_articles:
+            raise ValueError("没有提取到任何文章，请检查 PPT 内容")
+
+    except Exception as e:
+        if staging is not None:
+            staging.cleanup()
+
+        print(f"{ppt_path.name} 转换失败，已停止：{e}")
+        input("按回车退出...")
+        return
 
     # 合并旧数据中的手工人物（Excel 回填等），避免重跑丢失
     for a in all_articles:
-        key = (str(a.get("episode")), a.get("title"))
+        key = (
+            (a.get("date_start") or "")[:4],
+            str(a.get("episode")),
+            a.get("title")
+        )
         if key in old_chars and old_chars[key]:
             a["characters"] = list(dict.fromkeys(old_chars[key] + a.get("characters", [])))
 
-    data = {"version": 2, "articles": all_articles}
-    with open(DATA_DIR / "library.json", "w", encoding="utf-8") as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
+    # 用“年份+文件名日期数字”识别文章所属的期
+    def issue_key(article):
+        year = article["date_start"][:4]
+        episode = str(article["episode"])
+        return year, episode
+
+    # 本次转换涉及哪些期
+    updated_issues = {
+        issue_key(article)
+        for article in all_articles
+    }
+
+    # 保留旧数据中不属于这些期的文章
+    kept_articles = [
+        article
+        for article in old_articles
+        if issue_key(article) not in updated_issues
+    ]
+
+    # 其他期的旧文章 + 本次转换的新文章
+    merged_articles = kept_articles + all_articles
+
+    data = {"version": 2, "articles": merged_articles}
+
+    try:
+        # 先把合并后的数据完整写进临时文件
+        staged_json = staging_dir / "library.json"
+        with open(staged_json, "w", encoding="utf-8") as f:
+            json.dump(data, f, ensure_ascii=False, indent=2)
+
+        # 备份放在转换器旁边，独立于临时目录
+        backup_root = Path(__file__).resolve().parent / "备份"
+        backup_root.mkdir(parents=True, exist_ok=True)
+
+        backup_dir = Path(tempfile.mkdtemp(
+            prefix=f"{YEAR}_{episode}_",
+            dir=backup_root
+        ))
+        backup_images = backup_dir / "images"
+        backup_images.mkdir()
+
+        # 记录更新前是否已有总数据文件，并备份
+        had_old_json = old_json.exists()
+        if had_old_json:
+            shutil.copy2(old_json, backup_dir / "library.json")
+
+        # 列出本次准备发布的图片
+        new_image_files = list(staging_images.iterdir())
+
+        # 备份即将被同名覆盖的旧图片
+        for source in new_image_files:
+            target = IMAGES_DIR / source.name
+            if target.exists():
+                shutil.copy2(target, backup_images / target.name)
+
+    except Exception as e:
+        staging.cleanup()
+        print(f"准备输出或备份失败，正式数据尚未更新：{e}")
+        input("按回车退出...")
+        return
+
+    # 记录实际尝试更新的文件，失败时据此恢复
+    changed_images = []
+    json_update_started = False
+
+    print(f"本次备份位置：{backup_dir}")
+
+    try:
+        # 先发布图片
+        for source in new_image_files:
+            target = IMAGES_DIR / source.name
+            changed_images.append(target)
+            shutil.copy2(source, target)
+
+        # 图片就位后，再用完整的新 JSON 替换正式文件
+        json_update_started = True
+        staged_json.replace(old_json)
+
+    except Exception as e:
+        recovery_errors = []
+
+        # 恢复更新前的 JSON 状态
+        if json_update_started:
+            try:
+                if had_old_json:
+                    recovery_json = staging_dir / "restore-library.json"
+                    shutil.copy2(
+                        backup_dir / "library.json",
+                        recovery_json
+                    )
+                    recovery_json.replace(old_json)
+                else:
+                    old_json.unlink(missing_ok=True)
+            except Exception as restore_error:
+                recovery_errors.append(f"恢复 JSON 失败：{restore_error}")
+
+        # 恢复被覆盖的图片，移除本次新增的图片
+        for target in reversed(changed_images):
+            try:
+                saved_image = backup_images / target.name
+                if saved_image.exists():
+                    shutil.copy2(saved_image, target)
+                else:
+                    target.unlink(missing_ok=True)
+            except Exception as restore_error:
+                recovery_errors.append(
+                    f"恢复图片 {target.name} 失败：{restore_error}"
+                )
+
+        # 临时文件不再用于发布，独立备份继续保留
+        try:
+            staging.cleanup()
+        except Exception as cleanup_error:
+            print(f"临时目录清理失败：{cleanup_error}")
+
+        print(f"正式更新失败：{e}")
+
+        if recovery_errors:
+            print("自动恢复未全部成功，请保留备份并检查：")
+            for message in recovery_errors:
+                print(message)
+        else:
+            print("已恢复到本次更新前的状态。")
+
+        print(f"备份位置：{backup_dir}")
+        input("按回车退出...")
+        return
+
+    # 找出被替换的旧文章引用过的图片
+    old_image_paths = set()
+    for article in old_articles:
+        if issue_key(article) in updated_issues:
+            for paragraph in article.get("paragraphs", []):
+                old_image_paths.update(paragraph.get("images", []))
+
+    # 找出更新后的全部文章仍在引用的图片
+    used_image_paths = set()
+    for article in merged_articles:
+        for paragraph in article.get("paragraphs", []):
+            used_image_paths.update(paragraph.get("images", []))
+
+    # 只清理旧版本引用过、如今已无人引用的图片
+    for image_path in old_image_paths - used_image_paths:
+        try:
+            target = (LIBRARY_DIR / image_path).resolve()
+
+            # 只允许处理正式图片目录里的直接子文件
+            if target.parent != IMAGES_DIR.resolve():
+                print(f"跳过目录范围外的图片路径：{image_path}")
+                continue
+
+            if target.is_file():
+                saved_image = backup_images / target.name
+
+                # 不覆盖前面已经保存的原始备份
+                if not saved_image.exists():
+                    shutil.copy2(target, saved_image)
+
+                target.unlink()
+
+        except Exception as e:
+            print(f"旧图片清理未完成，文章更新已保存：{image_path}；{e}")
 
     if confirm_lines:
         with open(LIBRARY_DIR / "待确认清单.txt", "w", encoding="utf-8") as f:
@@ -323,8 +551,23 @@ def main():
     else:
         (LIBRARY_DIR / "待确认清单.txt").unlink(missing_ok=True)
 
-    img_count = len(list(IMAGES_DIR.glob("*")))
-    print(f"完成！{len(paths)} 个 PPT → {len(all_articles)} 篇 → library/data/library.json（图片 {img_count} 张）")
+    # 正式输出已完成，可以清理本次临时文件
+    try:
+        staging.cleanup()
+    except Exception as e:
+        print(f"临时目录清理失败，不影响已保存的内容：{e}")
+
+    is_update = any(
+        issue_key(article) in updated_issues
+        for article in old_articles
+    )
+    action = "更新一期" if is_update else "新增一期"
+
+    print(
+        f"完成！{action}，本次 {len(all_articles)} 篇，"
+        f"图书馆共 {len(merged_articles)} 篇。"
+    )
+    print(f"备份位置：{backup_dir}")
     input("按回车退出...")
 
 
