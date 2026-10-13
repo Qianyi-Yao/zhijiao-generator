@@ -6,25 +6,27 @@
   <title>微考据图书馆｜知交圈生成器</title>
   <meta name="description" content="忘川风华录知交圈微考据图文库：考据原图与文字，按人物、日期周、标题筛选浏览。" />
   <link rel="icon" type="image/png" href="ui/zhijiaoquan-icon.png" />
+  <link rel="stylesheet" href="vendor/flatpickr/flatpickr.min.css" />
   <style>
     @font-face { font-family: "Jinling"; src: url("fonts/BWKS.woff2") format("woff2"); font-display: swap; }
     @font-face { font-family: "ShengshiKai"; src: url("fonts/FZSHENGSKSJW_CU.woff2") format("woff2"); font-display: swap; }
+    @font-face { font-family: "HuiwenMincho"; src: url("fonts/汇文明朝体.woff2") format("woff2"); font-display: swap; }
 
     :root {
-      --paper: #f8f1df;
-      --ink: #3f382f;
-      --muted: #8a8072;
-      --line: #ded7c8;
-      --panel: #fffdf8;
-      --green: #69816f;
-      --green-dark: #485e50;
-      --gold: #b88749;
+      --paper: #F1F0E8;
+      --ink: #1C1E23;
+      --muted: #2E6A67;
+      --line: #C9D8D2;
+      --panel: #FAFAF6;
+      --green: #5E8C87;
+      --green-dark: #2E6A67;
+      --source-tag: #A9C8BE;
     }
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
       background: var(--paper);
       color: var(--ink);
-      font-family: "SimSun", "Songti SC", "Noto Serif SC", serif;
+      font-family: "HuiwenMincho", "SimSun", "Songti SC", "Noto Serif SC", serif;
       font-size: 16px;
       line-height: 1.9;
       min-height: 100vh;
@@ -48,7 +50,7 @@
       border: 1px solid var(--line); background: var(--panel); border-radius: 999px;
       padding: 3px 10px; font-size: 12px; cursor: pointer; color: var(--muted);
     }
-    .clear-btn:hover { background: #f0ead9; }
+    .clear-btn:hover { background: #E1EAE4; }
     .hidden { display: none !important; }
     /* 新 UI 控件统一粗金陵体 */
     .filter-bar input, .filter-bar select, .clear-btn, .filter-label,
@@ -59,20 +61,29 @@
 
     .article-card {
       background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
-      margin-bottom: 14px; overflow: hidden; box-shadow: 0 1px 3px rgba(90, 70, 40, .06);
+      margin-bottom: 14px; overflow: hidden; box-shadow: 0 1px 3px rgba(28, 30, 35, .06);
     }
     .article-head { padding: 13px 16px; cursor: pointer; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
-    .article-head:hover { background: #f6f1e4; }
+    .article-head:hover { background: #EAF0E9; }
     .article-title { font-size: 18px; letter-spacing: 1px; font-family: "Jinling", serif; }
-    .article-meta { font-size: 12px; color: var(--muted); font-family: "ShengshiKai", "Noto Serif SC", serif; }
+    .article-meta { font-size: 12px; color: var(--muted); font-family: "HuiwenMincho", "SimSun", "Songti SC", "Noto Serif SC", serif; }
     .article-tags { display: inline-flex; gap: 6px; flex-wrap: wrap; font-family: "ShengshiKai", "Noto Serif SC", serif; }
-    .tag {
-      font-size: 11px; color: var(--green-dark); border: 1px solid #b9c9ba; border-radius: 999px;
-      padding: 1px 8px; background: #f0f4ee; cursor: pointer;
+    .tag, .source-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      font-family: "HuiwenMincho", "SimSun", "Songti SC", "Noto Serif SC", serif;
+      font-size: 11px; font-weight: 400; line-height: 21px; color: var(--ink);
+      border: 0; border-radius: 10px; padding: 1px 8px; white-space: nowrap;
     }
-    .tag:hover { background: #e0e9dd; }
+    .tag { background: rgba(94, 140, 135, .2); cursor: pointer; }
+    .tag:hover { background: rgba(46, 106, 103, .2); }
     .article-body { display: none; padding: 6px 18px 18px; border-top: 1px dashed var(--line); }
     .article-card.open .article-body { display: block; }
+    .article-body, header.library-head .back, header.library-head .note, .foot-note {
+      font-family: "HuiwenMincho", "SimSun", "Songti SC", "Noto Serif SC", serif;
+    }
+    .article-tags {
+      font-family: "ShengshiKai", "Noto Serif SC", serif;
+    }
 
     .media-row { display: flex; gap: 18px; align-items: flex-start; margin: 12px 0; }
     .media-imgs { flex: 0 0 180px; }
@@ -86,6 +97,17 @@
     .rich-text { white-space: pre-wrap; word-break: break-word; }
     .rich-text strong { font-weight: 700; }
     .rich-text em { font-style: italic; }
+    .source-badge { background: rgba(169, 200, 190, .2); }
+    .markdown-quote { margin: 10px 0; padding: 4px 0 4px 14px; border-left: 3px solid var(--source-tag); font-family: "KaiTi", "STKaiti", "Noto Serif SC", serif; }
+    .markdown-quote p { margin: 0 0 8px; }
+    .markdown-list { margin: 4px 0 12px; padding-left: 1.7em; }
+    .markdown-list li + li { margin-top: 4px; }
+    .markdown-table-wrap { max-width: 100%; overflow-x: auto; margin: 12px 0; }
+    .markdown-table { border-collapse: collapse; min-width: 100%; font-size: 14px; line-height: 1.6; }
+    .markdown-table th, .markdown-table td { border: 1px solid var(--line); padding: 6px 9px; vertical-align: top; }
+    .markdown-table th { background: #EAF0E9; font-weight: 700; }
+    .markdown-heading { margin: 12px 0 4px; font-size: 16px; }
+    .markdown-rule { border: 0; border-top: 1px solid var(--line); margin: 12px 0; }
 
     .empty-tip { text-align: center; color: var(--muted); padding: 40px 0; }
     .pager { display: flex; justify-content: center; align-items: center; gap: 6px; flex-wrap: wrap; margin: 18px 0; }
@@ -94,7 +116,7 @@
       padding: 4px 11px; font-size: 14px; cursor: pointer; color: var(--ink);
       font-family: inherit;
     }
-    .page-btn:hover { background: #f0ead9; }
+    .page-btn:hover { background: #E1EAE4; }
     .page-num { font-family: "Jinling", serif; font-weight: bold; font-size: 15px; }
     .page-num.active { background: var(--green-dark); color: #fff; border-color: var(--green-dark); }
     .page-ellipsis {
@@ -105,7 +127,7 @@
     }
     .expand-btn { margin: 6px auto 0; display: block; font-size: 15px; padding: 8px 22px; }
 
-    .foot-note { text-align: center; font-size: 12px; color: #a89a82; margin-top: 30px; }
+    .foot-note { text-align: center; font-size: 12px; color: var(--muted); margin-top: 30px; }
 
     @media (max-width: 560px) {
       .library-wrap { padding: 20px 14px 50px; }
@@ -119,6 +141,101 @@
       .media-imgs { flex: none; width: 100%; }
       .img-only img { width: 100%; }
     }
+    .filter-bar {
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 100px;
+      grid-template-areas: "title character source" "date status clear";
+      gap: 10px; align-items: center;
+    }
+    #searchInput { grid-area: title; }
+    .character-field { grid-area: character; position: relative; min-width: 0; display: flex; }
+    #sourceFilter { grid-area: source; }
+    #weekPicker { grid-area: date; cursor: pointer; }
+    #weekLabel { grid-area: status; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    #clearFilters { grid-area: clear; width: 100%; height: 36px; }
+    #clearFilters:disabled { opacity: .45; cursor: default; }
+    .filter-bar input, .filter-bar select { width: 100%; min-width: 0 !important; height: 36px; font-size: 13px; }
+    #characterSelect { position: absolute; top: calc(100% + 10px); left: 0; z-index: 20; }
+    /* 提示、筛选控件及文字操作统一使用汇文明朝体。 */
+    .empty-tip, .filter-label, .filter-bar input, .filter-bar select,
+    .clear-btn, .expand-btn {
+      font-family: "HuiwenMincho", "SimSun", "Songti SC", "Noto Serif SC", serif;
+      font-weight: 400;
+    }
+    .filter-bar input::placeholder { font-family: inherit; font-weight: inherit; }
+    .filter-bar input[type="search"]::-webkit-search-cancel-button {
+      -webkit-appearance: none;
+      width: 14px; height: 14px; margin-left: 8px; cursor: pointer;
+      background: #5E8C87;
+      -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 4l8 8M12 4l-8 8' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+      mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 4l8 8M12 4l-8 8' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
+    }
+    .filter-bar input, .filter-bar select, .filter-bar .clear-btn { border-style: dashed; }
+    .flatpickr-calendar { background: var(--panel); font-family: "Jinling", serif; box-shadow: 0 4px 18px rgba(46,106,103,.14); }
+    .flatpickr-day.library-week { background: rgba(169,200,190,.4); border-color: transparent; border-radius: 6px; }
+    .flatpickr-day.selected, .flatpickr-day.selected:hover { background: var(--green-dark); border-color: var(--green-dark); }
+    .flatpickr-day:hover { background: #E1EAE4; border-color: #E1EAE4; }
+    @media (max-width: 560px) {
+      .filter-bar { grid-template-columns: minmax(0, 1fr) 100px; grid-template-areas: "title source" "character clear" "candidate candidate" "date date" "status status"; }
+      .character-field { display: contents; }
+      #characterSearch { grid-area: character; }
+      #characterSelect { grid-area: candidate; position: static; z-index: auto; }
+      #characterSelect.hidden { display: block !important; visibility: hidden; pointer-events: none; }
+      #weekLabel { min-height: 23px; }
+    }
+    .share-btn, .share-dialog button {
+      font-family: "HuiwenMincho", serif; font-size: 12px; color: var(--green-dark);
+      border: 1px dashed var(--line); border-radius: 8px; background: var(--panel);
+      padding: 3px 10px; cursor: pointer;
+    }
+    .share-btn { margin-left: auto; flex-shrink: 0; }
+    .share-btn:hover, .share-dialog button:hover { background: #E1EAE4; }
+    .share-dialog { margin: auto; width: min(420px, calc(100% - 32px)); padding: 24px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--ink); font-family: "HuiwenMincho", serif; }
+    .share-dialog::backdrop { background: rgba(28,30,35,.25); }
+    .share-dialog h2 { font-size: 19px; margin-bottom: 10px; }
+    .share-dialog p { font-size: 13px; margin-bottom: 12px; }
+    .share-actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .share-dialog button { font-size: 14px; padding: 7px 12px; }
+    .share-dialog button:disabled { opacity: .5; cursor: wait; }
+    #shareStatus { min-height: 25px; margin-top: 12px; }
+    .share-dialog { max-height: calc(100dvh - 32px); overflow-y: auto; }
+    .share-dialog button[aria-pressed="true"] { background: #A9C8BE; border-style: solid; }
+    .share-preview { margin: 14px 0; max-height: 42vh; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+    .share-preview img { display: block; width: 100%; height: auto; }
+    .share-preview a { display: block; }
+    .share-export { box-sizing: border-box; padding: 24px; background: var(--paper); color: var(--ink); }
+    .share-export .article-card { margin: 0; box-shadow: none; }
+    .share-export .article-head { cursor: default; background: var(--panel); }
+    .share-export .article-title { font-size: 18px; }
+    .share-export .article-body { display: block; }
+    .share-export .share-btn { display: none; }
+    .share-export .foot-note { margin-top: 16px; }
+    .share-export .markdown-table-wrap { overflow: visible; }
+    .share-export .markdown-table { width: 100%; min-width: 0; table-layout: fixed; }
+    .share-export .markdown-table td, .share-export .markdown-table th { overflow-wrap: anywhere; }
+    .share-export.desktop .media-row { flex-direction: row; }
+    .share-export.desktop .media-imgs { flex: 0 0 180px; width: 180px; }
+    .share-export.desktop .img-only img { width: 180px; }
+    .share-export.mobile { padding: 12px; }
+    .share-export.mobile .media-row { flex-direction: column; }
+    .share-export.mobile .media-imgs { flex: none; width: 100%; }
+    .share-export.mobile .img-only img { width: 100%; }
+    .article-heading-row, .article-detail-row { display: contents; }
+    .article-heading-row .article-tags { order: 1; }
+    .article-detail-row .share-btn { order: 2; }
+    @media (max-width: 560px) {
+      .article-heading-row, .article-detail-row {
+        display: flex; flex: 0 0 100%; min-width: 0; gap: 10px;
+        align-items: baseline; text-align: left;
+      }
+      .article-heading-row { flex-wrap: wrap; }
+      .article-heading-row .article-title { min-width: 0; overflow-wrap: anywhere; }
+      .article-detail-row .article-meta { min-width: 0; overflow-wrap: anywhere; }
+      .article-detail-row .share-btn { margin-left: auto; }
+    }
+    .share-export.desktop .article-heading-row, .share-export.desktop .article-detail-row { display: contents; }
+    .share-export.mobile .article-heading-row, .share-export.mobile .article-detail-row {
+      display: flex; flex: 0 0 100%; min-width: 0; gap: 10px; align-items: baseline; flex-wrap: wrap;
+    }
   </style>
 </head>
 <body>
@@ -131,20 +248,41 @@
 
     <div class="filter-bar">
       <input id="searchInput" type="search" placeholder="搜索标题关键词……" />
+      <div class="character-field">
       <input id="characterSearch" type="search" placeholder="搜索人物（输入后回车选择）……" />
       <select id="characterSelect" class="hidden" aria-label="人物候选"></select>
-      <select id="weekYear" class="week-select" aria-label="年"><option value="">年</option></select>
-      <select id="weekMonth" class="week-select" aria-label="月" disabled><option value="">月</option></select>
-      <select id="weekDay" class="week-select" aria-label="日" disabled><option value="">日</option></select>
-      <span id="weekLabel" class="filter-label"></span>
-      <button id="clearFilters" class="clear-btn hidden" type="button">清除筛选</button>
+      </div>
+      <select id="sourceFilter" aria-label="文章来源">
+        <option value="all">全部</option>
+        <option value="main">正篇</option>
+        <option value="extra">番外</option>
+      </select>
+      <input id="weekPicker" type="text" aria-label="选择日期，按周筛选" placeholder="点击日历选择一周" readonly />
+      <span id="weekLabel" class="filter-label" aria-live="polite">未限定日期</span>
+      <button id="clearFilters" class="clear-btn" type="button" disabled>清除筛选</button>
     </div>
 
     <div id="articleList"></div>
-    <p class="foot-note">内容由作者整理发布，素材版权归原权利人所有</p>
+    <p class="foot-note">内容由遣月整理发布，素材版权归原权利人所有</p>
   </div>
 
+  <dialog id="shareDialog" class="share-dialog" aria-labelledby="shareHeading">
+    <h2 id="shareHeading">分享文章</h2>
+    <p>先预览排版，再下载完整 JPG。预览可上下滚动，点击图片可查看大图。</p>
+    <div class="share-actions">
+      <button type="button" data-share-layout="desktop">网页版视图</button>
+      <button type="button" data-share-layout="mobile">手机版视图</button>
+    </div>
+    <p id="shareStatus" role="status" aria-live="polite"></p>
+    <div id="sharePreview" class="share-preview" hidden>
+      <a id="sharePreviewLink" target="_blank" rel="noopener" aria-label="打开分享大图"><img id="sharePreviewImage" alt="文章分享长图预览" /></a>
+    </div>
+    <button type="button" id="downloadShare" disabled>下载 JPG</button>
+  </dialog>
+  <script src="html2canvas.min.js"></script>
   <script src="characters.js"></script>
+  <script src="vendor/flatpickr/flatpickr.min.js"></script>
+  <script src="vendor/flatpickr/zh.js"></script>
   <script>
     let articles = [];
     let mode = 'preview';      // 'preview' 预览3篇 | 'paged' 分页浏览
@@ -161,9 +299,9 @@
     const searchInput = document.getElementById('searchInput');
     const characterSearch = document.getElementById('characterSearch');
     const characterSelect = document.getElementById('characterSelect');
-    const weekYear = document.getElementById('weekYear');
-    const weekMonth = document.getElementById('weekMonth');
-    const weekDay = document.getElementById('weekDay');
+    const sourceFilter = document.getElementById('sourceFilter');
+    const weekPicker = document.getElementById('weekPicker');
+    let calendar;
     const weekLabel = document.getElementById('weekLabel');
     const clearFilters = document.getElementById('clearFilters');
 
@@ -190,6 +328,7 @@
         if (r.strike) t = '<s>' + t + '</s>';
         const styles = [];
         if (r.color) styles.push('color:' + esc(r.color));
+        if (r.background) styles.push('background-color:' + esc(r.background));
         if (r.font) styles.push('font-family:\'KaiTi\',\'STKaiti\',\'Noto Serif SC\',serif'); // 引用统一楷体
         return styles.length ? '<span style="' + styles.join(';') + '">' + t + '</span>' : t;
       }).join('');
@@ -197,7 +336,37 @@
 
     function renderParagraph(p) {
       const imgs = (p.images || []).map(img =>
-        '<img src="library/' + esc(img) + '" alt="考据配图" loading="lazy">');
+        '<img src="library/' + esc(img) + '" alt="' + esc(p.alt || '考据配图') + '" loading="lazy">');
+      if (p.type === 'image') return '<div class="img-only">' + imgs.join('') + '</div>';
+      if (p.type === 'quote') {
+        return '<blockquote class="markdown-quote">' + (p.blocks || []).map(renderParagraph).join('') + '</blockquote>';
+      }
+      if (p.type === 'list') {
+        const tag = p.ordered ? 'ol' : 'ul';
+        const items = (p.items || []).map(item =>
+          '<li>' + (item || []).map(renderParagraph).join('') + '</li>'
+        ).join('');
+        return '<' + tag + ' class="markdown-list">' + items + '</' + tag + '>';
+      }
+      if (p.type === 'table') {
+        const rows = p.rows || [];
+        const align = p.align || [];
+        const tableRows = rows.map((row, rowIndex) => {
+          const cellTag = rowIndex === 0 ? 'th' : 'td';
+          const cells = (row || []).map((runs, cellIndex) => {
+            const alignment = ['left', 'center', 'right'].includes(align[cellIndex])
+              ? ' style="text-align:' + align[cellIndex] + '"' : '';
+            return '<' + cellTag + alignment + '><span class="rich-text">' + renderRuns(runs) + '</span></' + cellTag + '>';
+          }).join('');
+          return '<tr>' + cells + '</tr>';
+        }).join('');
+        return '<div class="markdown-table-wrap"><table class="markdown-table"><tbody>' + tableRows + '</tbody></table></div>';
+      }
+      if (p.type === 'heading') {
+        const level = Math.max(5, Math.min(6, Number(p.level) || 5));
+        return '<h' + level + ' class="markdown-heading">' + renderRuns(p.runs) + '</h' + level + '>';
+      }
+      if (p.type === 'rule') return '<hr class="markdown-rule">';
       const textHtml = '<span class="rich-text">' + renderRuns(p.runs) + '</span>';
       if (imgs.length && (p.runs || []).some(r => (r.text || '').trim())) {
         return '<div class="media-row"><div class="media-imgs">' + imgs.join('') +
@@ -213,6 +382,7 @@
       return {
         titleInput,
         titleQuery: titleInput.trim().toLowerCase(),
+        source: sourceFilter.value,
         character: selectedChar,
         year: selectedYear,
         month: selectedMonth,
@@ -225,6 +395,9 @@
 
     function filtered(filters) {
       return articles.filter(a => {
+        const articleSource = a.source === 'extra' ? 'extra' : 'main';
+        if (filters.source !== 'all' && filters.source !== articleSource) return false;
+
         if (
           filters.titleQuery &&
           !a.title.toLowerCase().includes(filters.titleQuery)
@@ -313,72 +486,55 @@
       }
     };
 
-    // 周筛选：年/月/日 下拉（中文）→ 选完自动归到该周（周日~周六）
-    function fillMonthOptions() {
-      weekMonth.innerHTML = '<option value="">月</option>' +
-        Array.from({ length: 12 }, (_, i) => `<option value="${i + 1}">${i + 1}月</option>`).join('');
+    // 日历选择一天，筛选所属周（日曜日至星期六），使用本地日期避免时区偏移。
+    function isoDate(date) {
+      return date.getFullYear() + '-' + String(date.getMonth() + 1).padStart(2, '0') + '-' + String(date.getDate()).padStart(2, '0');
     }
-    function fillDayOptions() {
-      const y = +weekYear.value, m = +weekMonth.value;
-      if (!y || !m) { weekDay.innerHTML = '<option value="">日</option>'; return; }
-      const days = new Date(y, m, 0).getDate();
-      weekDay.innerHTML = '<option value="">日</option>' +
-        Array.from({ length: days }, (_, i) => `<option value="${i + 1}">${i + 1}日</option>`).join('');
+    function weekBounds(date) {
+      const start = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+      start.setDate(start.getDate() - start.getDay());
+      const end = new Date(start);
+      end.setDate(end.getDate() + 6);
+      return [isoDate(start), isoDate(end)];
     }
-    function updateDateControls() {
-      weekMonth.disabled = !weekYear.value;
-      weekDay.disabled = !weekYear.value || !weekMonth.value;
+    function initCalendar() {
+      calendar = flatpickr(weekPicker, {
+        locale: { ...flatpickr.l10ns.zh, firstDayOfWeek: 0 },
+        dateFormat: 'Y-m-d', disableMobile: true,
+        defaultDate: null,
+        onChange(dates, value, instance) {
+          selectedYear = selectedMonth = '';
+          if (dates.length) {
+            const [start, end] = weekBounds(dates[0]);
+            selectedWeek = start;
+            weekPicker.value = start + ' 至 ' + end;
+            weekLabel.textContent = '按周筛选（日 至 六）';
+          } else {
+            selectedWeek = '';
+            weekLabel.textContent = '未限定日期';
+          }
+          instance.redraw();
+          renderFromFirstPage();
+        },
+        onDayCreate(dates, value, instance, day) {
+          if (selectedWeek && weekBounds(day.dateObj)[0] === selectedWeek) day.classList.add('library-week');
+        }
+      });
+      if (articles.length) calendar.jumpToDate(articles[articles.length - 1].date_start);
     }
-    function onWeekChange() {
-      const y = weekYear.value, m = weekMonth.value, d = weekDay.value;
-      selectedYear = y || '';
-      selectedMonth = m || '';
-      if (y && m && d) {
-        const date = new Date(+y, +m - 1, +d);
-        const sun = new Date(date);
-        sun.setDate(date.getDate() - date.getDay());
-        const pad = n => String(n).padStart(2, '0');
-        selectedWeek = sun.getFullYear() + '-' + pad(sun.getMonth() + 1) + '-' + pad(sun.getDate());
-        const end = new Date(sun);
-        end.setDate(sun.getDate() + 6);
-        weekLabel.textContent = selectedWeek + ' ~ ' + end.getFullYear() + '-' + pad(end.getMonth() + 1) + '-' + pad(end.getDate());
-      } else {
-        selectedWeek = '';
-        weekLabel.textContent = (y ? y + '年' : '') + (m ? ' ' + m + '月' : '');
-      }
-      renderFromFirstPage();
-    }
-    weekYear.onchange = () => {
-      if (!weekYear.value) {
-        weekMonth.value = '';
-      }
-
-      fillDayOptions();
-      updateDateControls();
-      onWeekChange();
-    };
-    weekMonth.onchange = () => {
-      fillDayOptions();
-      updateDateControls();
-      onWeekChange();
-    };
-    weekDay.onchange = onWeekChange;
-    fillMonthOptions();
-    fillDayOptions();
-    updateDateControls();
+    sourceFilter.onchange = renderFromFirstPage;
 
     clearFilters.onclick = () => {
       searchInput.value = '';
       characterSearch.value = '';
       selectedChar = '';
-      weekYear.value = '';
-      weekMonth.value = '';
-      weekDay.innerHTML = '<option value="">日</option>';
+      if (calendar) calendar.clear(false);
+      characterSelect.classList.add('hidden');
       selectedYear = '';
       selectedMonth = '';
       selectedWeek = '';
-      weekLabel.textContent = '';
-      updateDateControls();
+      sourceFilter.value = 'all';
+      weekLabel.textContent = '未限定日期';
       renderFromFirstPage();
     };
 
@@ -386,11 +542,12 @@
       const active =
         filters.titleInput ||
         filters.character ||
+        filters.source !== 'all' ||
         filters.year ||
         filters.month ||
         filters.week;
 
-      clearFilters.classList.toggle('hidden', !active);
+      clearFilters.disabled = !active;
     }
 
     function visiblePageNumbers(totalPages) {
@@ -482,13 +639,21 @@
       list.innerHTML = pageView.shown.map(a => {
         const tags = (a.characters || []).map(c =>
           `<span class="tag" data-tag="${esc(c)}">${esc(c)}</span>`).join('');
-        const meta = `${a.date_start} ~${a.date_end} · ${episodeLabel(a)}`;
+        const isExtra = a.source === 'extra';
+        const meta = `${a.date_start} 至 ${a.date_end}${isExtra ? '' : ' · ' + episodeLabel(a)}`;
+        const sourceBadge = isExtra ? '<span class="source-badge">番外</span>' : '';
         const body = a.paragraphs.map(renderParagraph).join('');
         return `<article class="article-card">
           <div class="article-head">
+            <div class="article-heading-row">
             <span class="article-title">${esc(a.title)}</span>
-            <span class="article-meta">${esc(meta)}</span>
+            ${sourceBadge}
             <span class="article-tags">${tags}</span>
+            </div>
+            <div class="article-detail-row">
+            <span class="article-meta">${esc(meta)}</span>
+            <button type="button" class="share-btn" aria-label="分享：${esc(a.title)}">分享</button>
+            </div>
           </div>
           <div class="article-body">${body}</div>
         </article>`;
@@ -497,6 +662,12 @@
 
     list.onclick = event => {
       if (!(event.target instanceof Element)) return;
+
+      const shareButton = event.target.closest('.share-btn');
+      if (shareButton) {
+        openShare(shareButton.closest('.article-card'));
+        return;
+      }
 
       const tag = event.target.closest('[data-tag]');
       if (tag) {
@@ -537,6 +708,150 @@
       }
     };
 
+    const shareDialog = document.getElementById('shareDialog');
+    const shareStatus = document.getElementById('shareStatus');
+    const sharePreview = document.getElementById('sharePreview');
+    const sharePreviewImage = document.getElementById('sharePreviewImage');
+    const sharePreviewLink = document.getElementById('sharePreviewLink');
+    const downloadShare = document.getElementById('downloadShare');
+    let shareUrl = '';
+    let shareFilename = '';
+    let shareArticle = null;
+    let sharing = false;
+    let shareGeneration = 0;
+
+    function clearSharePreview() {
+      sharePreview.hidden = true;
+      sharePreviewImage.removeAttribute('src');
+      sharePreviewLink.removeAttribute('href');
+      if (shareUrl) URL.revokeObjectURL(shareUrl);
+      shareUrl = '';
+      shareFilename = '';
+      downloadShare.disabled = true;
+    }
+
+    function openShare(card) {
+      shareArticle = card.cloneNode(true);
+      shareStatus.textContent = '';
+      shareDialog.showModal();
+      exportArticle('desktop');
+    }
+    shareDialog.addEventListener('close', () => {
+      shareGeneration++;
+      sharing = false;
+      clearSharePreview();
+      shareDialog.querySelectorAll('[data-share-layout]').forEach(button => button.disabled = false);
+    });
+    let backdropPressed = false;
+    function outsideShare(event) {
+      const rect = shareDialog.getBoundingClientRect();
+      return event.target === shareDialog && (event.clientX < rect.left || event.clientX > rect.right ||
+        event.clientY < rect.top || event.clientY > rect.bottom);
+    }
+    shareDialog.addEventListener('pointerdown', event => { backdropPressed = outsideShare(event); });
+    shareDialog.addEventListener('click', event => {
+      if (backdropPressed && outsideShare(event)) shareDialog.close();
+      backdropPressed = false;
+    });
+
+    async function exportArticle(layout) {
+      if (sharing || !shareArticle) return;
+      sharing = true;
+      const generation = ++shareGeneration;
+      clearSharePreview();
+      shareDialog.querySelectorAll('[data-share-layout]').forEach(button => {
+        button.setAttribute('aria-pressed', String(button.dataset.shareLayout === layout));
+      });
+      shareDialog.querySelectorAll('button').forEach(button => button.disabled = true);
+      shareStatus.textContent = '正在准备字体和图片…';
+      const host = document.createElement('div');
+      host.className = 'share-export ' + layout;
+      host.id = 'share-export-' + generation;
+      host.style.cssText = `position:absolute;left:-10000px;top:0;width:${layout === 'mobile' ? 390 : 880}px;`;
+      host.setAttribute('aria-hidden', 'true');
+      const card = shareArticle.cloneNode(true);
+      card.classList.add('open');
+      card.querySelectorAll('.share-btn').forEach(button => button.remove());
+      host.appendChild(card);
+      const footer = document.createElement('p');
+      footer.className = 'foot-note';
+      footer.textContent = '忘川风华录知交圈微考据 · 图文整理\n内容由遣月整理发布，素材版权归原权利人所有';
+      host.appendChild(footer);
+      document.body.appendChild(host);
+      try {
+        await Promise.all([
+          document.fonts.load('16px HuiwenMincho'),
+          document.fonts.load('18px Jinling'),
+          document.fonts.ready,
+          ...Array.from(host.querySelectorAll('img'), img => new Promise((resolve, reject) => {
+            const timer = setTimeout(() => finish(new Error('图片加载超时，请稍后重试')), 20000);
+            function finish(error) {
+              clearTimeout(timer);
+              img.onload = img.onerror = null;
+              if (error) reject(error); else resolve();
+            }
+            img.onload = () => finish();
+            img.onerror = () => finish(new Error('有图片加载失败，请确认文章图片可正常显示'));
+            img.loading = 'eager';
+            if (img.complete) finish(img.naturalWidth ? null : new Error('有图片加载失败'));
+          }))
+        ]);
+        if (generation !== shareGeneration) return;
+        const width = host.offsetWidth;
+        const height = host.scrollHeight;
+        const scale = Math.min(2, 30000 / height, Math.sqrt(24000000 / (width * height)));
+        if (scale < 1) throw new Error('文章过长，超出单张图片容量，请尝试网页版视图');
+        shareStatus.textContent = '正在生成完整 JPG…';
+        const canvas = await html2canvas(host, {
+          scale, useCORS: true, backgroundColor: '#F1F0E8', logging: false,
+          width, height, windowWidth: layout === 'mobile' ? 390 : 1200,
+          onclone(doc) {
+            const copy = doc.getElementById(host.id);
+            copy.style.left = '0';
+            doc.getElementById('shareDialog').remove();
+          }
+        });
+        const blob = await new Promise((resolve, reject) => canvas.toBlob(
+          result => result ? resolve(result) : reject(new Error('图片生成失败，请尝试网页版视图')),
+          'image/jpeg', .9
+        ));
+        if (generation !== shareGeneration) {
+          canvas.width = canvas.height = 0;
+          return;
+        }
+        const title = card.querySelector('.article-title').textContent.replace(/[\\/:*?"<>|\x00-\x1f]/g, '_').slice(0, 100);
+        shareUrl = URL.createObjectURL(blob);
+        shareFilename = `${title}-${layout === 'mobile' ? '手机版' : '网页版'}.jpg`;
+        sharePreviewImage.src = shareUrl;
+        sharePreviewLink.href = shareUrl;
+        sharePreview.hidden = false;
+        sharePreview.scrollTop = 0;
+        shareStatus.textContent = `${layout === 'mobile' ? '手机版' : '网页版'} · ${canvas.width} × ${canvas.height}px · ${(blob.size / 1024 / 1024).toFixed(2)} MB`;
+        canvas.width = canvas.height = 0;
+      } catch (error) {
+        if (generation === shareGeneration) shareStatus.textContent = error.message || '导出失败，请稍后重试';
+      } finally {
+        host.remove();
+        if (generation === shareGeneration) {
+          sharing = false;
+          shareDialog.querySelectorAll('button').forEach(button => button.disabled = false);
+          downloadShare.disabled = !shareUrl;
+        }
+      }
+    }
+    shareDialog.querySelectorAll('[data-share-layout]').forEach(button => {
+      button.onclick = () => exportArticle(button.dataset.shareLayout);
+    });
+    downloadShare.onclick = () => {
+      if (!shareUrl || sharing) return;
+      const link = document.createElement('a');
+      link.href = shareUrl;
+      link.download = shareFilename;
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+    };
+
     searchInput.oninput = renderFromFirstPage;
 
     fetch('library/data/library.json')
@@ -544,10 +859,7 @@
       .then(data => {
         articles = (data.articles || []).sort((a, b) =>
           (a.date_start || '').localeCompare(b.date_start || ''));
-        const years = [...new Set(articles.map(a => (a.date_start || '').slice(0, 4)))]
-          .filter(Boolean).sort();
-        weekYear.innerHTML = '<option value="">年</option>' +
-          years.map(y => `<option value="${y}">${y}年</option>`).join('');
+        initCalendar();
         render();
       })
       .catch(() => { list.innerHTML = '<div class="empty-tip">数据加载失败，请用 Live Server 打开。</div>'; });

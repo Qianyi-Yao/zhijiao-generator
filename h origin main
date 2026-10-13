@@ -1,0 +1,30 @@
+[33mtag v1.4.0[m
+
+知交圈生成器 v1.4.0
+[33m07fae4f[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;33mtag: [m[1;33mv1.4.0[m[33m)[m release: v1.4.0
+ .gitignore                                         |   8 [32m+[m[31m-[m
+ CHANGELOG.md                                       |  28 [32m+[m[31m-[m
+ app.js                                             | 517 [32m+++++++++++[m[31m-------[m
+ index.html                                         |  10 [32m+[m[31m-[m
+ library.html                                       | 340 [32m+++++++++[m[31m---[m
+ library/data/library.json                          | 591 [32m+++++++++++++++++++[m[31m--[m
+ library/images/531_p11_1.jpg                       | Bin [31m130362[m -> [32m206896[m bytes
+ library/images/531_p11_2.jpg                       | Bin [31m206896[m -> [32m110200[m bytes
+ library/images/531_p11_3.jpg                       | Bin [31m110200[m -> [32m0[m bytes
+ library/images/531_p11_3.png                       | Bin [31m0[m -> [32m332003[m bytes
+ .../images/{816_p14_1_att.png => 816_p15_1.png}    | Bin
+ .../images/{816_p14_2_att.png => 816_p15_2.png}    | Bin
+ library/images/816_p20_1.png                       | Bin [31m0[m -> [32m424009[m bytes
+ .../images/{816_p19_1_att.png => 816_p20_2.png}    | Bin
+ library/images/816_p2_1.png                        | Bin [31m1009942[m -> [32m203095[m bytes
+ library/images/816_p2_2.png                        | Bin [31m0[m -> [32m1009942[m bytes
+ library/images/823_p5_1.jpg                        | Bin [31m0[m -> [32m279524[m bytes
+ library/images/{823_p4_2_att.png => 823_p5_2.png}  | Bin
+ library/images/{823_p4_1_att.png => 823_p5_3.png}  | Bin
+ library/images/830_p1_1.png                        | Bin [31m0[m -> [32m467972[m bytes
+ ...41\256\350\256\244\346\270\205\345\215\225.txt" |   4 [31m-[m
+ sitemap.xml                                        |   5 [32m+[m[31m-[m
+ style.css                                          | 185 [32m+++[m[31m----[m
+ .../converter.py"                                  | 332 [32m++++++++++++[m
+ .../\350\277\220\350\241\214.bat"                  |   8 [32m+[m
+ 25 files changed, 1593 insertions(+), 435 deletions(-)

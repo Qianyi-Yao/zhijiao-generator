@@ -1,21 +1,22 @@
 # -*- coding: utf-8 -*-
 """
 知交圈微考据 PPT 转换器
-把考据 PPT 转为网页数据（JSON + 图片），输出到工作区 library/。
+把考据 PPT 或番外 Markdown 转为网页数据（JSON + 图片），输出到工作区 library/。
 
 用法：
   1) 双击 运行.bat：处理工作区根目录（及 输入PPT/ 文件夹）里的【全部】pptx，合并为一个数据文件；
-  2) 把单个 pptx 拖到 运行.bat 上（等效 python converter.py <ppt路径>）：仅处理该文件。
+  2) 把单个 .pptx 或 .md 拖到 运行.bat 上（等效 python converter.py <文件路径>）：仅处理该文件。
 
 规则（与遣月确认）：
   - 每页第一段文本 = 标题"关于XXX"；标题含水印文字的页（封面/装饰页）跳过；
   - 每页包含"忘川风华录知交圈微考据"的段落为水印页脚，剔除；
   - 相邻页标题相同 = 同一篇（合并）；正文忠实保留（不去重）；
   - 新 PPT 右上角"核心人物：xxx"识别为标签（逗号/顿号分隔多值）；没有则留空；
-  - 文件名数字 = 开始日期（月日连写，优先两位月；89=8.9，816=8.16），年份固定见 YEAR；
+  - 文件名末尾数字 = 开始日期（月不补零、日固定两位；709=7月9日，1004=10月4日），年份固定见 YEAR；
   - 日期解析失败、标题非"关于"开头等异常，写进 library/待确认清单.txt。
 
 富文本：runs 保留粗体/斜体/删除线/颜色/字体名；页面映射：正文宋体、带字体 run 楷体。
+番外 Markdown：只导入四级标题中以“关于”开头的条目，图片路径相对 Markdown 文件所在目录。
 """
 import sys, re, json
 import tempfile
@@ -24,6 +25,7 @@ from datetime import date, timedelta
 from pathlib import Path
 from pptx import Presentation
 from pptx.oxml.ns import qn
+from markdown_import import MarkdownImportError, parse_markdown
 
 # ===== 配置 =====
 YEAR = 2026                      # 年份（跨年改这里）
@@ -40,24 +42,28 @@ IMAGES_DIR = LIBRARY_DIR / "images"
 
 
 def parse_month_day(num):
-    """文件名数字 -> (月, 日)；无法解析返回 None（进待确认清单）"""
+    """解析新格式的原始文件名后缀（月不补零、日两位）；无效时返回 None。"""
     s = str(num)
-    if len(s) >= 2:
-        two = int(s[:2])
-        if 10 <= two <= 12:
-            rest = s[2:]
-            if rest and 1 <= int(rest) <= 31:
-                return two, int(rest)
-    if s:
-        day_s = s[1:]
-        if day_s and 1 <= int(s[0]) <= 9 and 1 <= int(day_s) <= 31:
-            return int(s[0]), int(day_s)
-    return None
+    if not re.fullmatch(r"(?:[1-9]|1[0-2])[0-9]{2}", s):
+        return None
+
+    month, day = int(s[:-2]), int(s[-2:])
+    try:
+        date(YEAR, month, day)
+    except ValueError:
+        return None
+    return month, day
+
+
+def extract_episode_suffix(name):
+    """提取文件名末尾的原始数字，保留前导零供格式校验。"""
+    m = re.search(r"([0-9]+)(?:\.pptx)?$", name)
+    return m.group(1) if m else None
 
 
 def extract_episode(name):
-    m = re.search(r"(\d+)(?:\.pptx)?$", name)
-    return int(m.group(1)) if m else None
+    suffix = extract_episode_suffix(name)
+    return int(suffix) if suffix is not None else None
 
 
 def parse_person(s):
@@ -166,8 +172,9 @@ def write_images(images, episode, page_no, output_dir):
 
 def process_one(ppt_path, confirm_lines, image_output_dir):
     """处理单个 PPT，返回该期文章列表。"""
-    episode = extract_episode(ppt_path.stem)
-    md = parse_month_day(episode) if episode is not None else None
+    episode_suffix = extract_episode_suffix(ppt_path.stem)
+    episode = int(episode_suffix) if episode_suffix is not None else None
+    md = parse_month_day(episode_suffix) if episode_suffix is not None else None
     date_start = date_end = None
     if md is None:
         confirm_lines.append(f"⚠️ 文件名 {ppt_path.name} 的日期数字无法解析（数字={episode}），请人工确认")
@@ -175,7 +182,7 @@ def process_one(ppt_path, confirm_lines, image_output_dir):
         date_start = date(YEAR, md[0], md[1])
         date_end = date_start + timedelta(days=6)
 
-    print(f"  处理: {ppt_path.name}  (期数={episode}, 日期={date_start} ~ {date_end})")
+    print(f"  处理: {ppt_path.name}  (期数={episode}, 日期={date_start} 至 {date_end})")
 
     prs = Presentation(str(ppt_path))
     right_x = prs.slide_width * 0.9  # 页面右侧 90% 起为人物标注区（823 起的新布局）
@@ -248,9 +255,216 @@ def process_one(ppt_path, confirm_lines, image_output_dir):
             "date_end": date_end.isoformat() if date_end else "",
             "episode": episode,
             "characters": a["chars"],
+            "source": "main",
             "paragraphs": pages_out
         })
     return out_articles
+
+
+def import_markdown_file(md_path):
+    """解析、合并并事务式发布一个番外 Markdown 文档。"""
+    old_json = DATA_DIR / "library.json"
+    old_articles = []
+    try:
+        # Parse and validate the complete source before reading the live library.
+        from html_import import parse_html
+        parser = parse_html if Path(md_path).suffix.lower() in (".html", ".htm") else parse_markdown
+        new_articles, image_assets, warnings = parser(md_path, YEAR)
+
+        if old_json.exists():
+            old_data = json.loads(old_json.read_text(encoding="utf-8"))
+            old_articles = old_data.get("articles", [])
+            if not isinstance(old_articles, list):
+                raise ValueError("articles 应该是一个文章列表")
+            if any(not isinstance(article, dict) for article in old_articles):
+                raise ValueError("articles 中包含无效记录")
+
+        source_document_id = new_articles[0]["source_document_id"]
+        incoming_by_key = {}
+        for article in new_articles:
+            key = (source_document_id, article["date_start"], article["title"])
+            if key in incoming_by_key:
+                raise ValueError(f"同一 Markdown 文档中存在重复条目：{article['title']}")
+            incoming_by_key[key] = article
+
+        old_matches = {}
+        for index, article in enumerate(old_articles):
+            if article.get("source") != "extra":
+                continue
+            if article.get("source_document_id") != source_document_id:
+                continue
+            key = (source_document_id, article.get("date_start"), article.get("title"))
+            if key in incoming_by_key:
+                old_matches.setdefault(key, []).append((index, article))
+
+        for key, matches in old_matches.items():
+            if len(matches) > 1:
+                raise ValueError(
+                    f"{Path(md_path).name}:{incoming_by_key[key].get('_source_line', '?')}: "
+                    f"圖書館中同一番外匹配键有多条旧记录：{matches[0][1].get('title')}"
+                )
+
+        for article in new_articles:
+            article.pop("_source_line", None)
+
+        merged_by_key = {}
+        for key, article in incoming_by_key.items():
+            matches = old_matches.get(key, [])
+            if matches:
+                previous = matches[0][1]
+                previous_characters = previous.get("characters") or []
+                article["characters"] = list(dict.fromkeys(
+                    list(previous_characters) + list(article.get("characters") or [])
+                ))
+                # Retain an existing ID if a prior importer version already assigned one.
+                article["id"] = previous.get("id") or article["id"]
+            merged_by_key[key] = article
+
+        # Replace matched records in place, preserve all unmatched old records, then append new entries.
+        merged_articles = []
+        matched_keys = set()
+        for old in old_articles:
+            key = (source_document_id, old.get("date_start"), old.get("title"))
+            if old.get("source") == "extra" and old.get("source_document_id") == source_document_id and key in merged_by_key:
+                if key not in matched_keys:
+                    merged_articles.append(merged_by_key[key])
+                    matched_keys.add(key)
+                continue
+            merged_articles.append(old)
+        merged_articles.extend(
+            article for key, article in merged_by_key.items()
+            if key not in matched_keys
+        )
+
+    except Exception as error:
+        print(f"{Path(md_path).name} 解析或检查失败，正式数据未写入：{error}")
+        return False
+
+    data = {"version": 2, "articles": merged_articles}
+    warning_path = LIBRARY_DIR / "番外待确认清单.txt"
+    staging = None
+    try:
+        LIBRARY_DIR.mkdir(parents=True, exist_ok=True)
+        DATA_DIR.mkdir(parents=True, exist_ok=True)
+        IMAGES_DIR.mkdir(parents=True, exist_ok=True)
+
+        staging = tempfile.TemporaryDirectory(prefix="markdown-import-", dir=LIBRARY_DIR)
+        staging_dir = Path(staging.name)
+        staging_images = staging_dir / "images"
+        staging_images.mkdir()
+
+        for relative_path, content in image_assets.items():
+            (staging_images / Path(relative_path).name).write_bytes(content)
+
+        staged_json = staging_dir / "library.json"
+        staged_json.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
+        staged_warning = None
+        if warnings:
+            staged_warning = staging_dir / "番外待确认清单.txt"
+            staged_warning.write_text("\n".join(warnings) + "\n", encoding="utf-8")
+
+        # Back up the current JSON, warning report and any image about to be replaced.
+        backup_root = Path(__file__).resolve().parent / "备份"
+        backup_root.mkdir(parents=True, exist_ok=True)
+        backup_dir = Path(tempfile.mkdtemp(
+            prefix=f"markdown_{source_document_id}_", dir=backup_root
+        ))
+        backup_images = backup_dir / "images"
+        backup_images.mkdir()
+        had_old_json = old_json.exists()
+        if had_old_json:
+            shutil.copy2(old_json, backup_dir / "library.json")
+        had_old_warning = warning_path.exists()
+        if had_old_warning:
+            shutil.copy2(warning_path, backup_dir / warning_path.name)
+
+        new_image_files = list(staging_images.iterdir())
+        for source in new_image_files:
+            target = IMAGES_DIR / source.name
+            if target.exists():
+                shutil.copy2(target, backup_images / target.name)
+
+    except Exception as error:
+        if staging is not None:
+            staging.cleanup()
+        print(f"準備番外輸出或備份失敗，正式数据未更新：{error}")
+        return False
+
+    changed_images = []
+    json_update_started = False
+    warning_update_started = False
+    try:
+        for source in new_image_files:
+            target = IMAGES_DIR / source.name
+            changed_images.append(target)
+            shutil.copy2(source, target)
+
+        json_update_started = True
+        staged_json.replace(old_json)
+
+        warning_update_started = True
+        if staged_warning is not None:
+            staged_warning.replace(warning_path)
+        else:
+            warning_path.unlink(missing_ok=True)
+
+    except Exception as error:
+        recovery_errors = []
+        if warning_update_started:
+            try:
+                if had_old_warning:
+                    restore_warning = staging_dir / "restore-warning.txt"
+                    shutil.copy2(backup_dir / warning_path.name, restore_warning)
+                    restore_warning.replace(warning_path)
+                else:
+                    warning_path.unlink(missing_ok=True)
+            except Exception as restore_error:
+                recovery_errors.append(f"恢復番外待確認清單失敗：{restore_error}")
+
+        if json_update_started:
+            try:
+                if had_old_json:
+                    restore_json = staging_dir / "restore-library.json"
+                    shutil.copy2(backup_dir / "library.json", restore_json)
+                    restore_json.replace(old_json)
+                else:
+                    old_json.unlink(missing_ok=True)
+            except Exception as restore_error:
+                recovery_errors.append(f"恢復 JSON 失敗：{restore_error}")
+
+        for target in reversed(changed_images):
+            try:
+                saved_image = backup_images / target.name
+                if saved_image.exists():
+                    shutil.copy2(saved_image, target)
+                else:
+                    target.unlink(missing_ok=True)
+            except Exception as restore_error:
+                recovery_errors.append(f"恢復圖片 {target.name} 失敗：{restore_error}")
+
+        staging.cleanup()
+        print(f"番外正式更新失敗：{error}")
+        if recovery_errors:
+            print("自動恢復未全部成功，請保留備份並檢查：")
+            for message in recovery_errors:
+                print(message)
+        else:
+            print("已恢復到本次更新前的狀態。")
+        print(f"備份位置：{backup_dir}")
+        return False
+
+    try:
+        staging.cleanup()
+    except Exception as error:
+        print(f"臨時目錄清理失敗，不影響已保存的內容：{error}")
+
+    if warnings:
+        print(f"⚠️ 有 {len(warnings)} 條日期提醒，見 library/{warning_path.name}")
+    is_update = bool(old_matches)
+    action = "更新番外文檔" if is_update else "新增番外文檔"
+    print(f"完成！{action}，本次 {len(new_articles)} 篇，圖書館共 {len(merged_articles)} 篇。")
+    print(f"備份位置：{backup_dir}")
+    return True
 
 
 def main():
@@ -261,14 +475,14 @@ def main():
 
     # 每次只接收一个PPT：支持拖入启动器，或启动后输入路径
     if len(sys.argv) > 2:
-        print("每次只能处理一个 PPT，请只提供一个文件。")
+        print("每次只能处理一个文件，请只提供一个文件。")
         input("按回车退出...")
         return
 
     if len(sys.argv) == 2:
         raw_path = sys.argv[1]
     else:
-        raw_path = input("请输入或拖入一个 PPT 文件，然后按回车：")
+        raw_path = input("请输入或拖入一个 PPT、Markdown 或 HTML 文件，然后按回车：")
 
     # 去掉路径两端的空白和双引号
     raw_path = raw_path.strip().strip('"')
@@ -285,23 +499,31 @@ def main():
         input("按回车退出...")
         return
 
+    if ppt_path.suffix.lower() in (".md", ".html", ".htm"):
+        import_markdown_file(ppt_path)
+        input("按回车退出...")
+        return
+
     if ppt_path.suffix.lower() != ".pptx":
-        print("请选择 .pptx 文件。")
+        print("请选择 .pptx、.md 或 .html 文件。")
         input("按回车退出...")
         return
 
     # 提前检查文件名中的日期，避免无法确定要更新哪一期
     try:
-        episode = extract_episode(ppt_path.stem)
-        if episode is None:
-            raise ValueError("文件名末尾缺少日期数字，例如 89 或 816")
+        episode_suffix = extract_episode_suffix(ppt_path.stem)
+        if episode_suffix is None:
+            raise ValueError("文件名末尾缺少日期数字，格式示例：709（7月9日）、1004（10月4日）")
 
-        month_day = parse_month_day(episode)
+        month_day = parse_month_day(episode_suffix)
         if month_day is None:
-            raise ValueError("文件名末尾的数字无法解析为月日")
+            raise ValueError(
+                "文件名末尾日期格式无效；请使用月份不补零、日期两位的格式，"
+                "例如 709（7月9日）或 1004（10月4日），并确保日期真实存在"
+            )
 
-        # 验证真实日期，例如 2 月 30 日会在这里报错
-        date(YEAR, month_day[0], month_day[1])
+        # 数据中的期数仍保存为文件名后缀对应的整数。
+        episode = int(episode_suffix)
 
     except ValueError as e:
         print(f"日期检查失败，已停止转换：{e}")
@@ -329,7 +551,7 @@ def main():
                     a.get("title")
                 ): a.get("characters", [])
                 for a in old_articles
-                if a.get("characters")
+                if a.get("characters") and a.get("source") != "extra"
             }
 
         except Exception as e:
@@ -397,7 +619,7 @@ def main():
     kept_articles = [
         article
         for article in old_articles
-        if issue_key(article) not in updated_issues
+        if article.get("source") == "extra" or issue_key(article) not in updated_issues
     ]
 
     # 其他期的旧文章 + 本次转换的新文章
@@ -512,7 +734,7 @@ def main():
     # 找出被替换的旧文章引用过的图片
     old_image_paths = set()
     for article in old_articles:
-        if issue_key(article) in updated_issues:
+        if article.get("source") != "extra" and issue_key(article) in updated_issues:
             for paragraph in article.get("paragraphs", []):
                 old_image_paths.update(paragraph.get("images", []))
 
@@ -558,7 +780,7 @@ def main():
         print(f"临时目录清理失败，不影响已保存的内容：{e}")
 
     is_update = any(
-        issue_key(article) in updated_issues
+        article.get("source") != "extra" and issue_key(article) in updated_issues
         for article in old_articles
     )
     action = "更新一期" if is_update else "新增一期"
