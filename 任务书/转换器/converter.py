@@ -41,6 +41,13 @@ DATA_DIR = LIBRARY_DIR / "data"
 IMAGES_DIR = LIBRARY_DIR / "images"
 
 
+def ppt_replaces(article, updated_issues):
+    """PPT 重转只替换来自 PPT 的同一期正文，不碰编辑器文章。"""
+    return (article.get("source") != "extra" and
+            article.get("origin") != "editor" and
+            article.get("date_start") in updated_issues)
+
+
 def parse_month_day(num):
     """解析新格式的原始文件名后缀（月不补零、日两位）；无效时返回 None。"""
     s = str(num)
@@ -76,7 +83,7 @@ def parse_person(s):
 
 def read_paragraph(para):
     """读取一个段落，返回 (runs列表, 纯文本)。
-    runs 保留 run 级格式（粗体/斜体/删除线/颜色/字体）与段内软换行（<a:br/> -> \\n）。"""
+    runs 保留 run 级格式、连续明黄高亮片段与段内软换行。"""
     runs = []
     plain = []
     for child in para._p.iterchildren():
@@ -94,7 +101,7 @@ def read_paragraph(para):
             if rPr is not None:
                 bold = rPr.get('b') == '1'
                 italic = rPr.get('i') == '1'
-                strike = rPr.get('strikethrough') in ('sngStrike', 'dblStrike')
+                strike = rPr.get('strike') in ('sngStrike', 'dblStrike')
                 sf = rPr.find(qn('a:solidFill'))
                 if sf is not None:
                     srgb = sf.find(qn('a:srgbClr'))
@@ -105,13 +112,95 @@ def read_paragraph(para):
                 latin = rPr.find(qn('a:latin'))
                 if latin is not None:
                     font = latin.get('typeface')
-            runs.append({"text": text, "bold": bold, "italic": italic, "strike": strike, "color": color, "font": font})
+            highlight = rPr.find(qn('a:highlight')) if rPr is not None else None
+            highlight_color = highlight.find(qn('a:srgbClr')) if highlight is not None else None
+            yellow = (highlight_color is not None and
+                      (highlight_color.get('val') or '').upper() == 'FFFF00')
+            runs.append({"text": text, "bold": bold, "italic": italic,
+                         "strike": strike, "color": color, "font": font,
+                         "_yellow": yellow})
             plain.append(text)
+    group_start = None
+    for index in range(len(runs) + 1):
+        yellow = index < len(runs) and runs[index].pop("_yellow", False)
+        if yellow and group_start is None:
+            group_start = index
+        elif not yellow and group_start is not None:
+            group = "".join(run["text"] for run in runs[group_start:index])
+            for run in runs[group_start:index]:
+                run["highlightGroup"] = group
+            group_start = None
     return runs, "".join(plain)
 
 
+def read_table(shape):
+    """保留表格的富文本、合并格和 PPT 页面坐标。"""
+    table = shape.table
+    rows = []
+    for row in table.rows:
+        cells = []
+        for cell in row.cells:
+            if cell.is_spanned:
+                cells.append(None)
+                continue
+            runs = []
+            for para in cell.text_frame.paragraphs:
+                if runs:
+                    runs.append({**EMPTY_RUN, "text": "\n"})
+                para_runs, _ = read_paragraph(para)
+                runs.extend(para_runs)
+            first_para = cell.text_frame.paragraphs[0]
+            alignment = {1: "left", 2: "center", 3: "right"}.get(
+                first_para.alignment)
+            cells.append({
+                "runs": runs,
+                "rowspan": cell.span_height if cell.is_merge_origin else 1,
+                "colspan": cell.span_width if cell.is_merge_origin else 1,
+                "align": alignment,
+                "images": []
+            })
+        rows.append(cells)
+    return {"type": "table", "rows": rows, "align": [],
+            "_shape": shape}
+
+
+def table_cell_at(table_block, image_shape):
+    """图片中心落入表格时，返回所在的可见单元格。"""
+    shape = table_block["_shape"]
+    x = image_shape.left + image_shape.width / 2
+    y = image_shape.top + image_shape.height / 2
+    if not (shape.left <= x < shape.left + shape.width and
+            shape.top <= y < shape.top + shape.height):
+        return None
+    table = shape.table
+    col = row = 0
+    edge = shape.left
+    for index, column in enumerate(table.columns):
+        edge += column.width
+        if x < edge:
+            col = index
+            break
+    edge = shape.top
+    for index, table_row in enumerate(table.rows):
+        edge += table_row.height
+        if y < edge:
+            row = index
+            break
+    cell = table.cell(row, col)
+    if cell.is_spanned:
+        for ri in range(row, -1, -1):
+            for ci in range(col, -1, -1):
+                origin = table.cell(ri, ci)
+                if (origin.is_merge_origin and
+                        ri + origin.span_height > row and
+                        ci + origin.span_width > col):
+                    return table_block["rows"][ri][ci]
+        return None
+    return table_block["rows"][row][col]
+
+
 def iter_page_content(slide):
-    """返回 (texts, paras, images)，按视觉位置（top, left）排序。"""
+    """返回正文、图片和表格；正文按视觉位置排序。"""
     items = []
     for shape in slide.shapes:
         top = shape.top if shape.top is not None else 0
@@ -122,7 +211,9 @@ def iter_page_content(slide):
         except Exception:
             img = None
         if img is not None:
-            items.append((top, left, "img", img))
+            items.append((top, left, "img", shape))
+        elif shape.has_table:
+            items.append((top, left, "table", read_table(shape)))
         elif shape.has_text_frame:
             for para in shape.text_frame.paragraphs:
                 runs, plain = read_paragraph(para)
@@ -133,7 +224,8 @@ def iter_page_content(slide):
     lefts = [it[1] for it in items if it[2] == "para"]
     paras = [it[3] for it in items if it[2] == "para"]
     images = [it[3] for it in items if it[2] == "img"]
-    return texts, paras, images, lefts
+    tables = [it[3] for it in items if it[2] == "table"]
+    return texts, paras, images, lefts, tables
 
 
 def classify_page_content(texts, paras, lefts, right_x):
@@ -161,7 +253,8 @@ def write_images(images, episode, page_no, output_dir):
     """写出普通 PPT 图片，返回 library.json 使用的相对路径。"""
     image_names = []
 
-    for index, image in enumerate(images, 1):
+    for index, shape in enumerate(images, 1):
+        image = shape.image
         ext = (image.ext or "png").lower()
         name = f"{YEAR}_{episode}_p{page_no}_{index}.{ext}"
         (output_dir / name).write_bytes(image.blob)
@@ -188,7 +281,7 @@ def process_one(ppt_path, confirm_lines, image_output_dir):
     right_x = prs.slide_width * 0.9  # 页面右侧 90% 起为人物标注区（823 起的新布局）
     pages = []
     for idx, slide in enumerate(prs.slides, 1):
-        texts, paras, images, lefts = iter_page_content(slide)
+        texts, paras, images, lefts, tables = iter_page_content(slide)
         if not texts:
             if images:
                 raise ValueError(
@@ -204,7 +297,7 @@ def process_one(ppt_path, confirm_lines, image_output_dir):
             right_x
         )
         page = {"title": title, "body": body_paras, "chars": chars,
-                "images": images, "page_no": idx}
+                "images": images, "tables": tables, "page_no": idx}
         pages.append(page)
 
     # 相邻页标题完全相同 = 同一篇；标题变化 = 开始新篇
@@ -242,12 +335,26 @@ def process_one(ppt_path, confirm_lines, image_output_dir):
             img_names = write_images(
                 p["images"], ep, p["page_no"], image_output_dir
             )
+            page_images = []
+            for image_shape, image_name in zip(p["images"], img_names):
+                destination = None
+                for table in p["tables"]:
+                    destination = table_cell_at(table, image_shape)
+                    if destination is not None:
+                        break
+                if destination is None:
+                    page_images.append(image_name)
+                else:
+                    destination["images"].append(image_name)
             all_runs = []
             for ri, pr in enumerate(p["body"]):
                 if ri > 0:
                     all_runs.append({**EMPTY_RUN, "text": "\n\n"})  # 段间空行
                 all_runs.extend(pr)
-            pages_out.append({"runs": all_runs, "images": img_names})
+            pages_out.append({"runs": all_runs, "images": page_images})
+            for table in p["tables"]:
+                pages_out.append({key: value for key, value in table.items()
+                                  if key != "_shape"})
         out_articles.append({
             "id": aid,
             "title": a["title"],
@@ -474,13 +581,15 @@ def main():
         pass
 
     # 每次只接收一个PPT：支持拖入启动器，或启动后输入路径
-    if len(sys.argv) > 2:
+    preserve_existing_images = "--preserve-existing-images" in sys.argv[1:]
+    paths = [arg for arg in sys.argv[1:] if arg != "--preserve-existing-images"]
+    if len(paths) > 1:
         print("每次只能处理一个文件，请只提供一个文件。")
         input("按回车退出...")
         return
 
-    if len(sys.argv) == 2:
-        raw_path = sys.argv[1]
+    if paths:
+        raw_path = paths[0]
     else:
         raw_path = input("请输入或拖入一个 PPT、Markdown 或 HTML 文件，然后按回车：")
 
@@ -532,7 +641,7 @@ def main():
 
     # 读取旧文章和人物标签，供后续增量更新使用
     old_articles = []
-    old_chars = {}
+    old_by_key = {}
     old_json = DATA_DIR / "library.json"
 
     if old_json.exists():
@@ -544,15 +653,13 @@ def main():
             if not isinstance(old_articles, list):
                 raise ValueError("articles 应该是一个文章列表")
 
-            old_chars = {
-                (
-                    (a.get("date_start") or "")[:4],
-                    str(a.get("episode")),
-                    a.get("title")
-                ): a.get("characters", [])
-                for a in old_articles
-                if a.get("characters") and a.get("source") != "extra"
-            }
+            for article in old_articles:
+                if article.get("source") == "extra" or article.get("origin") == "editor":
+                    continue
+                key = (article.get("date_start"), article.get("title"))
+                if key in old_by_key:
+                    raise ValueError(f"旧数据中存在重复文章：{key}")
+                old_by_key[key] = article
 
         except Exception as e:
             print(f"读取旧数据失败，已停止转换：{e}")
@@ -595,19 +702,46 @@ def main():
 
     # 合并旧数据中的手工人物（Excel 回填等），避免重跑丢失
     for a in all_articles:
-        key = (
-            (a.get("date_start") or "")[:4],
-            str(a.get("episode")),
-            a.get("title")
-        )
-        if key in old_chars and old_chars[key]:
-            a["characters"] = list(dict.fromkeys(old_chars[key] + a.get("characters", [])))
+        key = (a.get("date_start"), a.get("title"))
+        previous = old_by_key.get(key)
+        if previous:
+            a["characters"] = list(dict.fromkeys(
+                list(previous.get("characters") or []) + a.get("characters", [])))
+            a["id"] = previous.get("id") or a["id"]
+            a["episode"] = previous.get("episode", a["episode"])
+            if previous.get("source") is None:
+                a.pop("source", None)
+            if preserve_existing_images:
+                # 人工替换过的图片可能改了扩展名（例如 PNG 改成 JPG）。
+                old_images = {}
+                for paragraph in previous.get("paragraphs", []):
+                    image_paths = list(paragraph.get("images", []))
+                    if paragraph.get("type") == "table":
+                        for row in paragraph.get("rows", []):
+                            for cell in row:
+                                if isinstance(cell, dict):
+                                    image_paths.extend(cell.get("images", []))
+                    for image_path in image_paths:
+                        if (LIBRARY_DIR / image_path).is_file():
+                            old_images[Path(image_path).stem] = image_path
+                for paragraph in a["paragraphs"]:
+                    if "images" in paragraph:
+                        paragraph["images"] = [
+                            old_images.get(Path(path).stem, path)
+                            for path in paragraph["images"]
+                        ]
+                    if paragraph.get("type") == "table":
+                        for row in paragraph["rows"]:
+                            for cell in row:
+                                if isinstance(cell, dict):
+                                    cell["images"] = [
+                                        old_images.get(Path(path).stem, path)
+                                        for path in cell.get("images", [])
+                                    ]
 
-    # 用“年份+文件名日期数字”识别文章所属的期
+    # 日期是期的稳定身份；旧库有 67/607 等不同格式的期号。
     def issue_key(article):
-        year = article["date_start"][:4]
-        episode = str(article["episode"])
-        return year, episode
+        return article["date_start"]
 
     # 本次转换涉及哪些期
     updated_issues = {
@@ -615,15 +749,18 @@ def main():
         for article in all_articles
     }
 
-    # 保留旧数据中不属于这些期的文章
-    kept_articles = [
-        article
-        for article in old_articles
-        if article.get("source") == "extra" or issue_key(article) not in updated_issues
-    ]
-
-    # 其他期的旧文章 + 本次转换的新文章
-    merged_articles = kept_articles + all_articles
+    # 在旧期原有位置替换，避免重跑使其他文章的顺序变化。
+    merged_articles = []
+    inserted = False
+    for article in old_articles:
+        if ppt_replaces(article, updated_issues):
+            if not inserted:
+                merged_articles.extend(all_articles)
+                inserted = True
+            continue
+        merged_articles.append(article)
+    if not inserted:
+        merged_articles.extend(all_articles)
 
     data = {"version": 2, "articles": merged_articles}
 
@@ -650,7 +787,19 @@ def main():
             shutil.copy2(old_json, backup_dir / "library.json")
 
         # 列出本次准备发布的图片
-        new_image_files = list(staging_images.iterdir())
+        referenced_images = set()
+        for article in all_articles:
+            for paragraph in article["paragraphs"]:
+                referenced_images.update(paragraph.get("images", []))
+                if paragraph.get("type") == "table":
+                    for row in paragraph["rows"]:
+                        for cell in row:
+                            if isinstance(cell, dict):
+                                referenced_images.update(cell.get("images", []))
+        new_image_files = [source for source in staging_images.iterdir()
+                           if not (preserve_existing_images and
+                                   ((IMAGES_DIR / source.name).exists() or
+                                    f"images/{source.name}" not in referenced_images))]
 
         # 备份即将被同名覆盖的旧图片
         for source in new_image_files:
@@ -731,21 +880,31 @@ def main():
         input("按回车退出...")
         return
 
+    def paragraph_images(paragraph):
+        paths = set(paragraph.get("images", []))
+        if paragraph.get("type") == "table":
+            for row in paragraph.get("rows", []):
+                for cell in row:
+                    if isinstance(cell, dict):
+                        paths.update(cell.get("images", []))
+        return paths
+
     # 找出被替换的旧文章引用过的图片
     old_image_paths = set()
     for article in old_articles:
-        if article.get("source") != "extra" and issue_key(article) in updated_issues:
+        if ppt_replaces(article, updated_issues):
             for paragraph in article.get("paragraphs", []):
-                old_image_paths.update(paragraph.get("images", []))
+                old_image_paths.update(paragraph_images(paragraph))
 
     # 找出更新后的全部文章仍在引用的图片
     used_image_paths = set()
     for article in merged_articles:
         for paragraph in article.get("paragraphs", []):
-            used_image_paths.update(paragraph.get("images", []))
+            used_image_paths.update(paragraph_images(paragraph))
 
     # 只清理旧版本引用过、如今已无人引用的图片
-    for image_path in old_image_paths - used_image_paths:
+    for image_path in (() if preserve_existing_images else
+                       old_image_paths - used_image_paths):
         try:
             target = (LIBRARY_DIR / image_path).resolve()
 
@@ -780,7 +939,7 @@ def main():
         print(f"临时目录清理失败，不影响已保存的内容：{e}")
 
     is_update = any(
-        article.get("source") != "extra" and issue_key(article) in updated_issues
+        ppt_replaces(article, updated_issues)
         for article in old_articles
     )
     action = "更新一期" if is_update else "新增一期"

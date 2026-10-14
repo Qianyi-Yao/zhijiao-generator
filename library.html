@@ -10,7 +10,9 @@
   <style>
     @font-face { font-family: "Jinling"; src: url("fonts/BWKS.woff2") format("woff2"); font-display: swap; }
     @font-face { font-family: "ShengshiKai"; src: url("fonts/FZSHENGSKSJW_CU.woff2") format("woff2"); font-display: swap; }
-    @font-face { font-family: "HuiwenMincho"; src: url("fonts/汇文明朝体.woff2") format("woff2"); font-display: swap; }
+    @font-face { font-family: "HuiwenMincho"; src: url("fonts/HuiwenMincho.woff2") format("woff2"); font-display: swap; }
+
+    @font-face { font-family: "LXGWWenKai"; src: url("fonts/LXGWWenKaiLite-Regular.woff2") format("woff2"); font-display: swap; }
 
     :root {
       --paper: #F1F0E8;
@@ -95,10 +97,19 @@
     .media-text p { margin: 0 0 10px; }
     .img-only img { width: 180px; margin: 12px 0; display: block; border-radius: 8px; border: 1px solid var(--line); background: #fff; }
     .rich-text { white-space: pre-wrap; word-break: break-word; }
+    .article-link { color: var(--green-dark); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
+    .article-link:hover { color: var(--green); }
+    .article-navigation { margin: 14px 0; }
+    .article-return { color: var(--green-dark); text-decoration: underline; text-underline-offset: 2px; }
+    .filter-bar[hidden], #articleList[hidden], #articleDetail[hidden] { display: none !important; }
+    #articleDetail .article-head { cursor: default; }
+    #articleDetail .article-head:hover { background: var(--panel); }
+    #articleDetail .tag { cursor: default; }
     .rich-text strong { font-weight: 700; }
     .rich-text em { font-style: italic; }
     .source-badge { background: rgba(169, 200, 190, .2); }
-    .markdown-quote { margin: 10px 0; padding: 4px 0 4px 14px; border-left: 3px solid var(--source-tag); font-family: "KaiTi", "STKaiti", "Noto Serif SC", serif; }
+    .markdown-quote { margin: 10px 0; padding: 4px 0 4px 14px; border-left: 3px solid var(--source-tag); font-family: "LXGWWenKai", "KaiTi", "STKaiti", serif; }
+    .article-card.editor-article .markdown-quote { font-family: inherit; }
     .markdown-quote p { margin: 0 0 8px; }
     .markdown-list { margin: 4px 0 12px; padding-left: 1.7em; }
     .markdown-list li + li { margin-top: 4px; }
@@ -106,6 +117,7 @@
     .markdown-table { border-collapse: collapse; min-width: 100%; font-size: 14px; line-height: 1.6; }
     .markdown-table th, .markdown-table td { border: 1px solid var(--line); padding: 6px 9px; vertical-align: top; }
     .markdown-table th { background: #EAF0E9; font-weight: 700; }
+    .markdown-table td img, .markdown-table th img { display: block; max-width: 100%; height: auto; margin: 6px auto; }
     .markdown-heading { margin: 12px 0 4px; font-size: 16px; }
     .markdown-rule { border: 0; border-top: 1px solid var(--line); margin: 12px 0; }
 
@@ -200,14 +212,16 @@
     .share-dialog { max-height: calc(100dvh - 32px); overflow-y: auto; }
     .share-dialog button[aria-pressed="true"] { background: #A9C8BE; border-style: solid; }
     .share-preview { margin: 14px 0; max-height: 42vh; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
+    #sharePreview { max-height: 42vh; }
     .share-preview img { display: block; width: 100%; height: auto; }
-    .share-preview a { display: block; }
+    .share-preview img { -webkit-touch-callout: default; user-select: auto; }
     .share-export { box-sizing: border-box; padding: 24px; background: var(--paper); color: var(--ink); }
     .share-export .article-card { margin: 0; box-shadow: none; }
     .share-export .article-head { cursor: default; background: var(--panel); }
     .share-export .article-title { font-size: 18px; }
     .share-export .article-body { display: block; }
     .share-export .share-btn { display: none; }
+    .share-export .article-link { color: inherit; text-decoration: none; pointer-events: none; }
     .share-export .foot-note { margin-top: 16px; }
     .share-export .markdown-table-wrap { overflow: visible; }
     .share-export .markdown-table { width: 100%; min-width: 0; table-layout: fixed; }
@@ -263,23 +277,27 @@
     </div>
 
     <div id="articleList"></div>
+    <div id="articleDetail" hidden></div>
     <p class="foot-note">内容由遣月整理发布，素材版权归原权利人所有</p>
   </div>
 
   <dialog id="shareDialog" class="share-dialog" aria-labelledby="shareHeading">
     <h2 id="shareHeading">分享文章</h2>
-    <p>先预览排版，再下载完整 JPG。预览可上下滚动，点击图片可查看大图。</p>
+    <p>选择排版后生成单张无损 PNG；可长按图片保存，或使用下载按钮。</p>
     <div class="share-actions">
       <button type="button" data-share-layout="desktop">网页版视图</button>
       <button type="button" data-share-layout="mobile">手机版视图</button>
     </div>
     <p id="shareStatus" role="status" aria-live="polite"></p>
+    <div id="shareLayoutPreview" class="share-preview"></div>
+    <button type="button" id="generateShare">生成分享图片</button>
     <div id="sharePreview" class="share-preview" hidden>
-      <a id="sharePreviewLink" target="_blank" rel="noopener" aria-label="打开分享大图"><img id="sharePreviewImage" alt="文章分享长图预览" /></a>
+      <img id="sharePreviewImage" alt="文章分享长图预览" />
     </div>
-    <button type="button" id="downloadShare" disabled>下载 JPG</button>
+    <button type="button" id="downloadShare" disabled>下载完整 PNG</button>
   </dialog>
   <script src="html2canvas.min.js"></script>
+  <script src="vendor/share-png.bundle.js"></script>
   <script src="characters.js"></script>
   <script src="vendor/flatpickr/flatpickr.min.js"></script>
   <script src="vendor/flatpickr/zh.js"></script>
@@ -296,6 +314,8 @@
     const PREVIEW_COUNT = 3;
     const MAX_PAGE_BUTTONS = 10;
     const list = document.getElementById('articleList');
+    const detail = document.getElementById('articleDetail');
+    const filterBar = document.querySelector('.filter-bar');
     const searchInput = document.getElementById('searchInput');
     const characterSearch = document.getElementById('characterSearch');
     const characterSelect = document.getElementById('characterSelect');
@@ -319,19 +339,76 @@
       return a.date_start.replace(/-/g, '').slice(2) + '期';
     }
 
-    function renderRuns(runs) {
-      return (runs || []).map(r => {
+    const highlightedTitleAliases = new Map([
+      ['关于朱点与排版', '关于朱点与拍板'],
+      ['关于木樨与桂树', '关于木犀与桂树']
+    ]);
+    const highlightedTargetCache = new Map();
+
+    function normalizeLinkedTitle(value) {
+      return String(value || '').normalize('NFKC').replace(/[“”‘’「」『』"'（）()\s]/g, '');
+    }
+
+    function highlightedTarget(group) {
+      if (highlightedTargetCache.has(group)) return highlightedTargetCache.get(group);
+      const normalized = normalizeLinkedTitle(group);
+      const candidates = articles.filter(article =>
+        normalized.includes(normalizeLinkedTitle(article.title))
+      );
+      highlightedTitleAliases.forEach((title, alias) => {
+        if (normalized.includes(normalizeLinkedTitle(alias))) {
+          const article = articles.find(item => item.title === title);
+          if (article) candidates.push(article);
+        }
+      });
+      candidates.sort((a, b) => normalizeLinkedTitle(b.title).length - normalizeLinkedTitle(a.title).length);
+      const best = candidates[0];
+      const sameLength = candidates.filter(article =>
+        normalizeLinkedTitle(article.title).length === normalizeLinkedTitle(best?.title).length
+      );
+      const target = best && new Set(sameLength.map(article => article.id)).size === 1 ? best : null;
+      highlightedTargetCache.set(group, target);
+      return target;
+    }
+
+    function renderRuns(runs, pptTable = false) {
+      function renderRun(r, linked = false) {
         let t = esc(r.text || '');
         if (!t) return '';
         if (r.bold) t = '<strong>' + t + '</strong>';
         if (r.italic) t = '<em>' + t + '</em>';
         if (r.strike) t = '<s>' + t + '</s>';
         const styles = [];
-        if (r.color) styles.push('color:' + esc(r.color));
+        if (r.color && !linked) styles.push('color:' + esc(r.color));
         if (r.background) styles.push('background-color:' + esc(r.background));
-        if (r.font) styles.push('font-family:\'KaiTi\',\'STKaiti\',\'Noto Serif SC\',serif'); // 引用统一楷体
+        if (r.font && (!pptTable || r.font === '霞鹜文楷 轻便版' || r.font === '华康古籍木兰W3')) {
+          styles.push('font-family:\'LXGWWenKai\',\'KaiTi\',\'STKaiti\',serif');
+        }
         return styles.length ? '<span style="' + styles.join(';') + '">' + t + '</span>' : t;
-      }).join('');
+      }
+      const items = runs || [];
+      const output = [];
+      for (let index = 0; index < items.length;) {
+        const linkId = items[index].linkId;
+        const group = linkId ? null : items[index].highlightGroup;
+        if (!group && !linkId) {
+          output.push(renderRun(items[index]));
+          index++;
+          continue;
+        }
+        let end = index + 1;
+        while (end < items.length && (linkId
+          ? items[end].linkId === linkId
+          : !items[end].linkId && items[end].highlightGroup === group)) end++;
+        const target = linkId ? articles.find(article => article.id === linkId) : highlightedTarget(group);
+        const content = items.slice(index, end).map(r => renderRun(r, Boolean(target))).join('');
+        output.push(target
+          ? '<a class="article-link" href="#article=' + encodeURIComponent(target.id) +
+            '" data-article-link="' + esc(target.id) + '">' + content + '</a>'
+          : content);
+        index = end;
+      }
+      return output.join('');
     }
 
     function renderParagraph(p) {
@@ -351,12 +428,21 @@
       if (p.type === 'table') {
         const rows = p.rows || [];
         const align = p.align || [];
+        const pptTable = rows.some(row => (row || []).some(cell => cell && !Array.isArray(cell)));
         const tableRows = rows.map((row, rowIndex) => {
-          const cellTag = rowIndex === 0 ? 'th' : 'td';
-          const cells = (row || []).map((runs, cellIndex) => {
-            const alignment = ['left', 'center', 'right'].includes(align[cellIndex])
-              ? ' style="text-align:' + align[cellIndex] + '"' : '';
-            return '<' + cellTag + alignment + '><span class="rich-text">' + renderRuns(runs) + '</span></' + cellTag + '>';
+          const cellTag = !pptTable && rowIndex === 0 ? 'th' : 'td';
+          const cells = (row || []).map((cell, cellIndex) => {
+            if (cell == null) return '';
+            const richCell = Array.isArray(cell) ? {runs: cell} : cell;
+            const cellAlign = richCell.align || align[cellIndex];
+            const alignment = ['left', 'center', 'right'].includes(cellAlign)
+              ? ' style="text-align:' + cellAlign + '"' : '';
+            const span = (richCell.rowspan > 1 ? ' rowspan="' + Number(richCell.rowspan) + '"' : '') +
+                         (richCell.colspan > 1 ? ' colspan="' + Number(richCell.colspan) + '"' : '');
+            const cellImages = (richCell.images || []).map(img =>
+              '<img src="library/' + esc(img) + '" alt="表格配图" loading="lazy">').join('');
+            return '<' + cellTag + alignment + span + '><span class="rich-text">' + renderRuns(richCell.runs, pptTable) +
+                   '</span>' + cellImages + '</' + cellTag + '>';
           }).join('');
           return '<tr>' + cells + '</tr>';
         }).join('');
@@ -368,9 +454,12 @@
       }
       if (p.type === 'rule') return '<hr class="markdown-rule">';
       const textHtml = '<span class="rich-text">' + renderRuns(p.runs) + '</span>';
-      if (imgs.length && (p.runs || []).some(r => (r.text || '').trim())) {
+      if (imgs.length && (p.mediaBlocks || (p.runs || []).some(r => (r.text || '').trim()))) {
+        const mediaText = p.mediaBlocks
+          ? p.mediaBlocks.map(renderParagraph).join('')
+          : textHtml;
         return '<div class="media-row"><div class="media-imgs">' + imgs.join('') +
-               '</div><div class="media-text">' + textHtml + '</div></div>';
+               '</div><div class="media-text">' + mediaText + '</div></div>';
       }
       if (imgs.length) return '<div class="img-only">' + imgs.join('') + '</div>';
       return '<p>' + textHtml + '</p>';
@@ -394,6 +483,11 @@
     }
 
     function filtered(filters) {
+      let weekEnd = '';
+      if (filters.week) {
+        const [year, month, day] = filters.week.split('-').map(Number);
+        weekEnd = isoDate(new Date(year, month - 1, day + 6));
+      }
       return articles.filter(a => {
         const articleSource = a.source === 'extra' ? 'extra' : 'main';
         if (filters.source !== 'all' && filters.source !== articleSource) return false;
@@ -409,7 +503,8 @@
         ) return false;
 
         if (filters.week) {
-          if (a.date_start !== filters.week) return false;
+          // Include any article whose inclusive date range overlaps the selected week.
+          if (!a.date_start || !a.date_end || a.date_start > weekEnd || a.date_end < filters.week) return false;
         } else {
           if (
             filters.year &&
@@ -622,6 +717,29 @@
       };
     }
 
+    function renderArticleCard(a, expanded = false) {
+      const tags = (a.characters || []).map(c =>
+        `<span class="tag" data-tag="${esc(c)}">${esc(c)}</span>`).join('');
+      const isExtra = a.source === 'extra';
+      const meta = `${a.date_start} 至 ${a.date_end}${isExtra ? '' : ' · ' + episodeLabel(a)}`;
+      const sourceBadge = isExtra ? '<span class="source-badge">番外</span>' : '';
+      const body = a.paragraphs.map(renderParagraph).join('');
+      return `<article class="article-card${a.origin === 'editor' ? ' editor-article' : ''}${expanded ? ' open' : ''}" data-article-id="${esc(a.id)}">
+        <div class="article-head">
+          <div class="article-heading-row">
+          <span class="article-title">${esc(a.title)}</span>
+          ${sourceBadge}
+          <span class="article-tags">${tags}</span>
+          </div>
+          <div class="article-detail-row">
+          <span class="article-meta">${esc(meta)}</span>
+          <button type="button" class="share-btn" aria-label="分享：${esc(a.title)}">分享</button>
+          </div>
+        </div>
+        <div class="article-body">${body}</div>
+      </article>`;
+    }
+
     function render() {
       const filters = getFilterState();
       const items = filtered(filters);
@@ -636,29 +754,77 @@
       const pageView = getPageView(items);
       pageCount = pageView.totalPages;
 
-      list.innerHTML = pageView.shown.map(a => {
-        const tags = (a.characters || []).map(c =>
-          `<span class="tag" data-tag="${esc(c)}">${esc(c)}</span>`).join('');
-        const isExtra = a.source === 'extra';
-        const meta = `${a.date_start} 至 ${a.date_end}${isExtra ? '' : ' · ' + episodeLabel(a)}`;
-        const sourceBadge = isExtra ? '<span class="source-badge">番外</span>' : '';
-        const body = a.paragraphs.map(renderParagraph).join('');
-        return `<article class="article-card">
-          <div class="article-head">
-            <div class="article-heading-row">
-            <span class="article-title">${esc(a.title)}</span>
-            ${sourceBadge}
-            <span class="article-tags">${tags}</span>
-            </div>
-            <div class="article-detail-row">
-            <span class="article-meta">${esc(meta)}</span>
-            <button type="button" class="share-btn" aria-label="分享：${esc(a.title)}">分享</button>
-            </div>
-          </div>
-          <div class="article-body">${body}</div>
-        </article>`;
-      }).join('') + pageView.pager;
+      list.innerHTML = pageView.shown.map(a => renderArticleCard(a)).join('') + pageView.pager;
     }
+
+    function articleIdFromHash() {
+      if (!location.hash.startsWith('#article=')) return null;
+      try { return decodeURIComponent(location.hash.slice('#article='.length)); }
+      catch { return null; }
+    }
+
+    function articleRouteUrl(id) {
+      return location.pathname + location.search + (id ? '#article=' + encodeURIComponent(id) : '');
+    }
+
+    function showArticleRoute(restoreScroll = true) {
+      if (!articles.length) return;
+      const id = articleIdFromHash();
+      const article = articles.find(item => item.id === id);
+      if (article) {
+        const previousTitle = history.state?.returnTitle;
+        const label = previousTitle ? '← 返回《' + esc(previousTitle) + '》' : '← 返回图书馆';
+        detail.innerHTML = '<nav class="article-navigation"><a class="article-return" href="' +
+          (previousTitle ? '#' : articleRouteUrl(null)) + '">' + label + '</a></nav>' +
+          renderArticleCard(article, true);
+        list.hidden = true;
+        filterBar.hidden = true;
+        detail.hidden = false;
+      } else {
+        detail.hidden = true;
+        list.hidden = false;
+        filterBar.hidden = false;
+      }
+      if (restoreScroll) {
+        const scrollY = Number(history.state?.scrollY) || 0;
+        requestAnimationFrame(() => window.scrollTo(0, scrollY));
+      }
+    }
+
+    document.addEventListener('click', event => {
+      if (!(event.target instanceof Element)) return;
+      const articleLink = event.target.closest('[data-article-link]');
+      if (articleLink) {
+        if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+        event.preventDefault();
+        const targetId = articleLink.dataset.articleLink;
+        const target = articles.find(item => item.id === targetId);
+        if (!target) return;
+        const sourceId = articleLink.closest('.article-card')?.dataset.articleId;
+        const source = articles.find(item => item.id === sourceId);
+        history.replaceState({ ...(history.state || {}), scrollY: window.scrollY }, '', location.href);
+        history.pushState({ libraryRoute: true, articleId: targetId,
+          returnTitle: source?.title || '', scrollY: 0 }, '', articleRouteUrl(targetId));
+        showArticleRoute();
+        return;
+      }
+      if (event.target.closest('.article-return')) {
+        event.preventDefault();
+        if (history.state?.returnTitle) {
+          history.back();
+        } else {
+          history.pushState({ libraryRoute: true, articleId: null,
+            returnTitle: '', scrollY: 0 }, '', articleRouteUrl(null));
+          showArticleRoute();
+        }
+      }
+    });
+    window.addEventListener('popstate', () => showArticleRoute());
+    detail.addEventListener('click', event => {
+      if (!(event.target instanceof Element)) return;
+      const shareButton = event.target.closest('.share-btn');
+      if (shareButton) openShare(shareButton.closest('.article-card'));
+    });
 
     list.onclick = event => {
       if (!(event.target instanceof Element)) return;
@@ -712,8 +878,9 @@
     const shareStatus = document.getElementById('shareStatus');
     const sharePreview = document.getElementById('sharePreview');
     const sharePreviewImage = document.getElementById('sharePreviewImage');
-    const sharePreviewLink = document.getElementById('sharePreviewLink');
     const downloadShare = document.getElementById('downloadShare');
+    const layoutPreview = document.getElementById('shareLayoutPreview');
+    let shareLayout = 'mobile';
     let shareUrl = '';
     let shareFilename = '';
     let shareArticle = null;
@@ -721,25 +888,29 @@
     let shareGeneration = 0;
 
     function clearSharePreview() {
-      sharePreview.hidden = true;
+      sharePreviewImage.onload = sharePreviewImage.onerror = null;
       sharePreviewImage.removeAttribute('src');
-      sharePreviewLink.removeAttribute('href');
       if (shareUrl) URL.revokeObjectURL(shareUrl);
+      sharePreview.hidden = true;
+      sharePreview.scrollTop = 0;
       shareUrl = '';
       shareFilename = '';
       downloadShare.disabled = true;
+      downloadShare.textContent = '下载完整 PNG';
     }
 
     function openShare(card) {
       shareArticle = card.cloneNode(true);
       shareStatus.textContent = '';
       shareDialog.showModal();
-      exportArticle('desktop');
+      previewLayout(window.innerWidth <= 560 ? 'mobile' : 'desktop');
     }
     shareDialog.addEventListener('close', () => {
       shareGeneration++;
       sharing = false;
       clearSharePreview();
+      layoutPreview.replaceChildren();
+      document.getElementById('generateShare').disabled = false;
       shareDialog.querySelectorAll('[data-share-layout]').forEach(button => button.disabled = false);
     });
     let backdropPressed = false;
@@ -753,6 +924,50 @@
       if (backdropPressed && outsideShare(event)) shareDialog.close();
       backdropPressed = false;
     });
+
+    function previewLayout(layout) {
+      if (sharing) return;
+      shareLayout = layout;
+      clearSharePreview();
+      layoutPreview.hidden = false;
+      layoutPreview.replaceChildren();
+      const preview = document.createElement('div');
+      preview.className = 'share-export ' + layout;
+      const width = layout === 'mobile' ? 390 : 880;
+      preview.style.width = width + 'px';
+      preview.style.zoom = Math.min(1, (shareDialog.clientWidth - 50) / width);
+      const card = shareArticle.cloneNode(true);
+      card.classList.add('open');
+      card.querySelectorAll('.share-btn').forEach(button => button.remove());
+      card.querySelectorAll('img').forEach(img => img.loading = 'eager');
+      preview.appendChild(card);
+      const footer = document.createElement('p');
+      footer.className = 'foot-note';
+      footer.textContent = '忘川风华录知交圈微考据 · 图文整理\n内容由遣月整理发布，素材版权归原权利人所有';
+      preview.appendChild(footer);
+      layoutPreview.appendChild(preview);
+      layoutPreview.scrollTop = 0;
+      shareDialog.querySelectorAll('[data-share-layout]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.shareLayout === layout)));
+      shareStatus.textContent = '排版预览；确认后点击“生成分享图片”。';
+    }
+    document.getElementById('generateShare').onclick = () => exportArticle(shareLayout);
+
+    function showShareImage(blob, filename, width, height) {
+      shareUrl = URL.createObjectURL(blob);
+      shareFilename = filename + '.png';
+      downloadShare.disabled = false;
+      layoutPreview.hidden = true;
+      sharePreview.hidden = false;
+      shareStatus.textContent = `已生成单张 ${width} × ${height}px PNG，正在加载预览…`;
+      sharePreviewImage.onload = () => {
+        shareStatus.textContent = `图片已生成，可长按保存或下载完整 PNG。${width} × ${height}px · ${(blob.size / 1048576).toFixed(2)} MB`;
+      };
+      sharePreviewImage.onerror = () => {
+        sharePreview.hidden = true;
+        shareStatus.textContent = '完整 PNG 已生成，但当前浏览器无法预览；请点击“下载完整 PNG”，再用其他应用打开。';
+      };
+      sharePreviewImage.src = shareUrl;
+    }
 
     async function exportArticle(layout) {
       if (sharing || !shareArticle) return;
@@ -779,10 +994,10 @@
       host.appendChild(footer);
       document.body.appendChild(host);
       try {
-        await Promise.all([
+        await Promise.race([Promise.all([
           document.fonts.load('16px HuiwenMincho'),
           document.fonts.load('18px Jinling'),
-          document.fonts.ready,
+          document.fonts.load('16px LXGWWenKai'),
           ...Array.from(host.querySelectorAll('img'), img => new Promise((resolve, reject) => {
             const timer = setTimeout(() => finish(new Error('图片加载超时，请稍后重试')), 20000);
             function finish(error) {
@@ -795,39 +1010,70 @@
             img.loading = 'eager';
             if (img.complete) finish(img.naturalWidth ? null : new Error('有图片加载失败'));
           }))
-        ]);
+        ]), new Promise((_, reject) => setTimeout(() => reject(new Error('字体或图片加载超时，请检查网络后重试')), 25000))]);
         if (generation !== shareGeneration) return;
         const width = host.offsetWidth;
         const height = host.scrollHeight;
-        const scale = Math.min(2, 30000 / height, Math.sqrt(24000000 / (width * height)));
-        if (scale < 1) throw new Error('文章过长，超出单张图片容量，请尝试网页版视图');
-        shareStatus.textContent = '正在生成完整 JPG…';
-        const canvas = await html2canvas(host, {
-          scale, useCORS: true, backgroundColor: '#F1F0E8', logging: false,
-          width, height, windowWidth: layout === 'mobile' ? 390 : 1200,
-          onclone(doc) {
-            const copy = doc.getElementById(host.id);
-            copy.style.left = '0';
-            doc.getElementById('shareDialog').remove();
-          }
-        });
-        const blob = await new Promise((resolve, reject) => canvas.toBlob(
-          result => result ? resolve(result) : reject(new Error('图片生成失败，请尝试网页版视图')),
-          'image/jpeg', .9
+        const scale = 2;
+        const imageWidth = width * scale;
+        const imageHeight = height * scale;
+        // Keep every temporary canvas below mobile canvas limits; the PNG writer
+        // joins these pixels without allocating a canvas for the whole article.
+        const maxTilePixels = 2500000;
+        const maxTileHeight = 3600;
+        let stripHeight = Math.max(1, Math.min(
+          Math.floor(maxTileHeight / scale),
+          Math.floor(maxTilePixels / (width * scale * scale))
         ));
-        if (generation !== shareGeneration) {
-          canvas.width = canvas.height = 0;
-          return;
+        const writer = SharePng.createWriter(imageWidth, imageHeight);
+        let completedTiles = 0;
+        const started = performance.now();
+        for (let offset = 0; offset < height;) {
+          if (generation !== shareGeneration) return;
+          const chunkHeight = Math.min(stripHeight, height - offset);
+          shareStatus.textContent = `正在合成单张长图：第 ${completedTiles + 1} / ${completedTiles + Math.ceil((height - offset) / stripHeight)} 段…`;
+          await new Promise(resolve => requestAnimationFrame(() => setTimeout(resolve, 0)));
+          let canvas;
+          try {
+            canvas = await html2canvas(host, {
+              scale, useCORS: true, backgroundColor: '#F1F0E8', logging: false,
+              width, height: chunkHeight, y: offset,
+              windowWidth: layout === 'mobile' ? 390 : 1200,
+              // Exclude unrelated branches BEFORE cloning, not after cloning the whole library.
+              ignoreElements: element => element.parentElement === document.body && element !== host,
+              onclone(doc) {
+                doc.getElementById(host.id).style.left = '0';
+              }
+            });
+            if (canvas.width !== imageWidth || canvas.height !== chunkHeight * scale) {
+              throw new Error('当前设备无法生成此尺寸的分段');
+            }
+          } catch (error) {
+            // Retry the same content with a shorter canvas on devices with lower limits.
+            if (generation !== shareGeneration) return;
+            if (chunkHeight <= 128) throw error;
+            stripHeight = Math.max(128, Math.floor(chunkHeight / 2));
+            continue;
+          } finally {
+            if (!canvas || canvas.width !== imageWidth || canvas.height !== chunkHeight * scale) {
+              if (canvas) canvas.width = canvas.height = 0;
+            }
+          }
+          try {
+            if (generation !== shareGeneration) return;
+            writer.append(canvas);
+            offset += chunkHeight;
+            completedTiles++;
+          } finally {
+            canvas.width = canvas.height = 0;
+          }
         }
+        if (generation !== shareGeneration) return;
         const title = card.querySelector('.article-title').textContent.replace(/[\\/:*?"<>|\x00-\x1f]/g, '_').slice(0, 100);
-        shareUrl = URL.createObjectURL(blob);
-        shareFilename = `${title}-${layout === 'mobile' ? '手机版' : '网页版'}.jpg`;
-        sharePreviewImage.src = shareUrl;
-        sharePreviewLink.href = shareUrl;
-        sharePreview.hidden = false;
-        sharePreview.scrollTop = 0;
-        shareStatus.textContent = `${layout === 'mobile' ? '手机版' : '网页版'} · ${canvas.width} × ${canvas.height}px · ${(blob.size / 1024 / 1024).toFixed(2)} MB`;
-        canvas.width = canvas.height = 0;
+        const blob = writer.finish();
+        const filename = `${title}-${layout === 'mobile' ? '手机版' : '网页版'}`;
+        console.info('Article export', { layout, tiles: completedTiles, milliseconds: Math.round(performance.now() - started) });
+        showShareImage(blob, filename, imageWidth, imageHeight);
       } catch (error) {
         if (generation === shareGeneration) shareStatus.textContent = error.message || '导出失败，请稍后重试';
       } finally {
@@ -840,7 +1086,7 @@
       }
     }
     shareDialog.querySelectorAll('[data-share-layout]').forEach(button => {
-      button.onclick = () => exportArticle(button.dataset.shareLayout);
+      button.onclick = () => previewLayout(button.dataset.shareLayout);
     });
     downloadShare.onclick = () => {
       if (!shareUrl || sharing) return;
@@ -861,6 +1107,11 @@
           (a.date_start || '').localeCompare(b.date_start || ''));
         initCalendar();
         render();
+        if (!history.state?.libraryRoute) {
+          history.replaceState({ libraryRoute: true, articleId: articleIdFromHash(),
+            returnTitle: '', scrollY: 0 }, '', location.href);
+        }
+        showArticleRoute(Boolean(articleIdFromHash()));
       })
       .catch(() => { list.innerHTML = '<div class="empty-tip">数据加载失败，请用 Live Server 打开。</div>'; });
   </script>

@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>本地图书馆编辑器</title>
+  <link rel="icon" type="image/png" href="/ui/zhijiaoquan-icon.png">
+  <link rel="stylesheet" href="/editor/style.css">
+</head>
+<body>
+  <header class="topbar">
+    <div><h1>图书馆编辑器</h1><p>本地写作 · 草稿自动保存 · 逐篇发布</p></div>
+    <div class="top-actions"><span id="saveStatus" role="status">正在载入…</span><button id="refreshLibrary" type="button">重新读取图书馆</button><a href="/library.html" target="_blank" rel="noopener">打开网页图书馆 ↗</a></div>
+  </header>
+  <main class="workspace">
+    <aside class="sidebar">
+      <label for="issueDate">选择期开始日期（周日）</label>
+      <input id="issueDate" type="date">
+      <button id="newArticle" type="button" class="primary">＋ 新建本期篇目</button>
+      <div id="draftList" class="draft-list" aria-label="本地草稿"></div>
+      <p class="sidebar-note">草稿和图片只存在本机。发布后的篇目仍可回来修改；已有 PPT 篇目不能在这里编辑。</p>
+    </aside>
+    <section class="writing" aria-label="写作区">
+      <div id="emptyState" class="empty">请先在左侧选一期并新建篇目，或打开已有草稿。</div>
+      <div id="editing" hidden>
+        <div class="meta-grid">
+          <label>篇目标题<input id="title" type="text" maxlength="200" placeholder="例如：关于……"></label>
+          <label>分类<select id="source"><option value="main">正篇</option><option value="extra">番外</option></select></label>
+          <label>所属期（周日）<input id="dateStart" type="date"></label>
+          <label class="wide">人物标签<input id="characters" type="text" placeholder="用顿号或逗号分隔，例如：元宏、冯太后" list="knownCharacters"><datalist id="knownCharacters"></datalist></label>
+        </div>
+        <div id="topToolbar" class="toolbar" role="toolbar" aria-label="正文格式（上方）">
+          <div class="toolbar-group"><span class="toolbar-title">文字</span><div class="toolbar-items">
+          <button data-command="bold" type="button" title="粗体">粗体</button>
+          <button data-command="italic" type="button" title="斜体">斜体</button>
+          <button data-command="strike" type="button" title="删除线">删除线</button>
+          <button data-command="quoteFont" type="button" title="选中文字使用霞鹜文楷">引文楷体</button>
+          <button data-command="bodyFont" type="button" title="恢复正文汇文明朝体">正文字体</button>
+          <label title="输入十六进制字色">字色 <input id="textColor" class="hex-color" type="text" inputmode="text" maxlength="7" value="#1c1e23" aria-label="十六进制字色" autocomplete="off" spellcheck="false"></label>
+          <button id="applyTextColor" type="button">应用字色</button>
+          <button data-command="clearColor" type="button">清除字色</button>
+          <label title="输入十六进制背景色">背景色 <input id="highlightColor" class="hex-color" type="text" inputmode="text" maxlength="7" value="#fff2a8" aria-label="十六进制背景色" autocomplete="off" spellcheck="false"></label>
+          <button id="applyHighlightColor" type="button">应用背景色</button>
+          <button data-command="clearHighlight" type="button">清除背景色</button>
+          </div></div>
+          <div class="toolbar-group"><span class="toolbar-title">段落</span><div class="toolbar-items">
+          <button data-command="quote" type="button">引用块</button>
+          <button data-command="bullet" type="button">无序列表</button>
+          <button data-command="ordered" type="button">有序列表</button>
+          <button data-command="heading5" type="button">小标题</button>
+          <button data-command="rule" type="button">分隔线</button>
+          </div></div>
+          <div class="toolbar-group insert-group"><span class="toolbar-title">插入</span><div class="toolbar-items">
+            <button id="addImage" type="button">图片</button>
+            <button id="addMediaRow" type="button">左图右文</button>
+            <button id="toggleTableInsert" type="button" aria-expanded="false" aria-controls="tableInsert">表格</button>
+            <button id="toggleLinkInsert" type="button" aria-expanded="false" aria-controls="linkInsert">篇目链接</button>
+          </div>
+          <div id="tableInsert" class="insert-panel" hidden>
+            <label>行数 <input id="tableRows" type="number" min="1" max="30" step="1" value="2"></label>
+            <label>列数 <input id="tableCols" type="number" min="1" max="20" step="1" value="2"></label>
+            <button id="insertTable" type="button">插入表格</button>
+          </div>
+          <div id="linkInsert" class="insert-panel link-panel" hidden>
+            <label for="linkSearch">搜索篇名或期次</label>
+            <input id="linkSearch" type="search" placeholder="输入篇名关键词或日期" autocomplete="off">
+            <span id="linkCount" role="status" aria-live="polite"></span>
+            <select id="linkTarget" size="6" aria-label="搜索结果中的跳转篇目"></select>
+            <button id="insertLink" type="button">设置链接</button>
+            <button data-command="unlink" type="button">取消链接</button>
+          </div></div>
+          <div class="toolbar-group"><span class="toolbar-title">操作</span><div class="toolbar-items">
+          <button data-command="undo" type="button">撤销</button>
+          <button data-command="redo" type="button">重做</button>
+          </div></div>
+        </div>
+        <input id="imageFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif" multiple hidden>
+        <div id="editor" aria-label="文章正文">
+          <div id="tableToolbar" class="context-toolbar" role="toolbar" aria-label="表格操作" hidden>
+            <span>表格</span>
+            <button data-command="rowBefore" type="button">上方加行</button><button data-command="rowAfter" type="button">下方加行</button>
+            <button data-command="columnBefore" type="button">左侧加列</button><button data-command="columnAfter" type="button">右侧加列</button>
+            <button data-command="deleteRow" type="button">删行</button><button data-command="deleteColumn" type="button">删列</button>
+            <button data-command="merge" type="button">合并格</button><button data-command="split" type="button">拆分格</button>
+            <button data-command="deleteTable" type="button">删除表格</button>
+          </div>
+          <div id="imageToolbar" class="context-toolbar" role="toolbar" aria-label="图片操作" hidden>
+            <span>图片</span><button id="convertImage" type="button">转为左图右文</button>
+          </div>
+        </div>
+        <div id="bottomToolbarMount"></div>
+        <div class="writing-actions"><button id="deleteDraft" type="button">删除未发布草稿</button><button id="saveDraft" type="button">保存草稿</button><button id="publish" type="button" class="primary">发布这篇到网页图书馆</button></div>
+        <p id="message" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+    <section class="preview-panel" aria-label="图书馆排版预览">
+      <h2>图书馆排版预览</h2>
+      <p>内容会按网页版图书馆的样式显示；发布后可在图书馆生成长图。</p>
+      <iframe id="preview" title="文章排版预览"></iframe>
+    </section>
+  </main>
+  <script src="/editor/bundle.js"></script>
+</body>
+</html>
