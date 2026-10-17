@@ -6,6 +6,7 @@
   <title>本地图书馆编辑器</title>
   <link rel="icon" type="image/png" href="/ui/zhijiaoquan-icon.png">
   <link rel="stylesheet" href="/editor/style.css">
+  <link rel="stylesheet" href="/vendor/katex/katex.min.css">
 </head>
 <body>
   <header class="topbar">
@@ -36,10 +37,10 @@
           <button data-command="strike" type="button" title="删除线">删除线</button>
           <button data-command="quoteFont" type="button" title="选中文字使用霞鹜文楷">引文楷体</button>
           <button data-command="bodyFont" type="button" title="恢复正文汇文明朝体">正文字体</button>
-          <label title="输入十六进制字色">字色 <input id="textColor" class="hex-color" type="text" inputmode="text" maxlength="7" value="#1c1e23" aria-label="十六进制字色" autocomplete="off" spellcheck="false"></label>
+          <label title="输入十六进制字色">字色 <span class="color-swatch" aria-hidden="true"></span><input id="textColor" class="hex-color" type="text" inputmode="text" maxlength="7" value="#2E6A67" aria-label="十六进制字色" autocomplete="off" spellcheck="false"></label>
           <button id="applyTextColor" type="button">应用字色</button>
           <button data-command="clearColor" type="button">清除字色</button>
-          <label title="输入十六进制背景色">背景色 <input id="highlightColor" class="hex-color" type="text" inputmode="text" maxlength="7" value="#fff2a8" aria-label="十六进制背景色" autocomplete="off" spellcheck="false"></label>
+          <label title="输入十六进制背景色">背景色 <span class="color-swatch" aria-hidden="true"></span><input id="highlightColor" class="hex-color" type="text" inputmode="text" maxlength="7" value="#fff2a8" aria-label="十六进制背景色" autocomplete="off" spellcheck="false"></label>
           <button id="applyHighlightColor" type="button">应用背景色</button>
           <button data-command="clearHighlight" type="button">清除背景色</button>
           </div></div>

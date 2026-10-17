@@ -7,6 +7,7 @@
   <meta name="description" content="忘川风华录知交圈微考据图文库：考据原图与文字，按人物、日期周、标题筛选浏览。" />
   <link rel="icon" type="image/png" href="ui/zhijiaoquan-icon.png" />
   <link rel="stylesheet" href="vendor/flatpickr/flatpickr.min.css" />
+  <link rel="stylesheet" href="vendor/katex/katex.min.css" />
   <style>
     @font-face { font-family: "Jinling"; src: url("fonts/BWKS.woff2") format("woff2"); font-display: swap; }
     @font-face { font-family: "ShengshiKai"; src: url("fonts/FZSHENGSKSJW_CU.woff2") format("woff2"); font-display: swap; }
@@ -40,13 +41,11 @@
     header.library-head .back { font-size: 13px; color: var(--green-dark); text-decoration: none; border-bottom: 1px dashed var(--green-dark); }
     header.library-head .note { font-size: 12px; color: var(--muted); margin-left: auto; }
 
-    .filter-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; margin-bottom: 18px; }
     .filter-bar input, .filter-bar select {
       border: 1px solid var(--line); border-radius: 8px; background: var(--panel);
       padding: 7px 10px; font: 13px/1.4 inherit; color: var(--ink); outline: none;
     }
     .filter-bar input[type="search"] { flex: 1; min-width: 150px; }
-    .filter-bar .week-select { flex: none; }
     .filter-label { font-size: 12px; color: var(--muted); }
     .clear-btn {
       border: 1px solid var(--line); background: var(--panel); border-radius: 999px;
@@ -65,8 +64,23 @@
       background: var(--panel); border: 1px solid var(--line); border-radius: 12px;
       margin-bottom: 14px; overflow: hidden; box-shadow: 0 1px 3px rgba(28, 30, 35, .06);
     }
-    .article-head { padding: 13px 16px; cursor: pointer; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
-    .article-head:hover { background: #EAF0E9; }
+    .article-card:not(.open) { overflow: visible; }
+    .article-head { position: relative; --head-surface: var(--panel); padding: 13px 16px; cursor: pointer; display: flex; gap: 10px; align-items: baseline; flex-wrap: wrap; }
+    .article-card:not(.open) .article-head { border-radius: 11px; }
+    .article-head:hover { --head-surface: #EAF0E9; background: var(--head-surface); }
+    .article-head::before {
+      content: ""; position: absolute; right: -3px; bottom: -3px; width: 21px; height: 21px;
+      pointer-events: none; background: var(--paper); clip-path: polygon(100% 0, 0 100%, 100% 100%);
+      transform-origin: right bottom; transition: transform .26s ease, opacity .2s ease;
+    }
+    .article-head::after {
+      content: ""; position: absolute; right: -1px; bottom: -1px; width: 16px; height: 16px;
+      pointer-events: none; background: linear-gradient(135deg, #F8FBF7 0 45%, #BDD2C8 49%, transparent 52%);
+      border-top-left-radius: 8px; filter: drop-shadow(-2px -2px 2px rgba(46, 106, 103, .2));
+      transform-origin: right bottom; transition: transform .26s ease, opacity .2s ease;
+    }
+    .article-card.open .article-head::before, .article-card.open .article-head::after { transform: rotate(-90deg) scale(.15); opacity: 0; }
+    @media (prefers-reduced-motion: reduce) { .article-head::before, .article-head::after { transition: none; } }
     .article-title { font-size: 18px; letter-spacing: 1px; font-family: "Jinling", serif; }
     .article-meta { font-size: 12px; color: var(--muted); font-family: "HuiwenMincho", "SimSun", "Songti SC", "Noto Serif SC", serif; }
     .article-tags { display: inline-flex; gap: 6px; flex-wrap: wrap; font-family: "ShengshiKai", "Noto Serif SC", serif; }
@@ -83,10 +97,6 @@
     .article-body, header.library-head .back, header.library-head .note, .foot-note {
       font-family: "HuiwenMincho", "SimSun", "Songti SC", "Noto Serif SC", serif;
     }
-    .article-tags {
-      font-family: "ShengshiKai", "Noto Serif SC", serif;
-    }
-
     .media-row { display: flex; gap: 18px; align-items: flex-start; margin: 12px 0; }
     .media-imgs { flex: 0 0 180px; }
     .media-imgs img {
@@ -118,8 +128,12 @@
     .markdown-table th, .markdown-table td { border: 1px solid var(--line); padding: 6px 9px; vertical-align: top; }
     .markdown-table th { background: #EAF0E9; font-weight: 700; }
     .markdown-table td img, .markdown-table th img { display: block; max-width: 100%; height: auto; margin: 6px auto; }
+    #articleList .article-body img, #articleDetail .article-body img { cursor: zoom-in; }
+    #articleList .article-body img:focus-visible, #articleDetail .article-body img:focus-visible { outline: 3px solid var(--green-dark); outline-offset: 3px; }
     .markdown-heading { margin: 12px 0 4px; font-size: 16px; }
     .markdown-rule { border: 0; border-top: 1px solid var(--line); margin: 12px 0; }
+    .markdown-math { margin: 12px 0; max-width: 100%; overflow-x: auto; overflow-y: hidden; font-size: 1.05em; }
+    .markdown-math .katex-display { margin: .35em 0; }
 
     .empty-tip { text-align: center; color: var(--muted); padding: 40px 0; }
     .pager { display: flex; justify-content: center; align-items: center; gap: 6px; flex-wrap: wrap; margin: 18px 0; }
@@ -137,9 +151,19 @@
       font-family: "Jinling", serif;
       font-weight: bold;
     }
+    .page-jump { position: relative; display: inline-flex; align-items: center; gap: 4px; white-space: nowrap; color: var(--muted); font-size: 13px; }
+    .page-jump input { width: 54px; height: 30px; box-sizing: border-box; border: 1px dashed var(--line); border-radius: 6px; background: var(--panel); color: var(--ink); padding: 4px 5px; text-align: center; font: inherit; }
+    .page-jump input::placeholder { color: #838F8B; opacity: 1; }
+    .page-jump input:not(:placeholder-shown) { border-color: var(--green); }
+    .page-jump input:focus { border: 2px solid var(--green-dark); padding: 3px 4px; outline: none; background: #fff; box-shadow: 0 0 0 3px rgba(94, 140, 135, .18); }
+    .page-jump input[aria-invalid="true"] { border: 2px solid #78827F; padding: 3px 4px; background: #F4F5F2; box-shadow: 0 0 0 3px rgba(120, 130, 127, .2); }
+    .page-jump-hint { position: absolute; z-index: 5; right: 0; bottom: calc(100% + 9px); width: max-content; max-width: min(230px, calc(100vw - 32px)); padding: 8px 11px; border: 1px solid #C4CBC7; border-left: 3px solid #78827F; border-radius: 8px; background: #F8F9F6; color: #53605B; box-shadow: 0 5px 16px rgba(28, 30, 35, .12); line-height: 1.5; white-space: normal; text-align: left; font-family: "HuiwenMincho", "SimSun", serif; }
+    .page-jump-hint[hidden] { display: none; }
+    .page-jump-hint::after { content: ""; position: absolute; right: 24px; bottom: -5px; width: 8px; height: 8px; border-right: 1px solid #C4CBC7; border-bottom: 1px solid #C4CBC7; background: #F8F9F6; transform: rotate(45deg); }
     .expand-btn { margin: 6px auto 0; display: block; font-size: 15px; padding: 8px 22px; }
 
     .foot-note { text-align: center; font-size: 12px; color: var(--muted); margin-top: 30px; }
+    .library-aside { margin-top: 16px; color: var(--muted); font-size: 12px; line-height: 1.8; text-align: right; }
 
     @media (max-width: 560px) {
       .library-wrap { padding: 20px 14px 50px; }
@@ -156,9 +180,9 @@
     .filter-bar {
       display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 100px;
       grid-template-areas: "title character source" "date status clear";
-      gap: 10px; align-items: center;
+      gap: 10px; align-items: center; margin-bottom: 18px;
     }
-    #searchInput { grid-area: title; }
+    .title-field { grid-area: title; position: relative; min-width: 0; }
     .character-field { grid-area: character; position: relative; min-width: 0; display: flex; }
     #sourceFilter { grid-area: source; }
     #weekPicker { grid-area: date; cursor: pointer; }
@@ -174,6 +198,14 @@
       font-weight: 400;
     }
     .filter-bar input::placeholder { font-family: inherit; font-weight: inherit; }
+    .filter-bar input[type="search"]::placeholder { color: #838F8B; opacity: 1; }
+    .filter-bar input[type="search"] { border: 1px dashed var(--line); transition: border-color .15s, box-shadow .15s, background-color .15s; }
+    .filter-bar input[type="search"]:not(:placeholder-shown) { border-color: var(--green); background: var(--panel); }
+    .filter-bar input[type="search"]:focus { border: 2px solid var(--green-dark); padding: 6px 9px; background: #fff; box-shadow: 0 0 0 3px rgba(94, 140, 135, .18); }
+    .filter-bar input[type="search"][aria-invalid="true"] { border: 2px solid #78827F; padding: 6px 9px; background: #F4F5F2; box-shadow: 0 0 0 3px rgba(120, 130, 127, .13); }
+    .filter-bar input[type="search"][aria-invalid="true"]:focus { box-shadow: 0 0 0 3px rgba(120, 130, 127, .2); }
+    .search-error { position: absolute; z-index: 21; top: calc(100% + 5px); left: 0; max-width: 100%; padding: 5px 9px; border: 1px solid #C4CBC7; border-radius: 6px; background: #F8F9F6; color: #53605B; box-shadow: 0 3px 10px rgba(28, 30, 35, .08); font: 12px/1.5 "HuiwenMincho", "SimSun", serif; }
+    .search-error[hidden] { display: none; }
     .filter-bar input[type="search"]::-webkit-search-cancel-button {
       -webkit-appearance: none;
       width: 14px; height: 14px; margin-left: 8px; cursor: pointer;
@@ -182,16 +214,21 @@
       mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='M4 4l8 8M12 4l-8 8' stroke='black' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center / contain no-repeat;
     }
     .filter-bar input, .filter-bar select, .filter-bar .clear-btn { border-style: dashed; }
+    .filter-bar input[type="search"]:focus, .filter-bar input[type="search"][aria-invalid="true"] { border-style: solid; }
+    #weekPicker::placeholder { color: #838F8B; opacity: 1; }
+    #sourceFilter:not([data-filled="true"]) { color: #838F8B; }
+    #sourceFilter option { color: var(--ink); }
+    #sourceFilter[data-filled="true"], #weekPicker[data-filled="true"] { border-color: var(--green); }
+    #sourceFilter:focus, #weekPicker:focus { border: 2px solid var(--green-dark); padding: 6px 9px; outline: none; background: #fff; color: var(--ink); box-shadow: 0 0 0 3px rgba(94, 140, 135, .18); }
+    #sourceFilter[aria-invalid="true"], #weekPicker[aria-invalid="true"] { border: 2px solid #78827F; padding: 6px 9px; background: #F4F5F2; box-shadow: 0 0 0 3px rgba(120, 130, 127, .2); }
     .flatpickr-calendar { background: var(--panel); font-family: "Jinling", serif; box-shadow: 0 4px 18px rgba(46,106,103,.14); }
     .flatpickr-day.library-week { background: rgba(169,200,190,.4); border-color: transparent; border-radius: 6px; }
     .flatpickr-day.selected, .flatpickr-day.selected:hover { background: var(--green-dark); border-color: var(--green-dark); }
     .flatpickr-day:hover { background: #E1EAE4; border-color: #E1EAE4; }
     @media (max-width: 560px) {
-      .filter-bar { grid-template-columns: minmax(0, 1fr) 100px; grid-template-areas: "title source" "character clear" "candidate candidate" "date date" "status status"; }
-      .character-field { display: contents; }
-      #characterSearch { grid-area: character; }
-      #characterSelect { grid-area: candidate; position: static; z-index: auto; }
-      #characterSelect.hidden { display: block !important; visibility: hidden; pointer-events: none; }
+      .filter-bar { grid-template-columns: minmax(0, 1fr) 100px; grid-template-areas: "title source" "character clear" "date date" "status status"; }
+      .character-field { grid-area: character; }
+      #characterSelect { width: 100%; }
       #weekLabel { min-height: 23px; }
     }
     .share-btn, .share-dialog button {
@@ -201,23 +238,27 @@
     }
     .share-btn { margin-left: auto; flex-shrink: 0; }
     .share-btn:hover, .share-dialog button:hover { background: #E1EAE4; }
-    .share-dialog { margin: auto; width: min(420px, calc(100% - 32px)); padding: 24px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--ink); font-family: "HuiwenMincho", serif; }
+    .share-dialog { margin: auto; width: min(420px, calc(100% - 32px)); max-height: calc(100dvh - 32px); overflow-y: auto; padding: 24px; border: 1px solid var(--line); border-radius: 12px; background: var(--paper); color: var(--ink); font-family: "HuiwenMincho", serif; }
     .share-dialog::backdrop { background: rgba(28,30,35,.25); }
+    .image-dialog { position: fixed; inset: 0; margin: auto; width: max-content; padding: 38px 12px 12px; max-width: calc(100vw - 32px); max-height: calc(100dvh - 32px); border: 1px solid var(--line); border-radius: 12px; background: var(--paper); box-shadow: 0 12px 36px rgba(28,30,35,.24); }
+    .image-dialog::backdrop { background: rgba(28,30,35,.72); }
+    .image-dialog img { display: block; max-width: calc(100vw - 58px); max-height: calc(100dvh - 86px); width: auto; height: auto; object-fit: contain; }
+    .image-dialog-close { position: absolute; top: 7px; right: 9px; padding: 2px 9px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); color: var(--green-dark); font: 14px "HuiwenMincho", serif; cursor: pointer; }
+    .image-dialog-close:hover { background: #E1EAE4; }
     .share-dialog h2 { font-size: 19px; margin-bottom: 10px; }
     .share-dialog p { font-size: 13px; margin-bottom: 12px; }
     .share-actions { display: flex; gap: 10px; flex-wrap: wrap; }
     .share-dialog button { font-size: 14px; padding: 7px 12px; }
     .share-dialog button:disabled { opacity: .5; cursor: wait; }
     #shareStatus { min-height: 25px; margin-top: 12px; }
-    .share-dialog { max-height: calc(100dvh - 32px); overflow-y: auto; }
     .share-dialog button[aria-pressed="true"] { background: #A9C8BE; border-style: solid; }
     .share-preview { margin: 14px 0; max-height: 42vh; overflow-y: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--panel); }
     #sharePreview { max-height: 42vh; }
-    .share-preview img { display: block; width: 100%; height: auto; }
-    .share-preview img { -webkit-touch-callout: default; user-select: auto; }
+    .share-preview img { display: block; width: 100%; height: auto; -webkit-touch-callout: default; user-select: auto; }
     .share-export { box-sizing: border-box; padding: 24px; background: var(--paper); color: var(--ink); }
     .share-export .article-card { margin: 0; box-shadow: none; }
     .share-export .article-head { cursor: default; background: var(--panel); }
+    .share-export .article-head::before, .share-export .article-head::after { display: none; }
     .share-export .article-title { font-size: 18px; }
     .share-export .article-body { display: block; }
     .share-export .share-btn { display: none; }
@@ -226,6 +267,7 @@
     .share-export .markdown-table-wrap { overflow: visible; }
     .share-export .markdown-table { width: 100%; min-width: 0; table-layout: fixed; }
     .share-export .markdown-table td, .share-export .markdown-table th { overflow-wrap: anywhere; }
+    .share-export .markdown-math { overflow: visible; }
     .share-export.desktop .media-row { flex-direction: row; }
     .share-export.desktop .media-imgs { flex: 0 0 180px; width: 180px; }
     .share-export.desktop .img-only img { width: 180px; }
@@ -261,10 +303,14 @@
     </header>
 
     <div class="filter-bar">
-      <input id="searchInput" type="search" placeholder="搜索标题关键词……" />
+      <div class="title-field">
+        <input id="searchInput" type="search" aria-label="搜索标题关键词" placeholder="搜索标题关键词……" />
+        <p id="titleSearchError" class="search-error" role="status" hidden>没有匹配的篇目，请换个关键词。</p>
+      </div>
       <div class="character-field">
-      <input id="characterSearch" type="search" placeholder="搜索人物（输入后回车选择）……" />
-      <select id="characterSelect" class="hidden" aria-label="人物候选"></select>
+        <input id="characterSearch" type="search" aria-label="搜索人物，输入后按回车选择" placeholder="搜索人物（输入后回车选择）……" />
+        <select id="characterSelect" class="hidden" aria-label="人物候选"></select>
+        <p id="characterSearchError" class="search-error" role="status" hidden>未找到人物，请换个关键词。</p>
       </div>
       <select id="sourceFilter" aria-label="文章来源">
         <option value="all">全部</option>
@@ -279,6 +325,7 @@
     <div id="articleList"></div>
     <div id="articleDetail" hidden></div>
     <p class="foot-note">内容由遣月整理发布，素材版权归原权利人所有</p>
+    <footer class="library-aside">吾日三省吾身：<br>双司马加强否？<br>柳永、班固、程颐落地否？<br>是啊，吃什么？</footer>
   </div>
 
   <dialog id="shareDialog" class="share-dialog" aria-labelledby="shareHeading">
@@ -296,11 +343,16 @@
     </div>
     <button type="button" id="downloadShare" disabled>下载完整 PNG</button>
   </dialog>
+  <dialog id="imageDialog" class="image-dialog" aria-label="放大查看配图">
+    <button id="closeImageDialog" class="image-dialog-close" type="button" aria-label="关闭放大图片">关闭</button>
+    <img id="imageDialogImage" alt="">
+  </dialog>
   <script src="html2canvas.min.js"></script>
   <script src="vendor/share-png.bundle.js"></script>
   <script src="characters.js"></script>
   <script src="vendor/flatpickr/flatpickr.min.js"></script>
   <script src="vendor/flatpickr/zh.js"></script>
+  <script src="vendor/katex/katex.min.js"></script>
   <script>
     let articles = [];
     let mode = 'preview';      // 'preview' 预览3篇 | 'paged' 分页浏览
@@ -313,11 +365,15 @@
     const PAGE_SIZE = 10;
     const PREVIEW_COUNT = 3;
     const MAX_PAGE_BUTTONS = 10;
+    const LEADING_PAGE_BUTTONS = 5;
+    const TRAILING_PAGE_BUTTONS = 3;
     const list = document.getElementById('articleList');
     const detail = document.getElementById('articleDetail');
     const filterBar = document.querySelector('.filter-bar');
     const searchInput = document.getElementById('searchInput');
+    const titleSearchError = document.getElementById('titleSearchError');
     const characterSearch = document.getElementById('characterSearch');
+    const characterSearchError = document.getElementById('characterSearchError');
     const characterSelect = document.getElementById('characterSelect');
     const sourceFilter = document.getElementById('sourceFilter');
     const weekPicker = document.getElementById('weekPicker');
@@ -415,6 +471,7 @@
       const imgs = (p.images || []).map(img =>
         '<img src="library/' + esc(img) + '" alt="' + esc(p.alt || '考据配图') + '" loading="lazy">');
       if (p.type === 'image') return '<div class="img-only">' + imgs.join('') + '</div>';
+      if (p.type === 'math') return '<div class="markdown-math" data-latex="' + esc(p.latex || '') + '"></div>';
       if (p.type === 'quote') {
         return '<blockquote class="markdown-quote">' + (p.blocks || []).map(renderParagraph).join('') + '</blockquote>';
       }
@@ -463,6 +520,22 @@
       }
       if (imgs.length) return '<div class="img-only">' + imgs.join('') + '</div>';
       return '<p>' + textHtml + '</p>';
+    }
+
+    function renderMath(root) {
+      root.querySelectorAll('.markdown-math[data-latex]').forEach(element => {
+        katex.render(element.dataset.latex, element, {
+          displayMode: true, throwOnError: false, trust: false, strict: 'ignore'
+        });
+      });
+    }
+
+    function enableImageZoom(root) {
+      root.querySelectorAll('.article-body img').forEach(image => {
+        image.tabIndex = 0;
+        image.setAttribute('role', 'button');
+        image.setAttribute('aria-label', '放大图片：' + (image.alt || '考据配图'));
+      });
     }
 
     function getFilterState() {
@@ -526,6 +599,18 @@
       render();
     }
 
+    function setSearchError(input, message, show) {
+      const active = Boolean(show);
+      message.hidden = !active;
+      if (active) {
+        input.setAttribute('aria-invalid', 'true');
+        input.setAttribute('aria-describedby', message.id);
+      } else {
+        input.removeAttribute('aria-invalid');
+        input.removeAttribute('aria-describedby');
+      }
+    }
+
     // 人物筛选：搜索 → 回车 → 候选列表（全部 161 角色）
     characterSearch.onkeydown = e => {
       if (e.key !== 'Enter') return;
@@ -544,6 +629,13 @@
           .toLowerCase()
           .includes(kw)
       );
+
+      if (!matches.length) {
+        characterSelect.classList.add('hidden');
+        setSearchError(characterSearch, characterSearchError, true);
+        return;
+      }
+      setSearchError(characterSearch, characterSearchError, false);
 
       characterSelect.innerHTML =
         '<option value="" selected disabled>请选择人物</option>' +
@@ -569,13 +661,14 @@
         selectedChar = characterSelect.value;
         characterSearch.value = selectedChar;
         characterSelect.classList.add('hidden');
+        setSearchError(characterSearch, characterSearchError, false);
         renderFromFirstPage();
       }
     };
     characterSearch.oninput = () => {
       characterSelect.classList.add('hidden');
-
-      if (!characterSearch.value.trim()) {
+      setSearchError(characterSearch, characterSearchError, false);
+      if (characterSearch.value !== selectedChar) {
         selectedChar = '';
         renderFromFirstPage();
       }
@@ -622,6 +715,8 @@
     clearFilters.onclick = () => {
       searchInput.value = '';
       characterSearch.value = '';
+      setSearchError(searchInput, titleSearchError, false);
+      setSearchError(characterSearch, characterSearchError, false);
       selectedChar = '';
       if (calendar) calendar.clear(false);
       characterSelect.classList.add('hidden');
@@ -634,6 +729,8 @@
     };
 
     function updateFilterBar(filters) {
+      sourceFilter.dataset.filled = String(filters.source !== 'all');
+      weekPicker.dataset.filled = String(Boolean(filters.week));
       const active =
         filters.titleInput ||
         filters.character ||
@@ -649,26 +746,11 @@
       if (totalPages <= MAX_PAGE_BUTTONS) {
         return Array.from({ length: totalPages }, (_, index) => index + 1);
       }
-
-      const currentPageNeedsOwnButton =
-        page > MAX_PAGE_BUTTONS - 1 &&
-        page < totalPages;
-
-      const leadingPageCount = currentPageNeedsOwnButton
-        ? MAX_PAGE_BUTTONS - 2
-        : MAX_PAGE_BUTTONS - 1;
-
-      const pages = Array.from(
-        { length: leadingPageCount },
-        (_, index) => index + 1
-      );
-
-      if (currentPageNeedsOwnButton) {
-        pages.push(page);
-      }
-
-      pages.push(totalPages);
-      return pages;
+      const pages = new Set();
+      for (let number = 1; number <= LEADING_PAGE_BUTTONS; number++) pages.add(number);
+      for (let number = totalPages - TRAILING_PAGE_BUTTONS + 1; number <= totalPages; number++) pages.add(number);
+      pages.add(page);
+      return [...pages].sort((a, b) => a - b);
     }
 
     function buildPager(totalPages) {
@@ -690,6 +772,9 @@
         previousPage = pageNumber;
       });
 
+      html += `<label class="page-jump"><input type="text" inputmode="numeric" maxlength="6"
+        data-page-jump aria-label="输入页码，按回车跳转" aria-describedby="pageJumpHint" placeholder="页码">/${totalPages}
+        <span class="page-jump-hint" id="pageJumpHint" role="alert" hidden></span></label>`;
       html += '<button class="page-btn" data-page="next" aria-label="下一页">›</button>';
       return '<div class="pager">' + html + '</div>';
     }
@@ -744,6 +829,9 @@
       const filters = getFilterState();
       const items = filtered(filters);
       updateFilterBar(filters);
+      setSearchError(searchInput, titleSearchError,
+        Boolean(filters.titleQuery) && !articles.some(article =>
+          article.title.toLowerCase().includes(filters.titleQuery)));
 
       if (!items.length) {
         pageCount = 0;
@@ -755,6 +843,8 @@
       pageCount = pageView.totalPages;
 
       list.innerHTML = pageView.shown.map(a => renderArticleCard(a)).join('') + pageView.pager;
+      renderMath(list);
+      enableImageZoom(list);
     }
 
     function articleIdFromHash() {
@@ -777,6 +867,8 @@
         detail.innerHTML = '<nav class="article-navigation"><a class="article-return" href="' +
           (previousTitle ? '#' : articleRouteUrl(null)) + '">' + label + '</a></nav>' +
           renderArticleCard(article, true);
+        renderMath(detail);
+        enableImageZoom(detail);
         list.hidden = true;
         filterBar.hidden = true;
         detail.hidden = false;
@@ -793,6 +885,16 @@
 
     document.addEventListener('click', event => {
       if (!(event.target instanceof Element)) return;
+      const image = event.target.closest('.article-body img');
+      if (image && (list.contains(image) || detail.contains(image))) {
+        const dialog = document.getElementById('imageDialog');
+        const enlarged = document.getElementById('imageDialogImage');
+        enlarged.src = image.currentSrc || image.src;
+        enlarged.alt = image.alt || '考据配图';
+        dialog.showModal();
+        document.getElementById('closeImageDialog').focus();
+        return;
+      }
       const articleLink = event.target.closest('[data-article-link]');
       if (articleLink) {
         if (event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
@@ -819,6 +921,22 @@
         }
       }
     });
+    document.addEventListener('keydown', event => {
+      if ((event.key === 'Enter' || event.key === ' ') &&
+          event.target instanceof HTMLImageElement &&
+          (list.contains(event.target) || detail.contains(event.target))) {
+        event.preventDefault();
+        event.target.click();
+      }
+    });
+    const imageDialog = document.getElementById('imageDialog');
+    document.getElementById('closeImageDialog').onclick = () => imageDialog.close();
+    imageDialog.addEventListener('click', event => {
+      if (event.target === imageDialog) imageDialog.close();
+    });
+    imageDialog.addEventListener('close', () => {
+      document.getElementById('imageDialogImage').removeAttribute('src');
+    });
     window.addEventListener('popstate', () => showArticleRoute());
     detail.addEventListener('click', event => {
       if (!(event.target instanceof Element)) return;
@@ -826,6 +944,37 @@
       if (shareButton) openShare(shareButton.closest('.article-card'));
     });
 
+    function hidePageJumpHint(input) {
+      input.removeAttribute('aria-invalid');
+      input.closest('.page-jump').querySelector('.page-jump-hint').hidden = true;
+    }
+    list.addEventListener('input', event => {
+      if (event.target.matches?.('[data-page-jump]')) hidePageJumpHint(event.target);
+    });
+    list.addEventListener('focusout', event => {
+      if (event.target.matches?.('[data-page-jump]')) hidePageJumpHint(event.target);
+    });
+    list.addEventListener('keydown', event => {
+      if (!event.target.matches?.('[data-page-jump]')) return;
+      if (event.key === 'Escape') {
+        hidePageJumpHint(event.target);
+        return;
+      }
+      if (event.key !== 'Enter') return;
+      event.preventDefault();
+      const input = event.target;
+      const value = input.value.trim();
+      const destination = Number(value);
+      if (!/^[1-9]\d*$/.test(value) || !Number.isSafeInteger(destination) || destination > pageCount) {
+        input.setAttribute('aria-invalid', 'true');
+        const hint = input.closest('.page-jump').querySelector('.page-jump-hint');
+        hint.textContent = `请输入 1 至 ${pageCount} 之间的整数页码`;
+        hint.hidden = false;
+        return;
+      }
+      page = destination;
+      render();
+    });
     list.onclick = event => {
       if (!(event.target instanceof Element)) return;
 
@@ -925,6 +1074,21 @@
       backdropPressed = false;
     });
 
+    function fitShareMath(root) {
+      root.querySelectorAll('.markdown-math').forEach(formula => {
+        const lines = formula.querySelectorAll('.katex .base');
+        if (!lines.length) return;
+        // KaTeX centers wide display formulas, so scrollWidth alone can miss
+        // the part extending beyond the left edge of the export image.
+        for (let attempt = 0; attempt < 3; attempt++) {
+          const available = formula.getBoundingClientRect().width * .96;
+          const actual = Math.max(...Array.from(lines, line => line.getBoundingClientRect().width));
+          if (!available || actual <= available) break;
+          formula.style.fontSize = `${parseFloat(getComputedStyle(formula).fontSize) * available / actual}px`;
+        }
+      });
+    }
+
     function previewLayout(layout) {
       if (sharing) return;
       shareLayout = layout;
@@ -946,6 +1110,9 @@
       footer.textContent = '忘川风华录知交圈微考据 · 图文整理\n内容由遣月整理发布，素材版权归原权利人所有';
       preview.appendChild(footer);
       layoutPreview.appendChild(preview);
+      document.fonts.ready.then(() => {
+        if (preview.isConnected) fitShareMath(preview);
+      });
       layoutPreview.scrollTop = 0;
       shareDialog.querySelectorAll('[data-share-layout]').forEach(button => button.setAttribute('aria-pressed', String(button.dataset.shareLayout === layout)));
       shareStatus.textContent = '排版预览；确认后点击“生成分享图片”。';
@@ -998,6 +1165,7 @@
           document.fonts.load('16px HuiwenMincho'),
           document.fonts.load('18px Jinling'),
           document.fonts.load('16px LXGWWenKai'),
+          document.fonts.ready,
           ...Array.from(host.querySelectorAll('img'), img => new Promise((resolve, reject) => {
             const timer = setTimeout(() => finish(new Error('图片加载超时，请稍后重试')), 20000);
             function finish(error) {
@@ -1012,6 +1180,7 @@
           }))
         ]), new Promise((_, reject) => setTimeout(() => reject(new Error('字体或图片加载超时，请检查网络后重试')), 25000))]);
         if (generation !== shareGeneration) return;
+        fitShareMath(host);
         const width = host.offsetWidth;
         const height = host.scrollHeight;
         const scale = 2;
@@ -1100,7 +1269,7 @@
 
     searchInput.oninput = renderFromFirstPage;
 
-    fetch('library/data/library.json')
+    fetch('library/data/library.json', { cache: 'no-store' })
       .then(r => r.json())
       .then(data => {
         articles = (data.articles || []).sort((a, b) =>

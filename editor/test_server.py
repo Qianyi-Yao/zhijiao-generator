@@ -78,6 +78,23 @@ class StoreTests(unittest.TestCase):
         image = table["rows"][0][0]["images"][0]
         self.assertTrue((self.root / "library" / image).is_file())
 
+    def test_math_source_survives_preview_and_publish(self):
+        latex = r"\frac{a^2+b^2}{c}"
+        math = {"type": "mathBlock", "content": [{"type": "text", "text": latex}]}
+        doc = {"type": "doc", "content": [
+            {"type": "paragraph", "content": [{"type": "text", "text": "推导如下"}]},
+            math,
+            {"type": "blockquote", "content": [math]},
+        ]}
+        saved = self.draft(doc)
+        preview = self.store.preview(saved)["paragraphs"]
+        self.assertEqual(preview[1], {"type": "math", "latex": latex})
+        self.assertEqual(preview[2]["blocks"][0], {"type": "math", "latex": latex})
+        self.store.publish(self.id, self.store.state()["libraryHash"])
+        article = next(a for a in self.store.library()[0]["articles"]
+                       if a["id"] == "editor-" + self.id)
+        self.assertEqual(article["paragraphs"], preview)
+
     def test_external_change_blocks_publish(self):
         self.draft()
         old_hash = self.store.state()["libraryHash"]

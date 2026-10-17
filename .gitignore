@@ -4,10 +4,17 @@
 任务书/转换器/*
 !任务书/转换器/converter.py
 !任务书/转换器/运行.bat
+!任务书/转换器/markdown_import.py
+!任务书/转换器/html_import.py
+!任务书/转换器/requirements.txt
+!任务书/转换器/README.md
 
 # ��վ����ļ�
 *.zip
 node_modules/
+__pycache__/
+*.py[cod]
+/tmp/
 library/editor-drafts/
 library/editor-backups/
 miniprogram/

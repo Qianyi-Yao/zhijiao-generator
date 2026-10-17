@@ -39,7 +39,10 @@ input, select { width: 100%; border: 1px solid var(--line); border-radius: 7px; 
 .toolbar-title { font: 12px/1.4 HuiwenMincho, SimSun, serif; color: var(--green); white-space: nowrap; }
 .toolbar-items { display: flex; align-items: center; flex-wrap: wrap; gap: 5px; }
 .toolbar button, .toolbar select, .context-toolbar button { font-size: 12px; }
+.toolbar button[aria-expanded="true"], .toolbar button[aria-expanded="true"]:hover { background: #245350; border-color: #245350; color: #fff; }
 .toolbar label { display: flex; align-items: center; gap: 4px; white-space: nowrap; font-size: 12px; }
+.toolbar .color-swatch { display: inline-block; flex: 0 0 19px; width: 19px; height: 19px; border: 1px solid #9aa9a2; border-radius: 5px; background: #fff; }
+.toolbar .color-swatch.invalid { background: repeating-linear-gradient(45deg, #fff, #fff 4px, #e9eeeb 4px, #e9eeeb 8px) !important; }
 .toolbar .hex-color { width: 94px; padding: 4px 6px; font: 12px/1.5 Consolas, monospace; }
 .toolbar .hex-color[aria-invalid=true] { border-color: #a04036; }
 .toolbar select { width: auto; max-width: 190px; }
@@ -54,6 +57,11 @@ input, select { width: 100%; border: 1px solid var(--line); border-radius: 7px; 
 .link-panel [role=status] { font-size: 12px; color: #58706c; }
 .link-panel button { align-self: flex-start; }
 #editor { position: relative; min-height: 420px; padding: 14px 4px; }
+.tiptap .editor-math-block { margin: 12px 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; background: #f3f7f4; }
+.editor-math-source { min-height: 1.7em; outline: none; white-space: pre-wrap; overflow-wrap: anywhere; font: 14px/1.6 Consolas, monospace; }
+.editor-math-block .markdown-math { margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--line); }
+.markdown-math { max-width: 100%; overflow-x: auto; overflow-y: hidden; font-size: 1.05em; }
+.markdown-math .katex-display { margin: .35em 0; }
 .context-toolbar { position: absolute; z-index: 5; left: 4px; display: flex; align-items: center; flex-wrap: wrap; gap: 5px; max-width: calc(100% - 8px); padding: 6px; border: 1px solid var(--line); border-radius: 8px; background: #f2f6f2; box-shadow: 0 3px 12px #1c1e231c; }
 .context-toolbar span { font-size: 12px; color: var(--green); margin: 0 3px; }
 .tiptap { min-height: 390px; outline: none; font-size: 16px; line-height: 1.9; }
@@ -66,7 +74,7 @@ input, select { width: 100%; border: 1px solid var(--line); border-radius: 7px; 
 .editor-media-image { margin-bottom: 10px; }
 .editor-media-image-actions, .editor-media-actions { display: flex; flex-wrap: wrap; gap: 4px; }
 .editor-media-image-actions button, .editor-media-actions button { padding: 2px 6px; font-size: 11px; }
-.tiptap .editor-media-text { flex: 1; min-width: 0; min-height: 70px; overflow-wrap: anywhere; }
+.tiptap .editor-media-text { flex: 1; align-self: stretch; min-width: 0; min-height: 70px; overflow-wrap: anywhere; }
 .tiptap .editor-media-text p:last-child { margin-bottom: 0; }
 .tiptap .editor-media-text:empty::before { content: '在右侧输入文字'; color: #778580; }
 .tiptap table { border-collapse: collapse; table-layout: fixed; width: 100%; }

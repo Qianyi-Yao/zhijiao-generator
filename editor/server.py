@@ -147,6 +147,13 @@ def document_blocks(doc, draft_id, asset_path):
             children = node.get("content") or []
             if kind == "paragraph":
                 blocks.append({"runs": _runs(children)})
+            elif kind == "mathBlock":
+                if any(item.get("type") != "text" for item in children):
+                    raise EditorError("公式中只支持 LaTeX 文本")
+                latex = "".join(item.get("text", "") for item in children)
+                if not latex.strip() or len(latex) > 10000:
+                    raise EditorError("公式内容须在 1 至 10000 字符之间")
+                blocks.append({"type": "math", "latex": latex})
             elif kind == "heading":
                 level = (node.get("attrs") or {}).get("level")
                 if level not in (5, 6):
@@ -178,7 +185,7 @@ def document_blocks(doc, draft_id, asset_path):
                         raise EditorError("图文段图片格式无效")
                     paths.append(asset_path(_asset_name(image.get("src"), draft_id)))
                 media_blocks, plain_parts = [], []
-                has_quote = False
+                has_structured_content = False
                 for part in children:
                     part_type = part.get("type")
                     if part_type == "paragraph":
@@ -192,16 +199,19 @@ def document_blocks(doc, draft_id, asset_path):
                         quote_blocks = [{"runs": _runs(item.get("content"))} for item in quoted]
                         media_blocks.append({"type": "quote", "blocks": quote_blocks})
                         plain_parts.extend(item["runs"] for item in quote_blocks)
-                        has_quote = True
+                        has_structured_content = True
+                    elif part_type in ("mathBlock", "table"):
+                        media_blocks.extend(convert([part]))
+                        has_structured_content = True
                     else:
-                        raise EditorError("图文段右侧只支持普通段落和引文")
+                        raise EditorError("图文段右侧只支持普通段落、引文、公式和表格")
                 runs = []
                 for index, part_runs in enumerate(plain_parts):
                     if index:
                         runs.append({"text": "\n\n"})
                     runs.extend(part_runs)
                 block = {"runs": runs, "images": paths}
-                if has_quote:
+                if has_structured_content:
                     block["mediaBlocks"] = media_blocks
                 blocks.append(block)
             elif kind == "table":
@@ -420,7 +430,10 @@ class LibraryEditorStore:
     @staticmethod
     def _image_paths(blocks):
         for block in blocks:
-            if block.get("type") == "quote":
+            if "mediaBlocks" in block:
+                yield from block.get("images", [])
+                yield from LibraryEditorStore._image_paths(block["mediaBlocks"])
+            elif block.get("type") == "quote":
                 yield from LibraryEditorStore._image_paths(block.get("blocks", []))
             elif block.get("type") == "list":
                 for item in block.get("items", []):

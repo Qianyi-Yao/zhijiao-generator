@@ -12,6 +12,7 @@
     "@tiptap/extension-table": "^3.32.0",
     "@tiptap/extension-text-style": "^3.32.0",
     "@tiptap/starter-kit": "^3.32.0",
+    "katex": "^0.16.25",
     "pako": "2.1.0",
     "png-tools": "1.1.1"
   },

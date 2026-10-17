@@ -1,10 +1,12 @@
-import { Editor, Node } from '@tiptap/core';
+import { Editor, Extension, Node } from '@tiptap/core';
 import { StarterKit } from '@tiptap/starter-kit';
 import { Image } from '@tiptap/extension-image';
 import { TableKit } from '@tiptap/extension-table';
 import { Color, TextStyle } from '@tiptap/extension-text-style';
 import { FontFamily } from '@tiptap/extension-font-family';
 import { Highlight } from '@tiptap/extension-highlight';
+import { Plugin } from '@tiptap/pm/state';
+import katex from 'katex';
 
 const $ = id => document.getElementById(id);
 const token = new URLSearchParams(location.search).get('token') || '';
@@ -26,7 +28,7 @@ let imageRequest = null;
 const MediaRow = Node.create({
   name: 'mediaRow',
   group: 'block',
-  content: '(paragraph|blockquote)+',
+  content: '(paragraph|blockquote|mathBlock|table)+',
   defining: true,
   addAttributes() { return { images: { default: [] } }; },
   parseHTML() { return [{ tag: 'div[data-editor-media-row]' }]; },
@@ -100,6 +102,105 @@ const MediaRow = Node.create({
   }
 });
 
+const MediaRowTrailingParagraph = Extension.create({
+  name: 'mediaRowTrailingParagraph',
+  addProseMirrorPlugins() {
+    return [new Plugin({
+      appendTransaction(transactions, _oldState, state) {
+        if (!transactions.some(transaction => transaction.docChanged)) return null;
+        const positions = [];
+        state.doc.descendants((node, pos) => {
+          if (node.type.name === 'mediaRow' && node.lastChild?.type.name === 'table') {
+            positions.push(pos + node.nodeSize - 1);
+          }
+        });
+        if (!positions.length) return null;
+        const tr = state.tr;
+        for (const pos of positions.reverse()) {
+          tr.insert(pos, state.schema.nodes.paragraph.create());
+        }
+        return tr;
+      }
+    })];
+  }
+});
+
+function renderMath(root) {
+  root.querySelectorAll('.markdown-math[data-latex]').forEach(element => {
+    katex.render(element.dataset.latex, element, {
+      displayMode: true, throwOnError: false, trust: false, strict: 'ignore'
+    });
+  });
+}
+
+const MathBlock = Node.create({
+  name: 'mathBlock',
+  group: 'block',
+  content: 'text*',
+  marks: '',
+  code: true,
+  defining: true,
+  parseHTML() { return [{ tag: 'div[data-math-block]' }]; },
+  renderHTML() { return ['div', { 'data-math-block': '' }, 0]; },
+  addNodeView() {
+    return ({ node }) => {
+      const dom = document.createElement('div');
+      dom.className = 'editor-math-block';
+      const source = document.createElement('div');
+      source.className = 'editor-math-source';
+      const preview = document.createElement('div');
+      preview.className = 'markdown-math';
+      preview.contentEditable = 'false';
+      dom.append(source, preview);
+      const paint = current => katex.render(current.textContent || '\\;', preview, {
+        displayMode: true, throwOnError: false, trust: false, strict: 'ignore'
+      });
+      paint(node);
+      return { dom, contentDOM: source, update(updated) {
+        if (updated.type.name !== 'mathBlock') return false;
+        paint(updated);
+        return true;
+      } };
+    };
+  }
+});
+
+const MathShortcut = Extension.create({
+  name: 'mathShortcut',
+  priority: 1000,
+  addKeyboardShortcuts() {
+    return { Enter: () => {
+      const { state, view } = this.editor;
+      const { $from, empty } = state.selection;
+      if (!empty) return false;
+      const parent = $from.parent;
+      if (parent.type.name === 'paragraph' && parent.textContent === '$$' &&
+          $from.parentOffset === parent.content.size) {
+        // Keep table cells in their existing text-only publication format.
+        for (let depth = $from.depth - 1; depth > 0; depth--) {
+          if (['tableCell', 'tableHeader'].includes($from.node(depth).type.name)) return false;
+        }
+        const start = $from.before();
+        const tr = state.tr.setNodeMarkup(start, state.schema.nodes.mathBlock);
+        tr.delete(start + 1, start + 3);
+        view.dispatch(tr.setSelection(state.selection.constructor.near(tr.doc.resolve(start + 1))));
+        return true;
+      }
+      if (parent.type.name !== 'mathBlock') return false;
+      const text = parent.textContent;
+      if ($from.parentOffset === parent.content.size && text.endsWith('\n$$')) {
+        const tr = state.tr.delete($from.pos - 3, $from.pos);
+        const end = tr.mapping.map($from.after());
+        tr.insert(end, state.schema.nodes.paragraph.create());
+        view.dispatch(tr.setSelection(state.selection.constructor.near(tr.doc.resolve(end + 1))));
+      } else {
+        view.dispatch(state.tr.insertText('\n'));
+      }
+      return true;
+    } };
+  }
+});
+
 function message(text, error = false) {
   $('message').textContent = text;
   $('message').style.color = error ? '#a04036' : '#2e6a67';
@@ -138,7 +239,7 @@ const editor = new Editor({
       heading: { levels: [5, 6] },
       link: { openOnClick: false, autolink: false, linkOnPaste: false } }),
     Image.configure({ inline: false, allowBase64: false }),
-    MediaRow,
+    MathBlock, MathShortcut, MediaRow, MediaRowTrailingParagraph,
     TableKit.configure({ table: { resizable: true } }),
     TextStyle, Color, FontFamily, Highlight.configure({ multicolor: true })
   ],
@@ -257,6 +358,7 @@ function imageHtml(path, alt = '考据配图') {
 function renderBlock(block) {
   const type = block.type;
   if (type === 'image') return `<div class="img-only">${(block.images || []).map(x => imageHtml(x, block.alt)).join('')}</div>`;
+  if (type === 'math') return `<div class="markdown-math" data-latex="${esc(block.latex || '')}"></div>`;
   if (type === 'quote') return `<blockquote class="markdown-quote">${(block.blocks || []).map(renderBlock).join('')}</blockquote>`;
   if (type === 'list') {
     const tag = block.ordered ? 'ol' : 'ul';
@@ -298,12 +400,13 @@ function renderPreview(current, blocks) {
     <span class="article-tags">${current.characters.map(x => `<span class="tag">${esc(x)}</span>`).join('')}</span>
     </div><div class="article-detail-row"><span class="article-meta">${esc(start)} 至 ${esc(end)}${esc(episode)}</span></div>
     </div><div class="article-body">${blocks.map(renderBlock).join('')}</div></article></div>`;
+  renderMath(doc.body);
 }
 async function preparePreview() {
   const html = await fetch('/library.html', { cache: 'no-store' }).then(response => response.text());
   const page = new DOMParser().parseFromString(html, 'text/html');
   libraryCss = [...page.querySelectorAll('style')].map(style => style.textContent).join('\n');
-  $('preview').srcdoc = `<!doctype html><html lang="zh-CN"><head><base href="/"><meta charset="utf-8"><style>${libraryCss}</style></head><body></body></html>`;
+  $('preview').srcdoc = `<!doctype html><html lang="zh-CN"><head><base href="/"><meta charset="utf-8"><link rel="stylesheet" href="/vendor/katex/katex.min.css"><style>${libraryCss}</style><style>.media-row{flex-direction:row}.media-imgs{flex:0 0 min(180px,35%);width:min(180px,35%)}</style></head><body></body></html>`;
   $('preview').addEventListener('load', () => {
     $('preview').contentDocument.addEventListener('click', event => {
       if (event.target.closest('a')) event.preventDefault();
@@ -431,6 +534,19 @@ function toggleInsert(panel, trigger, toolbar) {
   panel.hidden = !opening;
   trigger.setAttribute('aria-expanded', String(opening));
 }
+function closeLinkInsert(toolbar) {
+  toolbarControl(toolbar, 'linkInsert').hidden = true;
+  toolbarControl(toolbar, 'toggleLinkInsert').setAttribute('aria-expanded', 'false');
+}
+function moveLinkChoice(target, direction) {
+  const choices = [...target.options].filter(option => option.value);
+  if (!choices.length) return;
+  const current = choices.findIndex(option => option.value === target.value);
+  const next = current < 0
+    ? (direction > 0 ? 0 : choices.length - 1)
+    : Math.max(0, Math.min(choices.length - 1, current + direction));
+  target.value = choices[next].value;
+}
 for (const toolbar of toolbars) {
   const control = id => toolbarControl(toolbar, id);
   control('toggleTableInsert').addEventListener('click', () =>
@@ -440,6 +556,32 @@ for (const toolbar of toolbars) {
     if (!control('linkInsert').hidden) control('linkSearch').focus();
   });
   control('linkSearch').addEventListener('input', () => renderLinks(toolbar));
+  control('linkSearch').addEventListener('keydown', event => {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      moveLinkChoice(control('linkTarget'), event.key === 'ArrowDown' ? 1 : -1);
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      if (control('linkTarget').value) control('insertLink').click();
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      closeLinkInsert(toolbar);
+      control('toggleLinkInsert').focus();
+    }
+  });
+  control('linkTarget').addEventListener('keydown', event => {
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      moveLinkChoice(control('linkTarget'), event.key === 'ArrowDown' ? 1 : -1);
+    } else if (event.key === 'Enter') {
+      event.preventDefault();
+      control('insertLink').click();
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      closeLinkInsert(toolbar);
+      control('toggleLinkInsert').focus();
+    }
+  });
   control('insertTable').addEventListener('click', () => {
     if (!draft) return;
     const rows = Number(control('tableRows').value), cols = Number(control('tableCols').value);
@@ -452,6 +594,15 @@ for (const toolbar of toolbars) {
     control('toggleTableInsert').setAttribute('aria-expanded', 'false');
   });
 }
+document.addEventListener('pointerdown', event => {
+  for (const toolbar of toolbars) {
+    const panel = toolbarControl(toolbar, 'linkInsert');
+    const trigger = toolbarControl(toolbar, 'toggleLinkInsert');
+    if (!panel.hidden && !panel.contains(event.target) && !trigger.contains(event.target)) {
+      closeLinkInsert(toolbar);
+    }
+  }
+});
 function updateContextToolbar() {
   const tableToolbar = $('tableToolbar'), imageToolbar = $('imageToolbar');
   const inTable = Boolean(draft && editor.isActive('table'));
@@ -481,21 +632,36 @@ function updateContextToolbar() {
 editor.on('selectionUpdate', updateContextToolbar);
 editor.on('update', updateContextToolbar);
 window.addEventListener('resize', updateContextToolbar);
+function normalizeHexColor(value) {
+  const raw = value.trim().replace(/^#/, '');
+  if (!/^(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(raw)) return null;
+  const expanded = raw.length === 3 ? [...raw].map(char => char + char).join('') : raw;
+  return '#' + expanded.toUpperCase();
+}
 function bindHexColor(input, button, label, applyColor) {
-  input.addEventListener('input', () => input.removeAttribute('aria-invalid'));
+  const swatch = input.closest('label').querySelector('.color-swatch');
+  const updateSwatch = () => {
+    const color = normalizeHexColor(input.value);
+    swatch.classList.toggle('invalid', !color);
+    swatch.style.backgroundColor = color || '';
+  };
+  updateSwatch();
+  input.addEventListener('input', () => {
+    input.removeAttribute('aria-invalid');
+    updateSwatch();
+  });
   button.addEventListener('mousedown', event => event.preventDefault());
   button.addEventListener('click', () => {
     if (!draft) return;
-    const raw = input.value.trim().replace(/^#/, '');
-    if (!/^(?:[0-9a-fA-F]{3}|[0-9a-fA-F]{6})$/.test(raw)) {
+    const color = normalizeHexColor(input.value);
+    if (!color) {
       input.setAttribute('aria-invalid', 'true');
       message(`${label}请输入 3 位或 6 位十六进制颜色，例如 #fff2a8。`, true);
       return;
     }
-    const expanded = raw.length === 3 ? [...raw].map(char => char + char).join('') : raw;
-    const color = '#' + expanded.toLowerCase();
     input.value = color;
     input.removeAttribute('aria-invalid');
+    updateSwatch();
     const { from, to } = editor.state.selection;
     applyColor(color, { from, to });
   });
@@ -511,6 +677,7 @@ for (const toolbar of toolbars) {
     if (!id) return message('请先选择目标篇目。', true);
     if (editor.state.selection.empty) return message('请先在正文中选中要做链接的文字。', true);
     editor.chain().focus().setLink({ href: '#article=' + encodeURIComponent(id) }).run();
+    closeLinkInsert(toolbar);
   });
 }
 function chooseImages(mode, position = null) {
@@ -640,6 +807,11 @@ window.addEventListener('beforeunload', event => {
 
 async function start() {
   if (!token) throw new Error('请通过“启动编辑器.bat”打开，不要直接打开 HTML 文件。');
+  for (const toolbar of toolbars) {
+    const input = toolbarControl(toolbar, 'textColor');
+    input.value = '#2E6A67';
+    input.dispatchEvent(new Event('input'));
+  }
   await preparePreview();
   await refreshState();
   const today = new Date();
