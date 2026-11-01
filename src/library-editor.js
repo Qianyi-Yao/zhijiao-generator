@@ -7,10 +7,14 @@ import { FontFamily } from '@tiptap/extension-font-family';
 import { Highlight } from '@tiptap/extension-highlight';
 import { Plugin } from '@tiptap/pm/state';
 import katex from 'katex';
+import { buildRelationshipData, createRelationshipView } from './relationship-graph.js';
 
 const $ = id => document.getElementById(id);
 const token = new URLSearchParams(location.search).get('token') || '';
 const emptyDoc = () => ({ type: 'doc', content: [{ type: 'paragraph' }] });
+const characterById = new Map(characters.filter(item => Number.isInteger(item.cardId)).map(item => [item.cardId, item]));
+const dynastyByName = new Map(characters.map(item => [item.name, item.dynasty || '未归类']));
+let characterRoster = [];
 const esc = value => String(value ?? '').replace(/[&<>"']/g, c => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
 }[c]));
@@ -24,6 +28,19 @@ let previewTimer;
 let writeChain = Promise.resolve();
 let previewSequence = 0;
 let imageRequest = null;
+let selectedWeek = '';
+let calendar;
+let scoreArticles = null;
+let scoreMode = 'people';
+let scoreExpanded = false;
+let scoreLoadError = false;
+let scoreReleaseDates = null;
+let scoreRangePicker;
+let scoreFrom = '';
+let scoreTo = '';
+let scoreSingleBound = 'from';
+let relationshipData = null;
+let relationshipView = null;
 
 const MediaRow = Node.create({
   name: 'mediaRow',
@@ -214,14 +231,148 @@ function currentWeek(dateValue) {
   const y = date.getFullYear(), m = String(date.getMonth() + 1).padStart(2, '0');
   return `${y}-${m}-${String(date.getDate()).padStart(2, '0')}`;
 }
+function todayWeek() {
+  const today = new Date();
+  return currentWeek(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`);
+}
+function weekEnd(start) {
+  const end = new Date(start + 'T12:00:00');
+  end.setDate(end.getDate() + 6);
+  return `${end.getFullYear()}-${String(end.getMonth() + 1).padStart(2, '0')}-${String(end.getDate()).padStart(2, '0')}`;
+}
+function selectWeek(start) {
+  selectedWeek = start;
+  calendar.setDate(start, false);
+  calendar.redraw();
+  renderDrafts();
+}
+function initCalendar() {
+  calendar = flatpickr($('weekPicker'), {
+    locale: { ...flatpickr.l10ns.zh, firstDayOfWeek: 0 },
+    dateFormat: 'Y-m-d', disableMobile: true,
+    onChange(dates) {
+      if (!dates.length) return;
+      const day = dates[0];
+      selectedWeek = currentWeek(`${day.getFullYear()}-${String(day.getMonth() + 1).padStart(2, '0')}-${String(day.getDate()).padStart(2, '0')}`);
+      calendar.redraw();
+      renderDrafts();
+    },
+    onDayCreate(_dates, _value, _instance, day) {
+      const date = day.dateObj;
+      const week = currentWeek(`${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`);
+      if (week === selectedWeek) day.classList.add('library-week');
+    }
+  });
+  selectWeek(todayWeek());
+}
 function tagsFromInput() {
   return [...new Set($('characters').value.split(/[、,，;；]/).map(x => x.trim()).filter(Boolean))];
 }
+function sourceValue() { return draft?.source === 'easter' ? 'easter' : $('source').value; }
 function payload() {
+  const pair = [$('pairFirst').value, $('pairSecond').value].filter(Boolean).map(Number);
   return { id: draft.id, date_start: $('dateStart').value, title: $('title').value,
-    source: $('source').value, characters: tagsFromInput(),
+    source: sourceValue(), characters: sourceValue() === 'easter' ? [] : tagsFromInput(),
+    pair_card_ids: sourceValue() === 'easter' ? pair : [],
     doc: editor.getJSON(), published_hash: draft.published_hash || null };
 }
+function updateSourceFields() {
+  const easter = sourceValue() === 'easter';
+  $('regularSourceField').hidden = easter;
+  $('easterSourceField').hidden = !easter;
+  $('dateField').hidden = easter;
+  $('pairFields').hidden = !easter;
+  $('charactersField').hidden = easter;
+  if (easter) $('dateStart').value = '';
+  else {
+    for (const key of ['pairFirst', 'pairSecond']) {
+      $(key).value = '';
+      $(key + 'Search').value = '';
+      closePairResults(key);
+    }
+  }
+}
+const pairSearchState = {
+  pairFirst: { matches: [], active: 0 },
+  pairSecond: { matches: [], active: 0 }
+};
+function pairLabel(id) {
+  const person = characterById.get(Number(id));
+  return person ? `${person.name} · ${person.cardId}` : '';
+}
+function closePairResults(key) {
+  $(key + 'Results').hidden = true;
+  $(key + 'Search').setAttribute('aria-expanded', 'false');
+  $(key + 'Search').removeAttribute('aria-activedescendant');
+}
+function renderPairResults(key) {
+  const input = $(key + 'Search');
+  const results = $(key + 'Results');
+  const query = input.value.trim().toLocaleLowerCase();
+  const state = pairSearchState[key];
+  const selected = characterRoster.find(person => person.cardId === Number($(key).value));
+  state.matches = (query === pairLabel($(key).value).toLocaleLowerCase() && selected
+    ? [selected]
+    : characterRoster.filter(person => !query || person.name.toLocaleLowerCase().includes(query) ||
+      String(person.cardId).includes(query))).slice(0, 30);
+  state.active = Math.min(state.active, Math.max(0, state.matches.length - 1));
+  results.innerHTML = state.matches.length ? state.matches.map((person, index) =>
+    `<button id="${key}Option${index}" type="button" role="option" data-pair-option="${person.cardId}" class="${index === state.active ? 'active' : ''}" aria-selected="${index === state.active}">${person.cardId} · ${esc(person.name)}</button>`).join('')
+    : '<p>没有找到人物，请换个姓名或编号。</p>';
+  results.hidden = false;
+  input.setAttribute('aria-expanded', 'true');
+  if (state.matches.length) input.setAttribute('aria-activedescendant', `${key}Option${state.active}`);
+  else input.removeAttribute('aria-activedescendant');
+  results.querySelector('.active')?.scrollIntoView({ block: 'nearest' });
+}
+function selectPair(key, id) {
+  const other = key === 'pairFirst' ? 'pairSecond' : 'pairFirst';
+  if ($(other).value === String(id)) {
+    message('两个人物不能相同，请选择另一位。', true);
+    return;
+  }
+  $(key).value = String(id);
+  $(key + 'Search').value = pairLabel(id);
+  closePairResults(key);
+  changed();
+}
+for (const key of ['pairFirst', 'pairSecond']) {
+  const input = $(key + 'Search');
+  const results = $(key + 'Results');
+  input.addEventListener('focus', () => { input.select(); pairSearchState[key].active = 0; renderPairResults(key); });
+  input.addEventListener('input', () => {
+    $(key).value = '';
+    pairSearchState[key].active = 0;
+    renderPairResults(key);
+    changed();
+  });
+  input.addEventListener('keydown', event => {
+    const state = pairSearchState[key];
+    if (event.key === 'Escape') { closePairResults(key); return; }
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (results.hidden) renderPairResults(key);
+      if (state.matches.length) {
+        state.active = (state.active + (event.key === 'ArrowDown' ? 1 : -1) + state.matches.length) % state.matches.length;
+        renderPairResults(key);
+      }
+    } else if (event.key === 'Enter' && !results.hidden && state.matches.length) {
+      event.preventDefault();
+      selectPair(key, state.matches[state.active].cardId);
+    }
+  });
+  results.addEventListener('pointerdown', event => { if (event.target.closest('button')) event.preventDefault(); });
+  results.addEventListener('click', event => {
+    const option = event.target.closest('[data-pair-option]');
+    if (option) selectPair(key, option.dataset.pairOption);
+  });
+}
+document.addEventListener('pointerdown', event => {
+  if (!event.target.closest('.pair-search')) {
+    closePairResults('pairFirst');
+    closePairResults('pairSecond');
+  }
+});
 async function api(path, body) {
   const response = await fetch(path, body === undefined ? { cache: 'no-store' } : {
     method: 'POST', headers: { 'Content-Type': 'application/json', 'X-Editor-Token': token },
@@ -304,6 +455,7 @@ async function saveNow() {
   writeChain = writeChain.catch(() => {}).then(() => api('/api/draft', snapshot));
   try {
     const saved = await writeChain;
+    syncDraftSummary(saved);
     if (draft && draft.id === saved.id) {
       draft = saved;
       if (!dirty) status('草稿已保存');
@@ -384,6 +536,7 @@ function renderPreview(current, blocks) {
   const frame = $('preview');
   const doc = frame.contentDocument;
   if (!doc?.body) return;
+  const isEaster = current.source === 'easter';
   const start = current.date_start || '未选择日期';
   let end = '';
   if (current.date_start) {
@@ -393,12 +546,15 @@ function renderPreview(current, blocks) {
   }
   const episode = current.source === 'main' && current.date_start
     ? ' · ' + current.date_start.replaceAll('-', '').slice(2) + '期' : '';
+  const previewTags = current.source === 'easter'
+    ? (current.pair_card_ids || []).map(id => characterById.get(id)?.name).filter(Boolean)
+    : current.characters;
   doc.body.innerHTML = `<div class="library-wrap"><article class="article-card editor-article open"><div class="article-head">
     <div class="article-heading-row">
     <span class="article-title">${esc(current.title || '未命名篇目')}</span>
-    ${current.source === 'extra' ? '<span class="source-badge">番外</span>' : ''}
-    <span class="article-tags">${current.characters.map(x => `<span class="tag">${esc(x)}</span>`).join('')}</span>
-    </div><div class="article-detail-row"><span class="article-meta">${esc(start)} 至 ${esc(end)}${esc(episode)}</span></div>
+    ${current.source === 'extra' ? '<span class="source-badge">番外</span>' : isEaster ? '<span class="source-badge">奇遇</span>' : ''}
+    <span class="article-tags">${previewTags.map(x => `<span class="tag">${esc(x)}</span>`).join('')}</span>
+    </div><div class="article-detail-row"><span class="article-meta">${isEaster ? '隐藏彩蛋' : `${esc(start)} 至 ${esc(end)}${esc(episode)}`}</span></div>
     </div><div class="article-body">${blocks.map(renderBlock).join('')}</div></article></div>`;
   renderMath(doc.body);
 }
@@ -415,16 +571,186 @@ async function preparePreview() {
   });
 }
 
+function draftButton(item) {
+  return `<button type="button" data-draft="${esc(item.id)}" class="${draft?.id === item.id ? 'active' : ''}">${esc(item.title || '未命名篇目')}<small>${item.source === 'easter' ? '奇遇' : item.source === 'extra' ? '番外' : '正篇'} · ${item.published_hash ? '已发布，可修改' : '草稿'}</small></button>`;
+}
 function renderDrafts() {
-  const groups = new Map();
-  for (const item of state.drafts) {
-    const date = item.date_start || '未选择日期';
-    if (!groups.has(date)) groups.set(date, []);
-    groups.get(date).push(item);
+  const regular = state.drafts.filter(item => item.source !== 'easter' && item.date_start === selectedWeek);
+  const easter = state.drafts.filter(item => item.source === 'easter');
+  $('weekPicker').value = selectedWeek + ' 至 ' + weekEnd(selectedWeek);
+  $('newArticle').textContent = '＋ 新建篇目';
+  $('weekLabel').textContent = selectedWeek === todayWeek() ? '本周 · 日至六' : '所选周 · 日至六';
+  $('currentWeek').disabled = selectedWeek === todayWeek();
+  $('draftList').innerHTML = regular.length
+    ? regular.map(draftButton).join('')
+    : '<p class="draft-empty">这一周还没有编辑器篇目。</p>';
+  $('easterCount').textContent = `(${easter.length})`;
+  $('easterDraftList').innerHTML = easter.length
+    ? easter.map(draftButton).join('')
+    : '<p class="draft-empty">还没有奇遇草稿。</p>';
+}
+function syncDraftSummary(saved) {
+  const summary = { id: saved.id, title: saved.title, date_start: saved.date_start,
+    source: saved.source, characters: saved.characters,
+    published_hash: saved.published_hash, updated_at: saved.updated_at };
+  const index = state.drafts.findIndex(item => item.id === saved.id);
+  if (index < 0) state.drafts.unshift(summary);
+  else state.drafts[index] = summary;
+  state.drafts.sort((a, b) => String(b.date_start || '').localeCompare(String(a.date_start || '')) ||
+    String(b.updated_at || '').localeCompare(String(a.updated_at || '')));
+  renderDrafts();
+}
+function updateScoreRange(dates) {
+  const days = dates.map(day => flatpickr.formatDate(day, 'Y-m-d'));
+  scoreFrom = days.length > 1 || scoreSingleBound === 'from' ? days[0] || '' : '';
+  scoreTo = days.length > 1 ? days[1] : scoreSingleBound === 'to' ? days[0] || '' : '';
+  $('scoreRange').value = days.length > 1 ? `${days[0]}  —  ${days[1]}`
+    : days.length ? `${scoreSingleBound === 'to' ? '截至' : '从'} ${days[0]}` : '全时间';
+  $('scoreRangeHint').textContent = days.length > 1 ? '起止日期均计入统计' : days.length ? '再选一天可组成时间段' : '点击日历，选起始日和结束日';
+  $('scoreRangeClear').hidden = !days.length;
+  $('scoreOneDay').hidden = days.length !== 1;
+  for (const button of document.querySelectorAll('[data-score-bound]')) {
+    button.setAttribute('aria-pressed', String(button.dataset.scoreBound === scoreSingleBound));
   }
-  $('draftList').innerHTML = [...groups].map(([date, items]) =>
-    `<h3>${esc(date)} 期</h3>${items.map(item => `<button type="button" data-draft="${esc(item.id)}" class="${draft?.id === item.id ? 'active' : ''}">${esc(item.title || '未命名篇目')}<small>${item.source === 'extra' ? '番外' : '正篇'} · ${item.published_hash ? '已发布，可修改' : '草稿'}</small></button>`).join('')}`
-  ).join('') || '<p class="sidebar-note">还没有草稿。</p>';
+  scoreExpanded = false;
+  renderScores();
+}
+function initScoreCalendar() {
+  scoreRangePicker = flatpickr($('scoreRange'), {
+    locale: { ...flatpickr.l10ns.zh, firstDayOfWeek: 0 },
+    mode: 'range', dateFormat: 'Y-m-d', disableMobile: true,
+    position: 'auto right',
+    onReady(_dates, _value, instance) { instance.calendarContainer.classList.add('score-range-calendar'); },
+    onChange(dates) { updateScoreRange(dates); }
+  });
+  updateScoreRange([]);
+}
+function renderScores() {
+  if (!scoreArticles) return;
+  const from = scoreFrom;
+  const to = scoreTo;
+  for (const tab of document.querySelectorAll('[data-score-tab]')) {
+    const active = tab.dataset.scoreTab === scoreMode;
+    tab.setAttribute('aria-selected', String(active));
+    tab.tabIndex = active ? 0 : -1;
+  }
+  $('scoreList').setAttribute('aria-labelledby', scoreMode === 'people' ? 'scorePeopleTab' : 'scoreDynastyTab');
+  $('scoreList').classList.toggle('expanded', scoreExpanded);
+  const people = new Map();
+  const dynasties = new Map();
+  let articleCount = 0;
+  for (const article of scoreArticles) {
+    const start = article.date_start || '';
+    const end = article.date_end || start;
+    if ((from || to) && (!start || (from && end < from) || (to && start > to))) continue;
+    articleCount++;
+    const points = article.source === 'extra' || article.source === 'easter' ? 1 : 10;
+    const tags = new Set((article.characters || []).filter(tag => typeof tag === 'string').map(tag => tag.trim()).filter(Boolean));
+    for (const name of tags) {
+      people.set(name, (people.get(name) || 0) + points);
+      const dynasty = dynastyByName.get(name) || '未归类';
+      dynasties.set(dynasty, (dynasties.get(dynasty) || 0) + points);
+    }
+  }
+  const scores = scoreMode === 'people' ? people : dynasties;
+  const ranked = [...scores].map(([name, points]) => ({ name, points }))
+    .sort((a, b) => b.points - a.points || a.name.localeCompare(b.name, 'zh-CN'));
+  $('scoreStatus').textContent = `${scoreLoadError ? '更新失败，显示上次数据 · ' : ''}${scoreReleaseDates ? '' : '实装时间读取失败 · '}${articleCount} 篇 · ${ranked.length} ${scoreMode === 'people' ? '人' : '朝代'}`;
+  if (!ranked.length) {
+    $('scoreList').innerHTML = '<p class="score-empty">此时间范围没有可计分的标签。</p>';
+    $('scoreExpand').hidden = true;
+    return;
+  }
+  const highest = ranked[0].points;
+  const shown = scoreExpanded ? ranked : ranked.slice(0, 10);
+  $('scoreList').innerHTML = '<ol>' + shown.map((item, index) => {
+    const release = scoreReleaseDates?.get(item.name);
+    const releaseLabel = !scoreReleaseDates ? '读取失败' : !release ? '待补' : release.date || '未实装';
+    const releaseMark = scoreMode === 'people'
+      ? `<span class="score-person"><span class="score-name">${esc(item.name)}</span><span class="score-release${release && !release.date ? ' unreleased' : ''}" title="实装时间${release?.note ? ` · ${esc(release.note)}` : ''}">${esc(releaseLabel)}</span></span>`
+      : `<span class="score-name">${esc(item.name)}</span>`;
+    return `<li><div class="score-row"><span class="score-position">${index + 1}</span>${releaseMark}<span class="score-points">${item.points} 分</span></div><div class="score-track" aria-hidden="true"><div class="score-bar" style="width:${Math.max(4, item.points / highest * 100)}%"></div></div></li>`;
+  }).join('') + '</ol>';
+  $('scoreExpand').hidden = ranked.length <= 10;
+  $('scoreExpand').textContent = scoreExpanded ? '收起至前 10 名' : `展开全部 ${ranked.length} 名`;
+}
+function renderRelationshipMonitor() {
+  if (!scoreArticles) return;
+  relationshipData = buildRelationshipData(characterRoster, scoreArticles);
+  const { nodes, edges, articleCount, unmatched } = relationshipData;
+  $('relationshipSummary').textContent = `${scoreLoadError ? '更新失败，显示上次数据 · ' : ''}${nodes.length} 位名士 · ${edges.length} 组关系 · ${articleCount} 篇奇遇${unmatched ? ` · ${unmatched} 篇配对资料不完整` : ''}`;
+  $('relationshipOpen').disabled = false;
+  $('relationshipNames').innerHTML = nodes.map(person => `<option value="${esc(person.name)}"></option>`).join('');
+  if (!$('relationshipDialog').hidden) showRelationshipGraph();
+}
+function relationshipDetails(item) {
+  if (!item) return '<p>点击头像查看人物奇遇，或点击连线查看两人的篇目。</p>';
+  const person = id => relationshipData.nodes.find(node => node.id === Number(id));
+  const edge = item.source && item.target ? relationshipData.edges.find(pair => pair.id === item.id.replace(/^pair-/, '')) : null;
+  const links = articles => articles.map(article => `<li><a href="/library.html#article=${encodeURIComponent(article.id)}" target="_blank" rel="noopener">${esc(article.title)} ↗</a></li>`).join('');
+  if (edge) return `<h3>${esc(person(edge.source)?.name)}与${esc(person(edge.target)?.name)}</h3><p>${edge.articles.length} 篇已发布奇遇</p><ul>${links(edge.articles)}</ul>`;
+  const node = person(item.id);
+  if (!node) return '<p>人物资料暂不可用。</p>';
+  const related = relationshipData.edges.filter(pair => pair.source === node.id || pair.target === node.id);
+  return `<h3>${esc(node.name)}</h3>${related.length ? `<p>${related.length} 组关系</p><ul>${related.map(pair => {
+    const other = person(pair.source === node.id ? pair.target : pair.source);
+    return `<li><strong>${esc(other?.name)}</strong><ul>${links(pair.articles)}</ul></li>`;
+  }).join('')}</ul>` : '<p>尚无已发布奇遇。</p>'}`;
+}
+function showRelationshipGraph() {
+  relationshipView?.destroy();
+  $('relationshipDetail').innerHTML = relationshipDetails(null);
+  relationshipView = createRelationshipView($('relationshipCanvas'), relationshipData, {
+    onSelect(item) { $('relationshipDetail').innerHTML = relationshipDetails(item); },
+    onHover(item, pointer) {
+      const tooltip = $('relationshipTooltip');
+      if (!item || !Number.isFinite(pointer?.clientX) || !Number.isFinite(pointer?.clientY)) { tooltip.hidden = true; return; }
+      const rect = $('relationshipCanvas').getBoundingClientRect();
+      const edge = item.source && item.target ? relationshipData.edges.find(pair => pair.id === item.id.replace(/^pair-/, '')) : null;
+      tooltip.textContent = edge
+        ? `${relationshipData.nodes.find(node => node.id === edge.source)?.name} · ${relationshipData.nodes.find(node => node.id === edge.target)?.name}（${edge.articles.length} 篇）`
+        : item.name;
+      tooltip.hidden = false;
+      tooltip.style.left = `${Math.max(8, Math.min(pointer.clientX - rect.left + 14, rect.width - tooltip.offsetWidth - 8))}px`;
+      tooltip.style.top = `${Math.max(8, pointer.clientY - rect.top - 34)}px`;
+    }
+  });
+}
+function closeRelationshipGraph() {
+  $('relationshipDialog').hidden = true;
+  document.body.classList.remove('relationship-open');
+  $('relationshipTooltip').hidden = true;
+  relationshipView?.destroy();
+  relationshipView = null;
+  $('relationshipOpen').focus();
+}
+async function loadScores() {
+  const releaseRequest = fetch('/library/data/character_release_dates.json', { cache: 'no-store' })
+    .then(async response => {
+      if (!response.ok) throw new Error(`读取实装时间失败 (${response.status})`);
+      const table = await response.json();
+      if (!Array.isArray(table.rows)) throw new Error('实装时间表格式无效');
+      return new Map(table.rows.map(row => [row[2], { date: row[3], note: row[4] }]));
+    }).catch(() => null);
+  try {
+    const response = await fetch('/library/data/library.json', { cache: 'no-store' });
+    if (!response.ok) throw new Error(`读取图书馆失败 (${response.status})`);
+    const data = await response.json();
+    if (!Array.isArray(data.articles)) throw new Error('图书馆文章格式无效');
+    scoreArticles = data.articles;
+    scoreReleaseDates = await releaseRequest;
+    scoreLoadError = false;
+    renderScores();
+    renderRelationshipMonitor();
+  } catch (error) {
+    scoreLoadError = true;
+    if (scoreArticles) { renderScores(); renderRelationshipMonitor(); }
+    else {
+      $('scoreStatus').textContent = '读取失败';
+      $('scoreList').innerHTML = `<p class="score-empty">${esc(error.message)}</p>`;
+      $('relationshipSummary').textContent = `读取失败：${error.message}`;
+    }
+  }
 }
 function renderLinks(toolbar) {
   if (!toolbar) {
@@ -467,9 +793,13 @@ async function openDraft(id) {
   draft = loaded;
   suppress = true;
   $('title').value = loaded.title || '';
-  $('source').value = loaded.source || 'main';
+  $('source').value = loaded.source === 'extra' ? 'extra' : 'main';
   $('dateStart').value = loaded.date_start || '';
-  $('issueDate').value = loaded.date_start || '';
+  $('pairFirst').value = String(loaded.pair_card_ids?.[0] || '');
+  $('pairSecond').value = String(loaded.pair_card_ids?.[1] || '');
+  $('pairFirstSearch').value = pairLabel($('pairFirst').value);
+  $('pairSecondSearch').value = pairLabel($('pairSecond').value);
+  updateSourceFields();
   $('characters').value = (loaded.characters || []).join('、');
   editor.commands.setContent(loaded.doc || emptyDoc());
   suppress = false;
@@ -483,12 +813,22 @@ async function openDraft(id) {
   schedulePreview();
 }
 async function newArticle() {
-  const date = currentWeek($('issueDate').value);
-  if (!date) { message('请先选择一期的日期。', true); $('issueDate').focus(); return; }
+  const date = selectedWeek || todayWeek();
   if (draft && dirty) await saveNow();
   const id = crypto.randomUUID().replaceAll('-', '');
   const created = await api('/api/draft', { id, date_start: date, title: '',
     source: 'main', characters: [], doc: emptyDoc(), published_hash: null });
+  selectWeek(date);
+  await refreshState();
+  await openDraft(created.id);
+  $('title').focus();
+}
+async function newEaster() {
+  if (draft && dirty) await saveNow();
+  const id = crypto.randomUUID().replaceAll('-', '');
+  const created = await api('/api/draft', { id, date_start: '', title: '',
+    source: 'easter', characters: [], pair_card_ids: [], doc: emptyDoc(), published_hash: null });
+  $('easterDetails').open = true;
   await refreshState();
   await openDraft(created.id);
   $('title').focus();
@@ -746,7 +1086,8 @@ $('imageFile').addEventListener('change', async event => {
     message(images.length > 1 ? `已加入 ${images.length} 张图片。` : '图片已放入草稿。');
   } catch (error) { message(error.message, true); }
 });
-['title', 'source', 'dateStart', 'characters'].forEach(id => $(id).addEventListener('input', changed));
+['title', 'dateStart', 'characters'].forEach(id => $(id).addEventListener('input', changed));
+$('source').addEventListener('change', () => { updateSourceFields(); changed(); });
 $('dateStart').addEventListener('change', () => {
   const normalized = currentWeek($('dateStart').value);
   if (normalized && normalized !== $('dateStart').value) {
@@ -756,12 +1097,82 @@ $('dateStart').addEventListener('change', () => {
   }
 });
 $('newArticle').addEventListener('click', () => newArticle().catch(error => message(error.message, true)));
-$('draftList').addEventListener('click', event => {
-  const button = event.target.closest('[data-draft]');
-  if (button) openDraft(button.dataset.draft).catch(error => message(error.message, true));
+$('newEaster').addEventListener('click', () => newEaster().catch(error => message(error.message, true)));
+$('currentWeek').addEventListener('click', () => selectWeek(todayWeek()));
+$('scoreRangeClear').addEventListener('click', () => {
+  scoreRangePicker.clear(false);
+  scoreSingleBound = 'from';
+  updateScoreRange([]);
 });
+for (const button of document.querySelectorAll('[data-score-bound]')) {
+  button.addEventListener('click', () => {
+    scoreSingleBound = button.dataset.scoreBound;
+    updateScoreRange(scoreRangePicker.selectedDates);
+  });
+}
+for (const tab of document.querySelectorAll('[data-score-tab]')) {
+  tab.addEventListener('click', () => { scoreMode = tab.dataset.scoreTab; scoreExpanded = false; renderScores(); });
+  tab.addEventListener('keydown', event => {
+    if (!['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+    event.preventDefault();
+    scoreMode = event.key === 'ArrowLeft' || event.key === 'Home' ? 'people' : 'dynasties';
+    scoreExpanded = false;
+    renderScores();
+    $(scoreMode === 'people' ? 'scorePeopleTab' : 'scoreDynastyTab').focus();
+  });
+}
+$('scoreExpand').addEventListener('click', () => {
+  scoreExpanded = !scoreExpanded;
+  renderScores();
+  if (!scoreExpanded) $('scoreList').scrollTop = 0;
+});
+$('relationshipOpen').addEventListener('click', () => {
+  if (!relationshipData) return;
+  $('relationshipDialog').hidden = false;
+  document.body.classList.add('relationship-open');
+  showRelationshipGraph();
+  $('relationshipSearch').focus();
+});
+$('relationshipClose').addEventListener('click', closeRelationshipGraph);
+$('relationshipDialog').addEventListener('click', event => {
+  if (event.target === $('relationshipDialog')) closeRelationshipGraph();
+});
+$('relationshipReset').addEventListener('click', () => {
+  $('relationshipSearch').value = '';
+  $('relationshipSearchStatus').textContent = '';
+  relationshipView?.reset();
+});
+$('relationshipSearchForm').addEventListener('submit', event => {
+  event.preventDefault();
+  const query = $('relationshipSearch').value.trim();
+  if (!query) { $('relationshipSearchStatus').textContent = '请输入姓名。'; return; }
+  const match = relationshipData.nodes.find(node => node.name === query) ||
+    relationshipData.nodes.find(node => node.name.includes(query));
+  $('relationshipSearchStatus').textContent = match ? `已找到：${match.name}` : '没有找到这位名士。';
+  if (match) relationshipView?.selectPerson(match.id);
+});
+document.addEventListener('keydown', event => {
+  if ((event.ctrlKey || event.metaKey) && !event.altKey && !event.shiftKey && event.key.toLowerCase() === 's') {
+    event.preventDefault();
+    if (!event.repeat) $('saveDraft').click();
+    return;
+  }
+  if ($('relationshipDialog').hidden) return;
+  if (event.key === 'Escape') { closeRelationshipGraph(); return; }
+  if (event.key !== 'Tab') return;
+  const focusable = [...$('relationshipDialog').querySelectorAll('button, input, a[href]')].filter(element => !element.disabled);
+  const first = focusable[0], last = focusable[focusable.length - 1];
+  if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
+  else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
+});
+for (const list of [$('draftList'), $('easterDraftList')]) {
+  list.addEventListener('click', event => {
+    const button = event.target.closest('[data-draft]');
+    if (button) openDraft(button.dataset.draft).catch(error => message(error.message, true));
+  });
+}
 $('saveDraft').addEventListener('click', () => saveNow().then(() => {
-  refreshState(); message('草稿已保存。');
+  message('草稿已保存。');
 }).catch(error => message(error.message, true)));
 $('deleteDraft').addEventListener('click', async () => {
   if (!draft || draft.published_hash) return;
@@ -779,7 +1190,7 @@ $('deleteDraft').addEventListener('click', async () => {
     await refreshState();
   } catch (error) { message(error.message, true); }
 });
-$('refreshLibrary').addEventListener('click', () => refreshState().then(() => {
+$('refreshLibrary').addEventListener('click', () => refreshState().then(loadScores).then(() => {
   message('已重新读取图书馆状态；请核对本篇内容后再发布。');
 }).catch(error => message(error.message, true)));
 $('publish').addEventListener('click', async () => {
@@ -791,6 +1202,7 @@ $('publish').addEventListener('click', async () => {
     draft = await api(`/api/draft?id=${encodeURIComponent(draft.id)}`);
     $('deleteDraft').hidden = true;
     await refreshState();
+    await loadScores();
     message(`发布成功。已备份旧图书馆数据。`);
     const link = document.createElement('a');
     link.href = `/library.html#article=${encodeURIComponent(result.articleId)}`;
@@ -807,15 +1219,23 @@ window.addEventListener('beforeunload', event => {
 
 async function start() {
   if (!token) throw new Error('请通过“启动编辑器.bat”打开，不要直接打开 HTML 文件。');
+  const rosterResponse = await fetch('/library/data/抽选人物名单.csv', { cache: 'no-store' });
+  if (!rosterResponse.ok) throw new Error('无法读取抽选人物名单，请确认 CSV 文件存在。');
+  const rosterCsv = (await rosterResponse.text()).replace(/^\uFEFF/, '');
+  const rosterIds = new Set(rosterCsv.split(/\r?\n/).slice(1)
+    .map(line => Number(line.split(',')[0])).filter(Number.isInteger));
+  characterRoster = characters.filter(person => rosterIds.has(person.cardId));
+  if (characterRoster.length < 2) throw new Error('抽选人物名单不足两人，请检查 CSV 文件。');
   for (const toolbar of toolbars) {
     const input = toolbarControl(toolbar, 'textColor');
     input.value = '#2E6A67';
     input.dispatchEvent(new Event('input'));
   }
   await preparePreview();
+  initCalendar();
+  initScoreCalendar();
   await refreshState();
-  const today = new Date();
-  $('issueDate').value = currentWeek(`${today.getFullYear()}-${String(today.getMonth() + 1).padStart(2, '0')}-${String(today.getDate()).padStart(2, '0')}`);
+  await loadScores();
   status('就绪');
 }
 start().catch(error => { status('启动失败'); message(error.message, true); });

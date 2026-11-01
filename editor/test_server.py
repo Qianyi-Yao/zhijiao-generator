@@ -16,6 +16,8 @@ class StoreTests(unittest.TestCase):
         self.temporary = tempfile.TemporaryDirectory(dir=server.ROOT)
         self.addCleanup(self.temporary.cleanup)
         self.root = Path(self.temporary.name)
+        (self.root / "characters.js").write_text(
+            'const characters = [{cardId: 2035, name: "元宏"}];', encoding="utf-8")
         data = self.root / "library" / "data" / "library.json"
         data.parent.mkdir(parents=True)
         data.write_text(json.dumps({"version": 2, "articles": [{

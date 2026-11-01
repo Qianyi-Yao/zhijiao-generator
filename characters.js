@@ -1072,7 +1072,7 @@ const characters = [
   {
     id: "jiangziya",
     cardId: 2085,
-    name: "姜太公",
+    name: "姜子牙",
     dynasty: "先秦",
     rarity: "天",
     role: "辅助",
@@ -2230,5 +2230,16 @@ const characters = [
         portrait: "portraits/sunquan_a.png"
       }
     ]
+  },
+
+  {
+    id: "xiean",
+    cardId: 2178,
+    name: "谢安",
+    dynasty: "晋",
+    rarity: "天",
+    role: "辅助",
+    avatar: "avatars/xiean_a.png",
+    portrait: "portraits/xiean_a.png"
   }
 ];

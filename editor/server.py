@@ -20,6 +20,7 @@ from urllib.parse import parse_qs, unquote, urlsplit
 
 
 ROOT = Path(__file__).resolve().parents[1]
+TAG_ALIASES = json.loads((ROOT / "library" / "data" / "tag_aliases.json").read_text(encoding="utf-8"))
 MAX_JSON = 8 * 1024 * 1024
 MAX_IMAGE = 20 * 1024 * 1024
 ID_RE = re.compile(r"^[0-9a-f]{32}$")
@@ -354,6 +355,12 @@ class LibraryEditorStore:
         tags = sorted({tag for a in library["articles"] for tag in a.get("characters", []) if isinstance(tag, str)})
         return {"libraryHash": library_hash, "drafts": drafts, "articles": articles, "characters": tags}
 
+    def character_names(self):
+        """Read the IDs from the same character registry used by the website."""
+        source = (self.root / "characters.js").read_text(encoding="utf-8")
+        return {int(card_id): name for card_id, name in re.findall(
+            r'cardId:\s*(\d+),\s*name:\s*"([^"]+)"', source)}
+
     def save_draft(self, value):
         draft_id = _id(value.get("id"))
         existing = self.get_draft(draft_id) if self.draft_path(draft_id).exists() else None
@@ -367,13 +374,25 @@ class LibraryEditorStore:
         if start:
             self._week(start)
         source = value.get("source")
-        if source not in ("main", "extra"):
-            raise EditorError("请选择正篇或番外")
+        if source not in ("main", "extra", "easter"):
+            raise EditorError("请选择正篇、番外或奇遇")
+        if source == "easter" and start:
+            raise EditorError("奇遇不属于某一期")
+        pair = value.get("pair_card_ids") or []
+        if not isinstance(pair, list) or len(pair) > 2 or any(type(item) is not int for item in pair):
+            raise EditorError("人物配对格式无效")
+        if pair and (len(pair) == 2 and pair[0] == pair[1] or
+                     any(item not in self.character_names() for item in pair)):
+            raise EditorError("请选择两个不同的现有人物编号")
+        if source != "easter" and pair:
+            raise EditorError("只有奇遇可以设置人物配对")
         characters = value.get("characters")
         if not isinstance(characters, list) or any(not isinstance(x, str) for x in characters):
             raise EditorError("人物标签格式无效")
         draft = {"id": draft_id, "date_start": start, "title": str(value.get("title") or "")[:200],
-                 "source": source, "characters": list(dict.fromkeys(x.strip() for x in characters if x.strip())),
+                 "source": source, "characters": [] if source == "easter" else
+                 list(dict.fromkeys(TAG_ALIASES.get(x.strip(), x.strip()) for x in characters if x.strip())),
+                 "pair_card_ids": sorted(pair),
                  "doc": doc, "published_hash": existing.get("published_hash") if existing else None,
                  "updated_at": datetime.now().isoformat(timespec="seconds")}
         atomic_write(self.draft_path(draft_id), json_bytes(draft))
@@ -460,7 +479,13 @@ class LibraryEditorStore:
         library, library_hash = self.library()
         if expected_hash != library_hash:
             raise EditorError("图书馆数据已在编辑期间改变。请检查新内容并重新载入后发布。", HTTPStatus.CONFLICT)
-        start, end = self._week(draft.get("date_start"))
+        is_easter = draft.get("source") == "easter"
+        start, end = (None, None) if is_easter else self._week(draft.get("date_start"))
+        pair = draft.get("pair_card_ids") or []
+        names = self.character_names()
+        if is_easter and (len(pair) != 2 or pair[0] == pair[1] or
+                          any(type(item) is not int or item not in names for item in pair)):
+            raise EditorError("请为奇遇选择两个不同的人物")
         title = draft.get("title", "").strip()
         if not title:
             raise EditorError("请填写篇目标题")
@@ -473,7 +498,7 @@ class LibraryEditorStore:
                 raise EditorError("已发布文章被外部修改，请先核对，避免覆盖。", HTTPStatus.CONFLICT)
         elif draft.get("published_hash"):
             raise EditorError("已发布文章已被移除，请先核对。", HTTPStatus.CONFLICT)
-        if any(a.get("id") != article_id and a.get("date_start") == start.isoformat()
+        if any(a.get("id") != article_id and a.get("date_start") == (start.isoformat() if start else None)
                and a.get("title") == title for a in library["articles"]):
             raise EditorError("本期已有同名文章，请换标题或检查图书馆。", HTTPStatus.CONFLICT)
         copied = {}
@@ -494,20 +519,25 @@ class LibraryEditorStore:
             if run.get("linkId") and run["linkId"] not in target_ids:
                 raise EditorError("篇目跳转目标已不存在，请重新选择。")
         article = {"id": article_id, "title": title,
-                   "date_start": start.isoformat(), "date_end": end.isoformat(),
-                   "characters": draft.get("characters", []), "source": draft["source"],
+                   "characters": [names[item] for item in pair] if is_easter else draft.get("characters", []),
+                   "source": draft["source"],
                    "origin": "editor", "editor_draft_id": draft_id,
                    "paragraphs": blocks}
+        if is_easter:
+            article["pair_card_ids"] = sorted(pair)
+        else:
+            article["date_start"] = start.isoformat()
+            article["date_end"] = end.isoformat()
         if draft["source"] == "main":
             article["episode"] = int(f"{start.month}{start.day:02d}")
-        if existing and existing.get("date_start") == start.isoformat():
+        if existing and existing.get("date_start") == (start.isoformat() if start else None):
             library["articles"][library["articles"].index(existing)] = article
         else:
             if existing:
                 library["articles"].remove(existing)
             # Keep existing manual ordering; place a new item after this issue's last item.
             same_issue = [i for i, a in enumerate(library["articles"])
-                          if a.get("date_start") == start.isoformat()]
+                          if start and a.get("date_start") == start.isoformat()]
             insert_at = same_issue[-1] + 1 if same_issue else len(library["articles"])
             library["articles"].insert(insert_at, article)
         before = self.data.read_bytes()
@@ -562,10 +592,17 @@ class LibraryEditorStore:
                 "backup": str(backup.relative_to(self.root))}
 
 
-def handler_for(store, token):
+def handler_for(store, token, session=None):
     class Handler(SimpleHTTPRequestHandler):
         def __init__(self, *args, **kwargs):
             super().__init__(*args, directory=str(store.root), **kwargs)
+
+        def handle(self):
+            try:
+                super().handle()
+            except (ConnectionResetError, BrokenPipeError):
+                # Closing the app disconnects previews and speculative connections.
+                pass
 
         def _json(self, value, status=HTTPStatus.OK):
             body = json_bytes(value)
@@ -582,6 +619,45 @@ def handler_for(store, token):
         def do_GET(self):
             route = urlsplit(self.path)
             try:
+                if route.path == "/api/browser-session":
+                    query = parse_qs(route.query)
+                    if session is None or query.get("token") != [token]:
+                        raise EditorError("编辑器会话无效", HTTPStatus.FORBIDDEN)
+                    role = query.get("role", [""])[0]
+                    if role not in ("editor", "preview"):
+                        raise EditorError("窗口类型无效")
+                    document = _id(query.get("document", [""])[0])
+                    if role == "editor" and not session.attach(document):
+                        self.send_response(204)
+                        self.end_headers()
+                        return
+                    try:
+                        self.send_response(200)
+                        self.send_header("Content-Type", "text/event-stream")
+                        self.send_header("Cache-Control", "no-store")
+                        self.send_header("Connection", "close")
+                        self.end_headers()
+                        while not session.closed.is_set():
+                            self.wfile.write(b": connected\n\n")
+                            self.wfile.flush()
+                            session.closed.wait(0.5)
+                        self.wfile.write(b"event: close\ndata: {}\n\n")
+                        self.wfile.flush()
+                    except (ConnectionError, OSError):
+                        pass
+                    return
+                if route.path == "/library.html" and session is not None:
+                    html = (store.root / "library.html").read_text(encoding="utf-8")
+                    html = html.replace("</head>", '<script src="/editor/session.js" '
+                        f'data-preview="true" data-token="{token}"></script></head>', 1)
+                    body = html.encode("utf-8")
+                    self.send_response(200)
+                    self.send_header("Content-Type", "text/html; charset=utf-8")
+                    self.send_header("Content-Length", str(len(body)))
+                    self.send_header("Cache-Control", "no-store")
+                    self.end_headers()
+                    self.wfile.write(body)
+                    return
                 if route.path == "/api/state":
                     return self._json(store.state())
                 if route.path == "/api/draft":
@@ -614,7 +690,10 @@ def handler_for(store, token):
                     raise EditorError("请求过大或为空")
                 payload = json.loads(self.rfile.read(length))
                 route = urlsplit(self.path).path
-                if route == "/api/draft":
+                if route == "/api/browser-close" and session is not None:
+                    session.leave(_id(payload.get("document")))
+                    result = {"ok": True}
+                elif route == "/api/draft":
                     result = store.save_draft(payload)
                 elif route == "/api/image":
                     result = store.save_image(_id(payload.get("id")), payload.get("data"))
@@ -633,6 +712,17 @@ def handler_for(store, token):
     return Handler
 
 
+class EditorServer(ThreadingHTTPServer):
+    # Finish accepted writes before server_close returns, including window exit.
+    daemon_threads = False
+    block_on_close = True
+
+    def get_request(self):
+        connection, address = super().get_request()
+        connection.settimeout(30)
+        return connection, address
+
+
 def main():
     store = LibraryEditorStore()
     try:
@@ -640,9 +730,7 @@ def main():
     except OSError as error:
         print(f"编辑器备份清理暂未完成：{error}", flush=True)
     token = uuid.uuid4().hex
-    class Server(ThreadingHTTPServer):
-        daemon_threads = True
-    server = Server(("127.0.0.1", 0), handler_for(store, token))
+    server = EditorServer(("127.0.0.1", 0), handler_for(store, token))
     url = f"http://127.0.0.1:{server.server_port}/editor/?token={token}"
     print("本地图书馆编辑器：" + url, flush=True)
     print("草稿保存在 library/editor-drafts；按 Ctrl+C 关闭。", flush=True)

@@ -39,6 +39,11 @@ BASE_DIR = Path(__file__).resolve().parents[2]   # 工作区
 LIBRARY_DIR = BASE_DIR / "library"               # 输出目录
 DATA_DIR = LIBRARY_DIR / "data"
 IMAGES_DIR = LIBRARY_DIR / "images"
+TAG_ALIASES = json.loads((DATA_DIR / "tag_aliases.json").read_text(encoding="utf-8"))
+
+
+def canonical_tags(tags):
+    return list(dict.fromkeys(TAG_ALIASES.get(tag.strip(), tag.strip()) for tag in tags if tag.strip()))
 
 
 def ppt_replaces(article, updated_issues):
@@ -78,7 +83,7 @@ def parse_person(s):
     s = s.strip()
     if s.startswith(CHARACTER_MARK):
         s = s[len(CHARACTER_MARK):].lstrip("：:")
-    return [c.strip() for c in re.split(r"[，,、/]", s) if c.strip()]
+    return canonical_tags(re.split(r"[，,、/]", s))
 
 
 def read_paragraph(para):
@@ -377,6 +382,8 @@ def import_markdown_file(md_path):
         from html_import import parse_html
         parser = parse_html if Path(md_path).suffix.lower() in (".html", ".htm") else parse_markdown
         new_articles, image_assets, warnings = parser(md_path, YEAR)
+        for article in new_articles:
+            article["characters"] = canonical_tags(article.get("characters") or [])
 
         if old_json.exists():
             old_data = json.loads(old_json.read_text(encoding="utf-8"))
@@ -738,6 +745,9 @@ def main():
                                         old_images.get(Path(path).stem, path)
                                         for path in cell.get("images", [])
                                     ]
+
+    for article in all_articles:
+        article["characters"] = canonical_tags(article.get("characters") or [])
 
     # 日期是期的稳定身份；旧库有 67/607 等不同格式的期号。
     def issue_key(article):

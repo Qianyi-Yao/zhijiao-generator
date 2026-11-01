@@ -128,8 +128,8 @@
     .markdown-table th, .markdown-table td { border: 1px solid var(--line); padding: 6px 9px; vertical-align: top; }
     .markdown-table th { background: #EAF0E9; font-weight: 700; }
     .markdown-table td img, .markdown-table th img { display: block; max-width: 100%; height: auto; margin: 6px auto; }
-    #articleList .article-body img, #articleDetail .article-body img { cursor: zoom-in; }
-    #articleList .article-body img:focus-visible, #articleDetail .article-body img:focus-visible { outline: 3px solid var(--green-dark); outline-offset: 3px; }
+    #articleList .article-body img, #articleDetail .article-body img, #encounterStory .article-body img { cursor: zoom-in; }
+    #articleList .article-body img:focus-visible, #articleDetail .article-body img:focus-visible, #encounterStory .article-body img:focus-visible { outline: 3px solid var(--green-dark); outline-offset: 3px; }
     .markdown-heading { margin: 12px 0 4px; font-size: 16px; }
     .markdown-rule { border: 0; border-top: 1px solid var(--line); margin: 12px 0; }
     .markdown-math { margin: 12px 0; max-width: 100%; overflow-x: auto; overflow-y: hidden; font-size: 1.05em; }
@@ -164,6 +164,42 @@
 
     .foot-note { text-align: center; font-size: 12px; color: var(--muted); margin-top: 30px; }
     .library-aside { margin-top: 16px; color: var(--muted); font-size: 12px; line-height: 1.8; text-align: right; }
+
+    .encounter-side { position: fixed; z-index: 12; left: calc(50% + 455px); top: 28px; width: 280px; }
+    .encounter-card, .encounter-reading { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: 0 3px 12px rgba(28,30,35,.08); }
+    .encounter-card { padding: 16px; }
+    .encounter-card h2 { font: 20px/1.4 "Jinling", serif; letter-spacing: 1px; }
+    .encounter-note, .encounter-status { color: var(--muted); font-size: 12px; line-height: 1.6; }
+    .encounter-note { margin: 5px 0 12px; }
+    .encounter-pair { display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 6px; margin-bottom: 12px; }
+    .encounter-person { min-width: 0; min-height: 104px; display: grid; justify-items: center; align-content: center; padding: 8px 3px; border: 1px dashed var(--line); border-radius: 9px; text-align: center; }
+    .encounter-person img { width: 46px; height: 46px; object-fit: cover; border-radius: 50%; border: 1px solid var(--line); }
+    .encounter-person strong { font-size: 14px; line-height: 1.4; }
+    .encounter-person small { color: var(--muted); font-size: 11px; line-height: 1.2; }
+    .encounter-join { color: var(--green-dark); font-family: "Jinling", serif; }
+    .encounter-actions { display: flex; gap: 7px; flex-wrap: wrap; }
+    .encounter-actions button, .encounter-story-list button { cursor: pointer; padding: 5px 10px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); color: var(--ink); font-family: "Jinling", serif; }
+    .encounter-actions button:hover, .encounter-story-list button:hover { background: #E1EAE4; }
+    .encounter-actions button:focus-visible, .encounter-story-list button:focus-visible { outline: 2px solid var(--green-dark); outline-offset: 2px; }
+    .encounter-actions .encounter-draw { background: var(--green-dark); border-color: var(--green-dark); color: white; }
+    .encounter-actions .encounter-draw:hover { background: #245350; }
+    .encounter-actions button:disabled { opacity: .5; cursor: wait; }
+    .encounter-status { margin-top: 10px; min-height: 20px; }
+    .encounter-reading { position: absolute; right: 0; top: calc(100% + 8px); width: min(690px, calc(100vw - 40px)); max-height: max(220px, calc(100vh - 300px)); overflow-y: auto; padding: 16px; z-index: 2; }
+    .encounter-reading[hidden] { display: none; }
+    .encounter-reading .encounter-reading-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+    .encounter-reading h3 { font: 19px "Jinling", serif; }
+    .encounter-reading-head a { color: var(--green-dark); font-size: 13px; text-decoration: underline; text-underline-offset: 2px; }
+    .encounter-story-list { display: flex; gap: 6px; flex-wrap: wrap; margin: 8px 0 12px; }
+    .encounter-story-list button[aria-current="true"] { background: var(--green-dark); border-color: var(--green-dark); color: white; }
+    .encounter-reading .article-card { margin-bottom: 0; }
+    .encounter-reading .article-body { display: block; }
+    @media (max-width: 1519px) {
+      .encounter-side { position: relative; left: auto; top: auto; width: 100%; margin: 0 0 18px; }
+      .encounter-card { max-width: 430px; }
+      .encounter-reading { position: fixed; left: 50%; right: auto; top: 5vh; transform: translateX(-50%); max-height: 90vh; }
+    }
+    @media (prefers-reduced-motion: reduce) { .encounter-person { transition: none; } }
 
     @media (max-width: 560px) {
       .library-wrap { padding: 20px 14px 50px; }
@@ -302,6 +338,24 @@
       <span class="note">忘川风华录知交圈微考据 · 图文整理</span>
     </header>
 
+    <aside id="encounterSide" class="encounter-side" aria-label="双人物奇遇抽选">
+      <div class="encounter-card">
+        <h2>双人奇遇</h2>
+        <p class="encounter-note">随机抽两位名士，看看他们能如何相遇。</p>
+        <div class="encounter-pair">
+          <div id="encounterFirst" class="encounter-person"><strong>?</strong></div><span class="encounter-join">与</span>
+          <div id="encounterSecond" class="encounter-person"><strong>?</strong></div>
+        </div>
+        <div class="encounter-actions"><button id="encounterDraw" class="encounter-draw" type="button" disabled>抽取两人</button><button id="encounterRead" type="button" hidden>阅读微考据</button></div>
+        <p id="encounterStatus" class="encounter-status" role="status" aria-live="polite">等待抽取</p>
+      </div>
+      <section id="encounterReading" class="encounter-reading" aria-label="奇遇" hidden>
+        <div class="encounter-reading-head"><h3>奇遇</h3><div class="encounter-actions"><a id="encounterOpenArticle" href="#" target="_blank" rel="noopener">在图书馆打开 ↗</a><button id="encounterClose" type="button">收起</button></div></div>
+        <div id="encounterStoryList" class="encounter-story-list"></div>
+        <div id="encounterStory"></div>
+      </section>
+    </aside>
+
     <div class="filter-bar">
       <div class="title-field">
         <input id="searchInput" type="search" aria-label="搜索标题关键词" placeholder="搜索标题关键词……" />
@@ -355,6 +409,9 @@
   <script src="vendor/katex/katex.min.js"></script>
   <script>
     let articles = [];
+    let drawPool = characters.filter(item => Number.isInteger(item.cardId));
+    let encounterMatches = [];
+    let encounterCurrent = null;
     let mode = 'preview';      // 'preview' 预览3篇 | 'paged' 分页浏览
     let page = 1;
     let pageCount = 0;
@@ -369,6 +426,8 @@
     const TRAILING_PAGE_BUTTONS = 3;
     const list = document.getElementById('articleList');
     const detail = document.getElementById('articleDetail');
+    const encounterReading = document.getElementById('encounterReading');
+    const encounterStory = document.getElementById('encounterStory');
     const filterBar = document.querySelector('.filter-bar');
     const searchInput = document.getElementById('searchInput');
     const titleSearchError = document.getElementById('titleSearchError');
@@ -562,6 +621,7 @@
         weekEnd = isoDate(new Date(year, month - 1, day + 6));
       }
       return articles.filter(a => {
+        if (a.source === 'easter') return false;
         const articleSource = a.source === 'extra' ? 'extra' : 'main';
         if (filters.source !== 'all' && filters.source !== articleSource) return false;
 
@@ -806,8 +866,9 @@
       const tags = (a.characters || []).map(c =>
         `<span class="tag" data-tag="${esc(c)}">${esc(c)}</span>`).join('');
       const isExtra = a.source === 'extra';
-      const meta = `${a.date_start} 至 ${a.date_end}${isExtra ? '' : ' · ' + episodeLabel(a)}`;
-      const sourceBadge = isExtra ? '<span class="source-badge">番外</span>' : '';
+      const isEaster = a.source === 'easter';
+      const meta = isEaster ? '双人奇遇 · 隐藏彩蛋' : `${a.date_start} 至 ${a.date_end}${isExtra ? '' : ' · ' + episodeLabel(a)}`;
+      const sourceBadge = isEaster ? '<span class="source-badge">奇遇</span>' : isExtra ? '<span class="source-badge">番外</span>' : '';
       const body = a.paragraphs.map(renderParagraph).join('');
       return `<article class="article-card${a.origin === 'editor' ? ' editor-article' : ''}${expanded ? ' open' : ''}" data-article-id="${esc(a.id)}">
         <div class="article-head">
@@ -825,12 +886,96 @@
       </article>`;
     }
 
+    function encounterPerson(slot, person) {
+      slot.innerHTML = person
+        ? `<img src="${esc(person.avatar)}" alt=""><strong>${esc(person.name)}</strong><small>${person.cardId}</small>`
+        : '<strong>?</strong>';
+    }
+    function encounterPairKey(pair) {
+      return [...pair].sort((a, b) => a - b).join('-');
+    }
+    function encounterPick() {
+      const first = Math.floor(Math.random() * drawPool.length);
+      const secondIndex = Math.floor(Math.random() * (drawPool.length - 1));
+      const second = secondIndex >= first ? secondIndex + 1 : secondIndex;
+      return [drawPool[first], drawPool[second]];
+    }
+    function showEncounterStory(article) {
+      encounterCurrent = article;
+      document.getElementById('encounterOpenArticle').href = articleRouteUrl(article.id);
+      document.getElementById('encounterStoryList').innerHTML = encounterMatches.length > 1
+        ? encounterMatches.map(item => `<button type="button" data-encounter-story="${esc(item.id)}" aria-current="${item.id === article.id}">${esc(item.title)}</button>`).join('') : '';
+      encounterStory.innerHTML = renderArticleCard(article, true);
+      renderMath(encounterStory);
+      enableImageZoom(encounterStory);
+      encounterReading.hidden = false;
+      document.getElementById('encounterRead').hidden = false;
+    }
+    async function drawEncounter() {
+      const button = document.getElementById('encounterDraw');
+      const status = document.getElementById('encounterStatus');
+      if (drawPool.length < 2 || button.disabled) return;
+      button.disabled = true;
+      encounterReading.hidden = true;
+      document.getElementById('encounterRead').hidden = true;
+      encounterCurrent = null;
+      const [first, second] = encounterPick();
+      const firstSlot = document.getElementById('encounterFirst');
+      const secondSlot = document.getElementById('encounterSecond');
+      status.textContent = '抽选中…';
+      const reduced = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (!reduced) {
+        const started = performance.now();
+        const ticker = setInterval(() => {
+          const [one, two] = encounterPick();
+          if (performance.now() - started < 800) encounterPerson(firstSlot, one);
+          encounterPerson(secondSlot, two);
+        }, 80);
+        const animations = [firstSlot, secondSlot].map((slot, index) => slot.animate(
+          [{ transform: 'translateY(-5px)', opacity: .65 }, { transform: 'translateY(0)', opacity: 1 }],
+          { duration: 240, iterations: index ? 5 : 4, easing: 'ease-out' }));
+        try { await Promise.all(animations.map(animation => animation.finished)); }
+        finally { clearInterval(ticker); }
+      }
+      encounterPerson(firstSlot, first);
+      encounterPerson(secondSlot, second);
+      button.textContent = '再抽一次';
+      const key = encounterPairKey([first.cardId, second.cardId]);
+      encounterMatches = articles.filter(article => article.source === 'easter' &&
+        Array.isArray(article.pair_card_ids) && encounterPairKey(article.pair_card_ids) === key);
+      if (encounterMatches.length) {
+        const article = encounterMatches[Math.floor(Math.random() * encounterMatches.length)];
+        status.textContent = `找到 ${encounterMatches.length} 篇奇遇`;
+        showEncounterStory(article);
+      } else {
+        status.textContent = '这组奇遇尚待考据。可以再抽一次。';
+      }
+      button.disabled = false;
+    }
+
+    document.getElementById('encounterDraw').onclick = () => drawEncounter();
+    document.getElementById('encounterClose').onclick = () => { encounterReading.hidden = true; };
+    document.getElementById('encounterRead').onclick = () => { if (encounterCurrent) encounterReading.hidden = false; };
+    encounterReading.addEventListener('click', event => {
+      const switcher = event.target.closest('[data-encounter-story]');
+      if (switcher) {
+        const selected = encounterMatches.find(item => item.id === switcher.dataset.encounterStory);
+        if (selected) showEncounterStory(selected);
+        return;
+      }
+      const share = event.target.closest('.share-btn');
+      if (share) openShare(share.closest('.article-card'));
+    });
+    document.addEventListener('keydown', event => {
+      if (event.key === 'Escape' && !encounterReading.hidden) encounterReading.hidden = true;
+    });
+
     function render() {
       const filters = getFilterState();
       const items = filtered(filters);
       updateFilterBar(filters);
       setSearchError(searchInput, titleSearchError,
-        Boolean(filters.titleQuery) && !articles.some(article =>
+        Boolean(filters.titleQuery) && !articles.some(article => article.source !== 'easter' &&
           article.title.toLowerCase().includes(filters.titleQuery)));
 
       if (!items.length) {
@@ -886,7 +1031,7 @@
     document.addEventListener('click', event => {
       if (!(event.target instanceof Element)) return;
       const image = event.target.closest('.article-body img');
-      if (image && (list.contains(image) || detail.contains(image))) {
+        if (image && (list.contains(image) || detail.contains(image) || encounterStory.contains(image))) {
         const dialog = document.getElementById('imageDialog');
         const enlarged = document.getElementById('imageDialogImage');
         enlarged.src = image.currentSrc || image.src;
@@ -924,7 +1069,7 @@
     document.addEventListener('keydown', event => {
       if ((event.key === 'Enter' || event.key === ' ') &&
           event.target instanceof HTMLImageElement &&
-          (list.contains(event.target) || detail.contains(event.target))) {
+          (list.contains(event.target) || detail.contains(event.target) || encounterStory.contains(event.target))) {
         event.preventDefault();
         event.target.click();
       }
@@ -1271,9 +1416,22 @@
 
     fetch('library/data/library.json', { cache: 'no-store' })
       .then(r => r.json())
-      .then(data => {
+      .then(async data => {
         articles = (data.articles || []).sort((a, b) =>
           (a.date_start || '').localeCompare(b.date_start || ''));
+        try {
+          const response = await fetch('library/data/抽选人物名单.csv', { cache: 'no-store' });
+          if (!response.ok) throw new Error('名单读取失败');
+          const csv = (await response.text()).replace(/^\uFEFF/, '');
+          const ids = new Set(csv.split(/\r?\n/).slice(1).map(line => Number(line.split(',')[0])).filter(Number.isInteger));
+          drawPool = characters.filter(person => ids.has(person.cardId));
+        } catch {
+          drawPool = [];
+          document.getElementById('encounterStatus').textContent = '抽选名单读取失败，请检查人物名单文件。';
+        }
+        document.getElementById('encounterDraw').disabled = drawPool.length < 2;
+        if (drawPool.length > 0 && drawPool.length < 2) document.getElementById('encounterStatus').textContent = '参与人物不足两位，暂不能抽取。';
+        if (drawPool.length === 0 && document.getElementById('encounterStatus').textContent === '等待抽取') document.getElementById('encounterStatus').textContent = '参与人物名单为空，暂不能抽取。';
         initCalendar();
         render();
         if (!history.state?.libraryRoute) {

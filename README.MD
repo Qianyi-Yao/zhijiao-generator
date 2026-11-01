@@ -1,6 +1,6 @@
-# 知交圈生成器：163人物版
+# 知交圈生成器：164人物版
 
-本版本已接入163名人物及其头像、立绘。人物资料统一存放在 `characters.js`，网页功能存放在 `app.js`，视觉排版存放在 `style.css`。
+本版本已接入164名人物及其头像、立绘。人物资料统一存放在 `characters.js`，网页功能存放在 `app.js`，视觉排版存放在 `style.css`。
 
 使用 VS Code 的 Live Server 打开 `index.html`，即可编辑帖子、评论并导出 PNG/JPG 或工程文件。
 
