@@ -127,7 +127,7 @@ const MediaRowTrailingParagraph = Extension.create({
         if (!transactions.some(transaction => transaction.docChanged)) return null;
         const positions = [];
         state.doc.descendants((node, pos) => {
-          if (node.type.name === 'mediaRow' && node.lastChild?.type.name === 'table') {
+          if (node.type.name === 'mediaRow' && ['table', 'mathBlock'].includes(node.lastChild?.type.name)) {
             positions.push(pos + node.nodeSize - 1);
           }
         });
@@ -272,6 +272,7 @@ function sourceValue() { return draft?.source === 'easter' ? 'easter' : $('sourc
 function payload() {
   const pair = [$('pairFirst').value, $('pairSecond').value].filter(Boolean).map(Number);
   return { id: draft.id, date_start: $('dateStart').value, title: $('title').value,
+    has_errors: $('hasErrors').getAttribute('aria-pressed') === 'true',
     source: sourceValue(), characters: sourceValue() === 'easter' ? [] : tagsFromInput(),
     pair_card_ids: sourceValue() === 'easter' ? pair : [],
     doc: editor.getJSON(), published_hash: draft.published_hash || null };
@@ -553,6 +554,7 @@ function renderPreview(current, blocks) {
     <div class="article-heading-row">
     <span class="article-title">${esc(current.title || '未命名篇目')}</span>
     ${current.source === 'extra' ? '<span class="source-badge">番外</span>' : isEaster ? '<span class="source-badge">奇遇</span>' : ''}
+    ${current.has_errors ? '<span class="error-badge">有谬误</span>' : ''}
     <span class="article-tags">${previewTags.map(x => `<span class="tag">${esc(x)}</span>`).join('')}</span>
     </div><div class="article-detail-row"><span class="article-meta">${isEaster ? '隐藏彩蛋' : `${esc(start)} 至 ${esc(end)}${esc(episode)}`}</span></div>
     </div><div class="article-body">${blocks.map(renderBlock).join('')}</div></article></div>`;
@@ -786,13 +788,22 @@ async function refreshState() {
   renderLinks();
   status(dirty ? '未保存…' : '图书馆状态已更新');
 }
+function updateArticleLink() {
+  const button = $('viewArticle');
+  button.disabled = !draft?.published_hash;
+  button.title = button.disabled ? '发布后即可在图书馆查看并生成 PNG' : '查看已发布篇目并生成 PNG';
+}
+$('viewArticle').addEventListener('click', () => {
+  if (draft?.published_hash) window.open('/library.html#article=' + encodeURIComponent('editor-' + draft.id), '_blank', 'noopener');
+});
 async function openDraft(id) {
   if (draft && dirty) await saveNow();
   previewSequence++;
   const loaded = await api(`/api/draft?id=${encodeURIComponent(id)}`);
   draft = loaded;
   suppress = true;
-  $('title').value = loaded.title || '';
+  $('title').value = (loaded.title || '').replace(/【(?:此处|此条)?有谬误】|（有谬误）/g, '').trim();
+  $('hasErrors').setAttribute('aria-pressed', String(loaded.has_errors === true || /【(?:此处|此条)?有谬误】|（有谬误）/.test(loaded.title || '')));
   $('source').value = loaded.source === 'extra' ? 'extra' : 'main';
   $('dateStart').value = loaded.date_start || '';
   $('pairFirst').value = String(loaded.pair_card_ids?.[0] || '');
@@ -807,6 +818,7 @@ async function openDraft(id) {
   $('emptyState').hidden = true;
   $('editing').hidden = false;
   $('deleteDraft').hidden = Boolean(loaded.published_hash);
+  updateArticleLink();
   message(loaded.published_hash ? '这篇已发布；修改后可再次发布，原文章 ID 会保留。' : '草稿仅保存在本机，确认后再发布。');
   status('草稿已载入');
   renderDrafts();
@@ -1086,6 +1098,10 @@ $('imageFile').addEventListener('change', async event => {
     message(images.length > 1 ? `已加入 ${images.length} 张图片。` : '图片已放入草稿。');
   } catch (error) { message(error.message, true); }
 });
+$('hasErrors').addEventListener('click', () => {
+  $('hasErrors').setAttribute('aria-pressed', String($('hasErrors').getAttribute('aria-pressed') !== 'true'));
+  changed();
+});
 ['title', 'dateStart', 'characters'].forEach(id => $(id).addEventListener('input', changed));
 $('source').addEventListener('change', () => { updateSourceFields(); changed(); });
 $('dateStart').addEventListener('change', () => {
@@ -1201,6 +1217,7 @@ $('publish').addEventListener('click', async () => {
     const result = await api('/api/publish', { id: draft.id, libraryHash: state.libraryHash });
     draft = await api(`/api/draft?id=${encodeURIComponent(draft.id)}`);
     $('deleteDraft').hidden = true;
+    updateArticleLink();
     await refreshState();
     await loadScores();
     message(`发布成功。已备份旧图书馆数据。`);

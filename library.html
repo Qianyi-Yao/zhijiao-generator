@@ -84,7 +84,7 @@
     .article-title { font-size: 18px; letter-spacing: 1px; font-family: "Jinling", serif; }
     .article-meta { font-size: 12px; color: var(--muted); font-family: "HuiwenMincho", "SimSun", "Songti SC", "Noto Serif SC", serif; }
     .article-tags { display: inline-flex; gap: 6px; flex-wrap: wrap; font-family: "ShengshiKai", "Noto Serif SC", serif; }
-    .tag, .source-badge {
+    .tag, .source-badge, .error-badge {
       display: inline-flex; align-items: center; justify-content: center;
       font-family: "HuiwenMincho", "SimSun", "Songti SC", "Noto Serif SC", serif;
       font-size: 11px; font-weight: 400; line-height: 21px; color: var(--ink);
@@ -117,6 +117,9 @@
     #articleDetail .tag { cursor: default; }
     .rich-text strong { font-weight: 700; }
     .rich-text em { font-style: italic; }
+    .error-badge { background: #D9A0B3; color: var(--ink); }
+    #errorFilter { grid-area: errors; height: 36px; white-space: nowrap; background: #F5E6E0; border-color: #D9A0B3; color: var(--ink); }
+    #errorFilter[aria-pressed="true"] { background: #E1EAE4; border-color: var(--line); color: var(--ink); }
     .source-badge { background: rgba(169, 200, 190, .2); }
     .markdown-quote { margin: 10px 0; padding: 4px 0 4px 14px; border-left: 3px solid var(--source-tag); font-family: "LXGWWenKai", "KaiTi", "STKaiti", serif; }
     .article-card.editor-article .markdown-quote { font-family: inherit; }
@@ -214,8 +217,8 @@
       .img-only img { width: 100%; }
     }
     .filter-bar {
-      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 100px;
-      grid-template-areas: "title character source" "date status clear";
+      display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) 100px 120px;
+      grid-template-areas: "title character source errors" "date status clear clear";
       gap: 10px; align-items: center; margin-bottom: 18px;
     }
     .title-field { grid-area: title; position: relative; min-width: 0; }
@@ -262,7 +265,7 @@
     .flatpickr-day.selected, .flatpickr-day.selected:hover { background: var(--green-dark); border-color: var(--green-dark); }
     .flatpickr-day:hover { background: #E1EAE4; border-color: #E1EAE4; }
     @media (max-width: 560px) {
-      .filter-bar { grid-template-columns: minmax(0, 1fr) 100px; grid-template-areas: "title source" "character clear" "date date" "status status"; }
+      .filter-bar { grid-template-columns: minmax(0, 1fr) 100px; grid-template-areas: "title title" "character character" "source errors" "date clear" "status status"; }
       .character-field { grid-area: character; }
       #characterSelect { width: 100%; }
       #weekLabel { min-height: 23px; }
@@ -371,6 +374,7 @@
         <option value="main">正篇</option>
         <option value="extra">番外</option>
       </select>
+      <button id="errorFilter" class="clear-btn" type="button" aria-pressed="false">只看有谬误</button>
       <input id="weekPicker" type="text" aria-label="选择日期，按周筛选" placeholder="点击日历选择一周" readonly />
       <span id="weekLabel" class="filter-label" aria-live="polite">未限定日期</span>
       <button id="clearFilters" class="clear-btn" type="button" disabled>清除筛选</button>
@@ -434,6 +438,8 @@
     const characterSearch = document.getElementById('characterSearch');
     const characterSearchError = document.getElementById('characterSearchError');
     const characterSelect = document.getElementById('characterSelect');
+    const errorFilter = document.getElementById('errorFilter');
+    errorFilter.onclick = () => { errorFilter.setAttribute('aria-pressed', String(errorFilter.getAttribute('aria-pressed') !== 'true')); renderFromFirstPage(); };
     const sourceFilter = document.getElementById('sourceFilter');
     const weekPicker = document.getElementById('weekPicker');
     let calendar;
@@ -604,6 +610,7 @@
         titleInput,
         titleQuery: titleInput.trim().toLowerCase(),
         source: sourceFilter.value,
+        hasErrors: errorFilter.getAttribute('aria-pressed') === 'true',
         character: selectedChar,
         year: selectedYear,
         month: selectedMonth,
@@ -622,6 +629,7 @@
       }
       return articles.filter(a => {
         if (a.source === 'easter') return false;
+        if (filters.hasErrors && !a.has_errors) return false;
         const articleSource = a.source === 'extra' ? 'extra' : 'main';
         if (filters.source !== 'all' && filters.source !== articleSource) return false;
 
@@ -784,14 +792,17 @@
       selectedMonth = '';
       selectedWeek = '';
       sourceFilter.value = 'all';
+      errorFilter.setAttribute('aria-pressed', 'false');
       weekLabel.textContent = '未限定日期';
       renderFromFirstPage();
     };
 
     function updateFilterBar(filters) {
+      errorFilter.textContent = filters.hasErrors ? '看所有篇目' : '只看有谬误';
       sourceFilter.dataset.filled = String(filters.source !== 'all');
       weekPicker.dataset.filled = String(Boolean(filters.week));
       const active =
+        filters.hasErrors ||
         filters.titleInput ||
         filters.character ||
         filters.source !== 'all' ||
@@ -875,6 +886,7 @@
           <div class="article-heading-row">
           <span class="article-title">${esc(a.title)}</span>
           ${sourceBadge}
+          ${a.has_errors ? '<span class="error-badge">有谬误</span>' : ''}
           <span class="article-tags">${tags}</span>
           </div>
           <div class="article-detail-row">
@@ -1264,6 +1276,19 @@
     }
     document.getElementById('generateShare').onclick = () => exportArticle(shareLayout);
 
+    function shareImageFilename(articleId, layout) {
+      const article = articles.find(item => item.id === articleId);
+      if (!article) throw new Error('找不到分享篇目，请刷新后重试');
+      const prefix = layout === 'mobile' ? 'p' : 'w';
+      // Use the complete library order, unaffected by search, filters or pagination.
+      if (article.source === 'easter' || !article.date_start) {
+        return prefix + '-qiyu-' + article.id;
+      }
+      const issue = article.date_start.replace(/-/g, '').slice(2);
+      const siblings = articles.filter(item => item.source !== 'easter' && item.date_start === article.date_start);
+      return prefix + '-' + issue + '-' + (siblings.findIndex(item => item.id === article.id) + 1);
+    }
+
     function showShareImage(blob, filename, width, height) {
       shareUrl = URL.createObjectURL(blob);
       shareFilename = filename + '.png';
@@ -1383,9 +1408,8 @@
           }
         }
         if (generation !== shareGeneration) return;
-        const title = card.querySelector('.article-title').textContent.replace(/[\\/:*?"<>|\x00-\x1f]/g, '_').slice(0, 100);
         const blob = writer.finish();
-        const filename = `${title}-${layout === 'mobile' ? '手机版' : '网页版'}`;
+        const filename = shareImageFilename(card.dataset.articleId, layout);
         console.info('Article export', { layout, tiles: completedTiles, milliseconds: Math.round(performance.now() - started) });
         showShareImage(blob, filename, imageWidth, imageHeight);
       } catch (error) {
@@ -1417,7 +1441,11 @@
     fetch('library/data/library.json', { cache: 'no-store' })
       .then(r => r.json())
       .then(async data => {
-        articles = (data.articles || []).sort((a, b) =>
+        articles = (data.articles || []).map(article => {
+          const marker = /【(?:此处|此条)?有谬误】|（有谬误）/g;
+          return { ...article, has_errors: article.has_errors === true || marker.test(article.title || ''),
+            title: (article.title || '').replace(/【(?:此处|此条)?有谬误】|（有谬误）/g, '').trim() };
+        }).sort((a, b) =>
           (a.date_start || '').localeCompare(b.date_start || ''));
         try {
           const response = await fetch('library/data/抽选人物名单.csv', { cache: 'no-store' });

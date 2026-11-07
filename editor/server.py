@@ -389,7 +389,9 @@ class LibraryEditorStore:
         characters = value.get("characters")
         if not isinstance(characters, list) or any(not isinstance(x, str) for x in characters):
             raise EditorError("人物标签格式无效")
-        draft = {"id": draft_id, "date_start": start, "title": str(value.get("title") or "")[:200],
+        if type(value.get("has_errors", False)) is not bool:
+            raise EditorError("谬误标记格式无效")
+        draft = {"has_errors": value.get("has_errors", False), "id": draft_id, "date_start": start, "title": str(value.get("title") or "")[:200],
                  "source": source, "characters": [] if source == "easter" else
                  list(dict.fromkeys(TAG_ALIASES.get(x.strip(), x.strip()) for x in characters if x.strip())),
                  "pair_card_ids": sorted(pair),
@@ -520,7 +522,7 @@ class LibraryEditorStore:
                 raise EditorError("篇目跳转目标已不存在，请重新选择。")
         article = {"id": article_id, "title": title,
                    "characters": [names[item] for item in pair] if is_easter else draft.get("characters", []),
-                   "source": draft["source"],
+                   "source": draft["source"], "has_errors": draft.get("has_errors", False),
                    "origin": "editor", "editor_draft_id": draft_id,
                    "paragraphs": blocks}
         if is_easter:

@@ -222,3 +222,20 @@ input, select { width: 100%; border: 1px solid var(--line); border-radius: 7px; 
 @media (max-width: 1100px) { .workspace { grid-template-columns: 220px 1fr; } .preview-panel { grid-column: 2; } #preview { height: 650px; } }
 @media (max-width: 700px) { .topbar { display: block; } .top-actions { margin-top: 10px; } .workspace { display: block; } .sidebar, .writing, .preview-panel { margin-bottom: 12px; } #preview { height: 600px; } .tiptap .editor-media-row { flex-direction: column; } .tiptap .editor-media-imgs { flex: none; width: 100%; } .tiptap .editor-media-imgs img { width: 180px; max-width: 100%; } .tiptap .editor-media-text { width: 100%; } }
 @media (max-width: 700px) { .relationship-dialog { padding: 6px; } .relationship-window { height: 100%; } .relationship-body { grid-template-columns: 1fr; grid-template-rows: minmax(280px, 1fr) minmax(120px, 30%); } .relationship-detail { border-left: 0; border-top: 1px solid var(--line); } }
+
+/* Shared button rows: compact controls, consistent baselines, safe wrapping. */
+.top-actions, .writing-actions { align-items: center; flex-wrap: wrap; gap: 8px; }
+.top-actions button, .writing-actions button { min-height: 36px; padding: 6px 10px; font-size: 13px; line-height: 22px; white-space: nowrap; }
+.article-actions { border-top: 0; padding-top: 0; padding-bottom: 12px; }
+.article-actions #hasErrors { margin-right: auto; }
+#hasErrors { flex: 0 0 auto; background: #E1EAE4; border-color: var(--line); color: var(--ink); }
+#hasErrors[aria-pressed="true"] { background: #F5E6E0; border-color: #D9A0B3; color: var(--ink); }
+.meta-grid { align-items: end; }
+.toolbar { align-items: flex-start; }
+.toolbar-group { align-items: flex-start; }
+.toolbar-title { display: flex; align-items: center; min-height: 30px; }
+.toolbar button, .toolbar select, .toolbar .hex-color, .context-toolbar button { height: 30px; padding-top: 3px; padding-bottom: 3px; line-height: 22px; }
+.toolbar label { min-height: 30px; }
+.context-toolbar, .editor-media-image-actions, .editor-media-actions { align-items: center; }
+.editor-media-image-actions button, .editor-media-actions button { min-height: 26px; line-height: 20px; }
+
