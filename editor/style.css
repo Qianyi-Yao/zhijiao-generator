@@ -239,3 +239,43 @@ input, select { width: 100%; border: 1px solid var(--line); border-radius: 7px; 
 .context-toolbar, .editor-media-image-actions, .editor-media-actions { align-items: center; }
 .editor-media-image-actions button, .editor-media-actions button { min-height: 26px; line-height: 20px; }
 
+
+/* Encounter manager: fixed graph area and independently scrolling cards. */
+.easter-manager-entry { margin-top: 16px; border-top: 1px solid var(--line); padding-top: 12px; }
+.easter-manager-entry button { width: 100%; }
+.easter-manager-entry p { font-size: 12px; color: #64716e; margin: 6px 0; }
+.relationship-body { grid-template-columns: minmax(0, 1fr) 340px; }
+.relationship-tools { flex-wrap: wrap; align-items: center; gap: 8px; }
+.relationship-tools input, .relationship-tools select, .relationship-tools button { height: 36px; font-size: 13px; }
+#encounterQuery { width: 210px; }
+#encounterStatus { width: 100px; }
+#encounterMessage { color: #a04036; width: 100%; }
+.encounter-item { border: 1px solid var(--line); border-radius: 9px; padding: 12px; margin: 10px 0; overflow-wrap: anywhere; }
+.encounter-item h3 { font-size: 16px; }
+.encounter-item p { margin: 5px 0; }
+.encounter-state { display: inline-block; background: #e1eae4; border-radius: 10px; padding: 1px 8px; font-size: 12px; }
+.encounter-item-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.encounter-item-actions button, .encounter-list-heading button { min-height: 32px; }
+.encounter-item small { display: block; margin-top: 8px; color: #64716e; }
+@media (max-width: 700px) {
+  .relationship-body { grid-template-columns: 1fr; grid-template-rows: minmax(200px, 1fr) minmax(160px, 42%); }
+  .relationship-tools { max-height: 35vh; overflow: auto; flex-shrink: 0; }
+  #encounterQuery { flex: 1; min-width: 140px; }
+}
+
+/* Separate article filtering from the graph's current selection. */
+.relationship-tools { display: flex; flex-direction: column; align-items: stretch; }
+.encounter-filter-row { display: grid; grid-template-columns: minmax(0, 1fr) 120px auto; align-items: center; gap: 10px; }
+.encounter-filter-row #relationshipSearchForm { display: flex; min-width: 0; align-items: center; gap: 6px; }
+.encounter-filter-row #encounterQuery { flex: 1; width: 100%; min-width: 0; }
+.encounter-filter-row #encounterStatus { width: 100%; }
+.relationship-tools button { white-space: nowrap; flex-shrink: 0; }
+.encounter-context-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; padding-top: 8px; border-top: 1px dashed var(--line); color: #64716e; font-size: 12px; }
+.encounter-context-row strong { font-weight: normal; color: var(--green); }
+.encounter-context-row button { height: 30px; font-size: 12px; }
+#relationshipReset { margin-left: auto; }
+#encounterMessage:empty { display: none; }
+@media (max-width: 700px) {
+  .encounter-filter-row { grid-template-columns: minmax(0, 1fr) auto; gap: 8px; }
+  .encounter-filter-row #relationshipSearchForm { grid-column: 1 / -1; }
+}

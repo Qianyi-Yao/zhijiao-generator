@@ -254,6 +254,15 @@
     }
     .filter-bar input, .filter-bar select, .filter-bar .clear-btn { border-style: dashed; }
     .filter-bar input[type="search"]:focus, .filter-bar input[type="search"][aria-invalid="true"] { border-style: solid; }
+    #errorFilter { box-sizing: border-box; transition: box-shadow .15s, border-color .15s; }
+    #errorFilter:hover { box-shadow: 0 0 0 2px rgba(217,160,179,.16); }
+    #errorFilter:focus, #errorFilter:active { border: 2px solid #D9A0B3; padding: 2px 9px; outline: none; box-shadow: 0 0 0 3px rgba(217,160,179,.25); }
+    #errorFilter[aria-pressed="true"]:hover { box-shadow: 0 0 0 2px rgba(94,140,135,.16); }
+    #errorFilter[aria-pressed="true"]:focus, #errorFilter[aria-pressed="true"]:active { border-color: var(--green-dark); box-shadow: 0 0 0 3px rgba(94,140,135,.18); }
+    button.source-badge, button.error-badge { cursor: pointer; }
+    button.source-badge:hover, button.error-badge:hover { filter: brightness(.96); }
+    button.source-badge:focus-visible, button.error-badge:focus-visible { outline: 2px solid var(--green-dark); outline-offset: 2px; }
+    button.error-badge:focus-visible { outline-color: #D9A0B3; }
     #weekPicker::placeholder { color: #838F8B; opacity: 1; }
     #sourceFilter:not([data-filled="true"]) { color: #838F8B; }
     #sourceFilter option { color: var(--ink); }
@@ -361,7 +370,7 @@
 
     <div class="filter-bar">
       <div class="title-field">
-        <input id="searchInput" type="search" aria-label="搜索标题关键词" placeholder="搜索标题关键词……" />
+        <input id="searchInput" type="search" aria-label="搜索全文关键词" placeholder="搜索关键词……" />
         <p id="titleSearchError" class="search-error" role="status" hidden>没有匹配的篇目，请换个关键词。</p>
       </div>
       <div class="character-field">
@@ -603,6 +612,28 @@
       });
     }
 
+    // Index text only; URLs, image paths and formatting metadata are not searchable.
+    const articleSearchCache = new WeakMap();
+    function articleSearchText(article) {
+      if (articleSearchCache.has(article)) return articleSearchCache.get(article);
+      const runsText = runs => (runs || []).map(run => run.text || '').join('');
+      const blockText = block => {
+        if (!block) return '';
+        if (block.type === 'math') return block.latex || '';
+        if (block.type === 'quote') return blocksText(block.blocks);
+        if (block.type === 'list') return (block.items || []).map(blocksText).join('\n');
+        if (block.type === 'table') return (block.rows || []).map(row =>
+          (row || []).map(cell => cell ? runsText(Array.isArray(cell) ? cell : cell.runs) : '').join('\n')
+        ).join('\n');
+        if (block.mediaBlocks) return blocksText(block.mediaBlocks);
+        return runsText(block.runs);
+      };
+      const blocksText = blocks => (blocks || []).map(blockText).join('\n');
+      const text = [article.title || '', blocksText(article.paragraphs)].join('\n').toLowerCase();
+      articleSearchCache.set(article, text);
+      return text;
+    }
+
     function getFilterState() {
       const titleInput = searchInput.value;
 
@@ -635,7 +666,7 @@
 
         if (
           filters.titleQuery &&
-          !a.title.toLowerCase().includes(filters.titleQuery)
+          !articleSearchText(a).includes(filters.titleQuery)
         ) return false;
 
         if (
@@ -820,7 +851,9 @@
       const pages = new Set();
       for (let number = 1; number <= LEADING_PAGE_BUTTONS; number++) pages.add(number);
       for (let number = totalPages - TRAILING_PAGE_BUTTONS + 1; number <= totalPages; number++) pages.add(number);
-      pages.add(page);
+      for (let number = Math.max(1, page - 2); number <= Math.min(totalPages, page + 2); number++) {
+        pages.add(number);
+      }
       return [...pages].sort((a, b) => a - b);
     }
 
@@ -879,14 +912,14 @@
       const isExtra = a.source === 'extra';
       const isEaster = a.source === 'easter';
       const meta = isEaster ? '双人奇遇 · 隐藏彩蛋' : `${a.date_start} 至 ${a.date_end}${isExtra ? '' : ' · ' + episodeLabel(a)}`;
-      const sourceBadge = isEaster ? '<span class="source-badge">奇遇</span>' : isExtra ? '<span class="source-badge">番外</span>' : '';
+      const sourceBadge = isEaster ? '<span class="source-badge">奇遇</span>' : '<button type="button" class="source-badge" data-source-filter="' + (isExtra ? 'extra' : 'main') + '">' + (isExtra ? '番外' : '正篇') + '</button>';
       const body = a.paragraphs.map(renderParagraph).join('');
       return `<article class="article-card${a.origin === 'editor' ? ' editor-article' : ''}${expanded ? ' open' : ''}" data-article-id="${esc(a.id)}">
         <div class="article-head">
           <div class="article-heading-row">
           <span class="article-title">${esc(a.title)}</span>
           ${sourceBadge}
-          ${a.has_errors ? '<span class="error-badge">有谬误</span>' : ''}
+          ${a.has_errors ? '<button type="button" class="error-badge" data-error-filter>有谬误</button>' : ''}
           <span class="article-tags">${tags}</span>
           </div>
           <div class="article-detail-row">
@@ -988,7 +1021,7 @@
       updateFilterBar(filters);
       setSearchError(searchInput, titleSearchError,
         Boolean(filters.titleQuery) && !articles.some(article => article.source !== 'easter' &&
-          article.title.toLowerCase().includes(filters.titleQuery)));
+          articleSearchText(article).includes(filters.titleQuery)));
 
       if (!items.length) {
         pageCount = 0;
@@ -1132,8 +1165,26 @@
       page = destination;
       render();
     });
+    function applyBadgeFilter(event) {
+      const badge = event.target.closest('[data-source-filter], [data-error-filter]');
+      if (!badge) return false;
+      event.preventDefault();
+      event.stopPropagation();
+      if (badge.hasAttribute('data-source-filter')) sourceFilter.value = badge.dataset.sourceFilter;
+      else errorFilter.setAttribute('aria-pressed', 'true');
+      if (articleIdFromHash()) {
+        history.pushState({ libraryRoute: true, articleId: null, scrollY: 0 }, '', articleRouteUrl(null));
+        showArticleRoute(false);
+      }
+      renderFromFirstPage();
+      filterBar.scrollIntoView({ block: 'nearest' });
+      return true;
+    }
+    detail.addEventListener('click', applyBadgeFilter);
+    encounterStory.addEventListener('click', applyBadgeFilter);
     list.onclick = event => {
       if (!(event.target instanceof Element)) return;
+      if (applyBadgeFilter(event)) return;
 
       const shareButton = event.target.closest('.share-btn');
       if (shareButton) {
@@ -1281,6 +1332,20 @@
       if (!article) throw new Error('找不到分享篇目，请刷新后重试');
       const prefix = layout === 'mobile' ? 'p' : 'w';
       // Use the complete library order, unaffected by search, filters or pagination.
+      if (article.source === 'easter') {
+        const pairKey = item => {
+          const pair = item.pair_card_ids;
+          if (!Array.isArray(pair) || pair.length !== 2 ||
+              !pair.every(id => Number.isSafeInteger(id) && id > 0) || pair[0] === pair[1]) return null;
+          return [...pair].sort((a, b) => a - b).join('_');
+        };
+        const key = pairKey(article);
+        if (key) {
+          const siblings = articles.filter(item => item.source === 'easter' && pairKey(item) === key);
+          const suffix = siblings.length > 1 ? '-' + (siblings.findIndex(item => item.id === article.id) + 1) : '';
+          return prefix + '-' + key + suffix;
+        }
+      }
       if (article.source === 'easter' || !article.date_start) {
         return prefix + '-qiyu-' + article.id;
       }
@@ -1304,6 +1369,53 @@
         shareStatus.textContent = '完整 PNG 已生成，但当前浏览器无法预览；请点击“下载完整 PNG”，再用其他应用打开。';
       };
       sharePreviewImage.src = shareUrl;
+    }
+
+    function splitShareHighlights(root) {
+      // html2canvas paints a wrapped inline background as its union rectangle.
+      // Measure each text fragment after fonts/layout settle, then give each line
+      // its own background span without changing the text or inline formatting.
+      const plans = [];
+      root.querySelectorAll('span[style]').forEach(element => {
+        if (!element.style.backgroundColor) return;
+        const color = getComputedStyle(element).backgroundColor;
+        const walker = document.createTreeWalker(element, NodeFilter.SHOW_TEXT);
+        const texts = [];
+        while (walker.nextNode()) texts.push(walker.currentNode);
+        const replacements = texts.map(node => {
+          const range = document.createRange();
+          const groups = [];
+          let offset = 0;
+          for (const character of node.data) {
+            const end = offset + character.length;
+            range.setStart(node, offset);
+            range.setEnd(node, end);
+            const rect = Array.from(range.getClientRects()).find(rect => rect.width > 0 && rect.height > 0);
+            const top = rect ? rect.top : null;
+            const last = groups[groups.length - 1];
+            if (last && (top === null || last.top === null || Math.abs(last.top - top) < 1)) {
+              last.text += character;
+              if (last.top === null) last.top = top;
+            } else groups.push({ top, text: character });
+            offset = end;
+          }
+          return { node, groups };
+        });
+        plans.push({ element, color, replacements });
+      });
+      for (const { element, color, replacements } of plans) {
+        element.style.backgroundColor = 'transparent';
+        for (const { node, groups } of replacements) {
+          const fragment = document.createDocumentFragment();
+          for (const group of groups) {
+            const span = document.createElement('span');
+            span.style.backgroundColor = color;
+            span.textContent = group.text;
+            fragment.appendChild(span);
+          }
+          node.replaceWith(fragment);
+        }
+      }
     }
 
     async function exportArticle(layout) {
@@ -1351,6 +1463,7 @@
         ]), new Promise((_, reject) => setTimeout(() => reject(new Error('字体或图片加载超时，请检查网络后重试')), 25000))]);
         if (generation !== shareGeneration) return;
         fitShareMath(host);
+        splitShareHighlights(host);
         const width = host.offsetWidth;
         const height = host.scrollHeight;
         const scale = 2;

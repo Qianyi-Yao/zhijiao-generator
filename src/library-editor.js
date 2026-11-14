@@ -41,11 +41,51 @@ let scoreTo = '';
 let scoreSingleBound = 'from';
 let relationshipData = null;
 let relationshipView = null;
+let encounterSelection = null;
+let relationshipSnapshot = null;
+let encounterScroll = 0;
+let encounterBusy = false;
+let encounterRecords = [];
+function rebuildEncounterRecords() {
+  const drafts = state.drafts.filter(item => item.source === 'easter');
+  const used = new Set();
+  encounterRecords = state.articles.filter(item => item.source === 'easter').map(article => {
+    const local = drafts.find(item => item.id === article.editor_draft_id || article.id === 'editor-' + item.id);
+    if (local) used.add(local.id);
+    return { ...article, title: local?.title || article.title, draftId: local?.id,
+      published: true, updated_at: local?.updated_at || '' };
+  });
+  encounterRecords.push(...drafts.filter(item => !used.has(item.id)).map(item => ({
+    ...item, draftId: item.id, published: false
+  })));
+  encounterRecords.sort((a, b) => Number(Boolean(b.draftId)) - Number(Boolean(a.draftId)) ||
+    String(b.updated_at || '').localeCompare(String(a.updated_at || '')));
+}
+function renderEncounterList() {
+  const ids = encounterSelection ? encounterSelection.source && encounterSelection.target
+    ? [Number(encounterSelection.source), Number(encounterSelection.target)] : [Number(encounterSelection.id)] : [];
+  const names = pair => (pair || []).map(id => characterById.get(Number(id))?.name || String(id)).join('、');
+  $('encounterSelection').textContent = ids.length ? names(ids) : '全部人物';
+  $('encounterClear').hidden = !ids.length;
+  const query = $('encounterQuery').value.trim().toLocaleLowerCase();
+  const status = $('encounterStatus').value;
+  const selected = encounterRecords.filter(item => ids.every(id => (item.pair_card_ids || []).includes(id)));
+  const shown = selected.filter(item => (status === 'all' || item.published === (status === 'published')) &&
+    (!query || (item.title + ' ' + names(item.pair_card_ids)).toLocaleLowerCase().includes(query)));
+  const published = selected.filter(item => item.published).length;
+  $('relationshipDetail').innerHTML = `<div class="encounter-list-heading"><p>${published} 篇已发布 · ${selected.length - published} 篇草稿 · 筛选结果 ${shown.length} 篇</p>
+    ${ids.length ? '<button type="button" data-encounter-create="' + ids.join(',') + '">' + (ids.length === 2 ? '为这对人物新建' : '为此人物新建') + '</button>' : ''}</div>` +
+    (shown.map(item => `<article class="encounter-item"><h3>${esc(item.title || '未命名奇遇')}</h3><p>${esc(names(item.pair_card_ids) || '尚未选择人物')}</p>
+      <span class="encounter-state">${item.published ? '已发布' : '草稿'}</span>
+      <div class="encounter-item-actions">${item.draftId ? '<button type="button" data-encounter-edit="' + esc(item.draftId) + '">编辑</button>' : ''}
+      ${item.published ? '<a href="/library.html#article=' + encodeURIComponent(item.id) + '" target="_blank" rel="noopener">在图书馆查看 ↗</a>' : ''}</div>
+      ${!item.draftId ? '<small>本机没有可编辑草稿</small>' : ''}</article>`).join('') || '<p class="draft-empty">没有符合条件的奇遇。</p>');
+}
 
 const MediaRow = Node.create({
   name: 'mediaRow',
   group: 'block',
-  content: '(paragraph|blockquote|mathBlock|table)+',
+  content: '(paragraph|blockquote|mathBlock|table|horizontalRule|bulletList|orderedList)+',
   defining: true,
   addAttributes() { return { images: { default: [] } }; },
   parseHTML() { return [{ tag: 'div[data-editor-media-row]' }]; },
@@ -127,7 +167,7 @@ const MediaRowTrailingParagraph = Extension.create({
         if (!transactions.some(transaction => transaction.docChanged)) return null;
         const positions = [];
         state.doc.descendants((node, pos) => {
-          if (node.type.name === 'mediaRow' && ['table', 'mathBlock'].includes(node.lastChild?.type.name)) {
+          if (node.type.name === 'mediaRow' && ['table', 'mathBlock', 'horizontalRule', 'bulletList', 'orderedList'].includes(node.lastChild?.type.name)) {
             positions.push(pos + node.nodeSize - 1);
           }
         });
@@ -279,6 +319,7 @@ function payload() {
 }
 function updateSourceFields() {
   const easter = sourceValue() === 'easter';
+  $('hasErrors').hidden = easter;
   $('regularSourceField').hidden = easter;
   $('easterSourceField').hidden = !easter;
   $('dateField').hidden = easter;
@@ -586,14 +627,11 @@ function renderDrafts() {
   $('draftList').innerHTML = regular.length
     ? regular.map(draftButton).join('')
     : '<p class="draft-empty">这一周还没有编辑器篇目。</p>';
-  $('easterCount').textContent = `(${easter.length})`;
-  $('easterDraftList').innerHTML = easter.length
-    ? easter.map(draftButton).join('')
-    : '<p class="draft-empty">还没有奇遇草稿。</p>';
+  renderRelationshipMonitor();
 }
 function syncDraftSummary(saved) {
   const summary = { id: saved.id, title: saved.title, date_start: saved.date_start,
-    source: saved.source, characters: saved.characters,
+    source: saved.source, characters: saved.characters, pair_card_ids: saved.pair_card_ids,
     published_hash: saved.published_hash, updated_at: saved.updated_at };
   const index = state.drafts.findIndex(item => item.id === saved.id);
   if (index < 0) state.drafts.unshift(summary);
@@ -677,33 +715,28 @@ function renderScores() {
   $('scoreExpand').textContent = scoreExpanded ? '收起至前 10 名' : `展开全部 ${ranked.length} 名`;
 }
 function renderRelationshipMonitor() {
-  if (!scoreArticles) return;
-  relationshipData = buildRelationshipData(characterRoster, scoreArticles);
-  const { nodes, edges, articleCount, unmatched } = relationshipData;
-  $('relationshipSummary').textContent = `${scoreLoadError ? '更新失败，显示上次数据 · ' : ''}${nodes.length} 位名士 · ${edges.length} 组关系 · ${articleCount} 篇奇遇${unmatched ? ` · ${unmatched} 篇配对资料不完整` : ''}`;
+  rebuildEncounterRecords();
+  relationshipData = buildRelationshipData(characterRoster, encounterRecords);
+  const published = encounterRecords.filter(item => item.published).length;
+  const summary = published + ' 篇已发布 · ' + (encounterRecords.length - published) + ' 篇草稿';
+  $('easterCount').textContent = summary;
+  $('relationshipSummary').textContent = relationshipData.edges.length + ' 组关系 · ' + summary;
   $('relationshipOpen').disabled = false;
-  $('relationshipNames').innerHTML = nodes.map(person => `<option value="${esc(person.name)}"></option>`).join('');
+  $('relationshipNames').innerHTML = relationshipData.nodes.map(person => `<option value="${esc(person.name)}"></option>`).join('');
+  if (encounterSelection) {
+    const valid = encounterSelection.source
+      ? relationshipData.edges.some(edge => 'pair-' + edge.id === encounterSelection.id)
+      : relationshipData.nodes.some(node => String(node.id) === String(encounterSelection.id));
+    if (!valid) encounterSelection = null;
+  }
   if (!$('relationshipDialog').hidden) showRelationshipGraph();
 }
-function relationshipDetails(item) {
-  if (!item) return '<p>点击头像查看人物奇遇，或点击连线查看两人的篇目。</p>';
-  const person = id => relationshipData.nodes.find(node => node.id === Number(id));
-  const edge = item.source && item.target ? relationshipData.edges.find(pair => pair.id === item.id.replace(/^pair-/, '')) : null;
-  const links = articles => articles.map(article => `<li><a href="/library.html#article=${encodeURIComponent(article.id)}" target="_blank" rel="noopener">${esc(article.title)} ↗</a></li>`).join('');
-  if (edge) return `<h3>${esc(person(edge.source)?.name)}与${esc(person(edge.target)?.name)}</h3><p>${edge.articles.length} 篇已发布奇遇</p><ul>${links(edge.articles)}</ul>`;
-  const node = person(item.id);
-  if (!node) return '<p>人物资料暂不可用。</p>';
-  const related = relationshipData.edges.filter(pair => pair.source === node.id || pair.target === node.id);
-  return `<h3>${esc(node.name)}</h3>${related.length ? `<p>${related.length} 组关系</p><ul>${related.map(pair => {
-    const other = person(pair.source === node.id ? pair.target : pair.source);
-    return `<li><strong>${esc(other?.name)}</strong><ul>${links(pair.articles)}</ul></li>`;
-  }).join('')}</ul>` : '<p>尚无已发布奇遇。</p>'}`;
-}
 function showRelationshipGraph() {
+  if (relationshipView) relationshipSnapshot = relationshipView.snapshot();
   relationshipView?.destroy();
-  $('relationshipDetail').innerHTML = relationshipDetails(null);
+  renderEncounterList();
   relationshipView = createRelationshipView($('relationshipCanvas'), relationshipData, {
-    onSelect(item) { $('relationshipDetail').innerHTML = relationshipDetails(item); },
+    onSelect(item) { encounterSelection = item; renderEncounterList(); },
     onHover(item, pointer) {
       const tooltip = $('relationshipTooltip');
       if (!item || !Number.isFinite(pointer?.clientX) || !Number.isFinite(pointer?.clientY)) { tooltip.hidden = true; return; }
@@ -717,8 +750,11 @@ function showRelationshipGraph() {
       tooltip.style.top = `${Math.max(8, pointer.clientY - rect.top - 34)}px`;
     }
   });
+  relationshipView.restore(relationshipSnapshot, encounterSelection?.id);
 }
 function closeRelationshipGraph() {
+  encounterScroll = $('relationshipDetail').scrollTop;
+  if (relationshipView) relationshipSnapshot = relationshipView.snapshot();
   $('relationshipDialog').hidden = true;
   document.body.classList.remove('relationship-open');
   $('relationshipTooltip').hidden = true;
@@ -766,7 +802,9 @@ function renderLinks(toolbar) {
   const selected = target.value;
   const matches = query ? state.articles.filter(article =>
     String(article.title || '').toLocaleLowerCase().includes(query) ||
-    String(article.date_start || '').includes(query)) : [];
+    String(article.date_start || '').includes(query) ||
+    (article.characters || []).some(name => String(name).toLocaleLowerCase().includes(query)) ||
+    (article.source === 'easter' && '奇遇'.includes(query))) : [];
   matches.sort((a, b) => {
     const rank = article => {
       const title = String(article.title || '').toLocaleLowerCase();
@@ -776,7 +814,7 @@ function renderLinks(toolbar) {
   });
   const shown = matches.slice(0, 50);
   target.innerHTML = '<option value="">请选择搜索结果…</option>' + shown.map(a =>
-    `<option value="${esc(a.id)}">${esc(a.title)} · ${esc(a.date_start)}</option>`).join('');
+    `<option value="${esc(a.id)}">${esc(a.title)} · ${a.source === 'easter' ? '奇遇 · ' + esc((a.characters || []).join('、')) : esc(a.date_start)}</option>`).join('');
   target.value = shown.some(a => a.id === selected) ? selected : '';
   toolbarControl(toolbar, 'linkCount').textContent = query
     ? matches.length ? `找到 ${matches.length} 篇${matches.length > shown.length ? '，显示前 50 篇，请继续缩小范围' : ''}` : '没有匹配的篇目'
@@ -835,12 +873,11 @@ async function newArticle() {
   await openDraft(created.id);
   $('title').focus();
 }
-async function newEaster() {
+async function newEaster(pair = []) {
   if (draft && dirty) await saveNow();
   const id = crypto.randomUUID().replaceAll('-', '');
   const created = await api('/api/draft', { id, date_start: '', title: '',
-    source: 'easter', characters: [], pair_card_ids: [], doc: emptyDoc(), published_hash: null });
-  $('easterDetails').open = true;
+    source: 'easter', characters: [], pair_card_ids: pair, doc: emptyDoc(), published_hash: null });
   await refreshState();
   await openDraft(created.id);
   $('title').focus();
@@ -857,7 +894,6 @@ const commands = {
   quote: () => editor.chain().focus().toggleBlockquote().run(),
   bullet: () => editor.chain().focus().toggleBulletList().run(),
   ordered: () => editor.chain().focus().toggleOrderedList().run(),
-  heading5: () => editor.chain().focus().toggleHeading({ level: 5 }).run(),
   rule: () => editor.chain().focus().setHorizontalRule().run(),
   rowBefore: () => editor.chain().focus().addRowBefore().run(),
   rowAfter: () => editor.chain().focus().addRowAfter().run(),
@@ -1008,7 +1044,7 @@ function bindHexColor(input, button, label, applyColor) {
     const color = normalizeHexColor(input.value);
     if (!color) {
       input.setAttribute('aria-invalid', 'true');
-      message(`${label}请输入 3 位或 6 位十六进制颜色，例如 #fff2a8。`, true);
+      message(`${label}请输入 3 位或 6 位十六进制颜色，例如 #D9A0B3。`, true);
       return;
     }
     input.value = color;
@@ -1113,7 +1149,7 @@ $('dateStart').addEventListener('change', () => {
   }
 });
 $('newArticle').addEventListener('click', () => newArticle().catch(error => message(error.message, true)));
-$('newEaster').addEventListener('click', () => newEaster().catch(error => message(error.message, true)));
+$('newEaster').addEventListener('click', () => encounterAction(() => newEaster()));
 $('currentWeek').addEventListener('click', () => selectWeek(todayWeek()));
 $('scoreRangeClear').addEventListener('click', () => {
   scoreRangePicker.clear(false);
@@ -1147,24 +1183,45 @@ $('relationshipOpen').addEventListener('click', () => {
   $('relationshipDialog').hidden = false;
   document.body.classList.add('relationship-open');
   showRelationshipGraph();
-  $('relationshipSearch').focus();
+  $('relationshipDetail').scrollTop = encounterScroll;
+  $('encounterQuery').focus();
+});
+$('easterManagerOpen').addEventListener('click', () => $('relationshipOpen').click());
+$('encounterQuery').addEventListener('input', () => { $('relationshipSearchStatus').textContent = ''; renderEncounterList(); });
+$('encounterStatus').addEventListener('change', renderEncounterList);
+$('encounterClear').addEventListener('click', () => { encounterSelection = null; relationshipView?.clear(); renderEncounterList(); });
+async function encounterAction(action) {
+  if (encounterBusy) return;
+  encounterBusy = true;
+  $('encounterMessage').textContent = '';
+  try {
+    await writeChain.catch(() => {});
+    await action();
+    closeRelationshipGraph();
+    $('title').focus();
+  } catch (error) { $('encounterMessage').textContent = error.message; message(error.message, true); }
+  finally { encounterBusy = false; }
+}
+$('relationshipDetail').addEventListener('click', event => {
+  const edit = event.target.closest('[data-encounter-edit]');
+  const create = event.target.closest('[data-encounter-create]');
+  if (edit) encounterAction(() => openDraft(edit.dataset.encounterEdit));
+  if (create) encounterAction(() => newEaster(create.dataset.encounterCreate.split(',').map(Number)));
 });
 $('relationshipClose').addEventListener('click', closeRelationshipGraph);
 $('relationshipDialog').addEventListener('click', event => {
   if (event.target === $('relationshipDialog')) closeRelationshipGraph();
 });
 $('relationshipReset').addEventListener('click', () => {
-  $('relationshipSearch').value = '';
-  $('relationshipSearchStatus').textContent = '';
-  relationshipView?.reset();
+  relationshipView?.fit();
 });
 $('relationshipSearchForm').addEventListener('submit', event => {
   event.preventDefault();
-  const query = $('relationshipSearch').value.trim();
+  const query = $('encounterQuery').value.trim();
   if (!query) { $('relationshipSearchStatus').textContent = '请输入姓名。'; return; }
-  const match = relationshipData.nodes.find(node => node.name === query) ||
-    relationshipData.nodes.find(node => node.name.includes(query));
-  $('relationshipSearchStatus').textContent = match ? `已找到：${match.name}` : '没有找到这位名士。';
+  const matches = relationshipData.nodes.filter(node => node.name.includes(query));
+  const match = relationshipData.nodes.find(node => node.name === query) || (matches.length === 1 ? matches[0] : null);
+  $('relationshipSearchStatus').textContent = match ? `已找到：${match.name}` : matches.length > 1 ? '匹配多位人物，请输入完整姓名再定位。' : '没有对应人物；篇名搜索结果已显示在右侧。';
   if (match) relationshipView?.selectPerson(match.id);
 });
 document.addEventListener('keydown', event => {
@@ -1176,12 +1233,12 @@ document.addEventListener('keydown', event => {
   if ($('relationshipDialog').hidden) return;
   if (event.key === 'Escape') { closeRelationshipGraph(); return; }
   if (event.key !== 'Tab') return;
-  const focusable = [...$('relationshipDialog').querySelectorAll('button, input, a[href]')].filter(element => !element.disabled);
+  const focusable = [...$('relationshipDialog').querySelectorAll('button, input, select, a[href]')].filter(element => !element.disabled && element.getClientRects().length);
   const first = focusable[0], last = focusable[focusable.length - 1];
   if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last.focus(); }
   else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first.focus(); }
 });
-for (const list of [$('draftList'), $('easterDraftList')]) {
+for (const list of [$('draftList')]) {
   list.addEventListener('click', event => {
     const button = event.target.closest('[data-draft]');
     if (button) openDraft(button.dataset.draft).catch(error => message(error.message, true));

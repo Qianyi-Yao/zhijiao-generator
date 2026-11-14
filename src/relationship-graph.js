@@ -10,9 +10,9 @@ export function buildRelationshipData(roster, articles) {
     if (ids.length !== 2 || !ids.every(id => people.has(id))) { unmatched++; continue; }
     const key = ids.join('-');
     if (!pairs.has(key)) pairs.set(key, { id: key, source: ids[0], target: ids[1], articles: [] });
-    pairs.get(key).articles.push({ id: article.id, title: article.title || '未命名奇遇' });
+    pairs.get(key).articles.push({ id: article.id, title: article.title || '未命名奇遇', published: article.published !== false });
   }
-  const edges = [...pairs.values()];
+  const edges = [...pairs.values()].map(pair => ({ ...pair, draftOnly: pair.articles.every(article => !article.published) ? 1 : 0 }));
   return {
     nodes: [...people.values()].map(person => ({ id: person.cardId, name: person.name, avatar: person.avatar })),
     edges,
@@ -91,6 +91,7 @@ export function createRelationshipView(container, data, { onSelect, onHover }) {
     style: [
       { selector: 'node', style: { width: 58, height: 58, shape: 'ellipse', 'background-color': '#dce9e2', 'background-image': 'data(avatar)', 'background-fit': 'cover', 'background-clip': 'node', 'border-width': 3, 'border-color': '#6f9d91', label: '' } },
       { selector: 'edge', style: { width: 3, 'line-color': '#7aa99a', 'curve-style': 'bezier' } },
+      { selector: 'edge[draftOnly = 1]', style: { 'line-style': 'dashed' } },
       { selector: '.muted', style: { opacity: 0.18 } },
       { selector: 'node.active', style: { 'border-width': 5, 'border-color': '#b5794e', opacity: 1 } },
       { selector: 'edge.active', style: { width: 5, 'line-color': '#b5794e', opacity: 1 } }
@@ -115,6 +116,17 @@ export function createRelationshipView(container, data, { onSelect, onHover }) {
       const node = cy.getElementById(String(id));
       if (!node.empty()) { select(node); cy.animate({ center: { eles: node }, zoom: Math.max(cy.zoom(), 1.2) }, { duration: 250 }); }
     },
+    snapshot() { return { zoom: cy.zoom(), pan: { ...cy.pan() }, positions: cy.nodes().map(node => ({ id: node.id(), position: { ...node.position() } })) }; },
+    restore(saved, selectedId) {
+      cy.resize();
+      if (saved) {
+        for (const node of saved.positions) cy.getElementById(node.id).position(node.position);
+        cy.zoom(saved.zoom); cy.pan(saved.pan);
+      }
+      if (selectedId && !cy.getElementById(selectedId).empty()) select(cy.getElementById(selectedId));
+    },
+    clear,
+    fit() { cy.fit(cy.elements(), 45); },
     reset() { clear(); cy.fit(cy.elements(), 45); },
     destroy() { cy.destroy(); }
   };

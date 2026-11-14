@@ -201,11 +201,11 @@ def document_blocks(doc, draft_id, asset_path):
                         media_blocks.append({"type": "quote", "blocks": quote_blocks})
                         plain_parts.extend(item["runs"] for item in quote_blocks)
                         has_structured_content = True
-                    elif part_type in ("mathBlock", "table"):
+                    elif part_type in ("mathBlock", "table", "horizontalRule", "bulletList", "orderedList"):
                         media_blocks.extend(convert([part]))
                         has_structured_content = True
                     else:
-                        raise EditorError("图文段右侧只支持普通段落、引文、公式和表格")
+                        raise EditorError("图文段右侧只支持普通段落、引文、公式、表格、分隔线和列表")
                 runs = []
                 for index, part_runs in enumerate(plain_parts):
                     if index:
@@ -348,9 +348,11 @@ class LibraryEditorStore:
         for path in self.drafts.glob("*.json") if self.drafts.exists() else []:
             draft = json.loads(path.read_text(encoding="utf-8"))
             drafts.append({key: draft.get(key) for key in
-                           ("id", "title", "date_start", "source", "characters", "published_hash", "updated_at")})
+                           ("id", "title", "date_start", "source", "characters", "pair_card_ids", "published_hash", "updated_at")})
         drafts.sort(key=lambda item: (item.get("date_start") or "", item.get("updated_at") or ""), reverse=True)
-        articles = [{"id": a.get("id"), "title": a.get("title"), "date_start": a.get("date_start")}
+        articles = [{"id": a.get("id"), "title": a.get("title"), "date_start": a.get("date_start"),
+                     "source": a.get("source", "main"), "characters": a.get("characters", []),
+                     "pair_card_ids": a.get("pair_card_ids", []), "editor_draft_id": a.get("editor_draft_id")}
                     for a in library["articles"]]
         tags = sorted({tag for a in library["articles"] for tag in a.get("characters", []) if isinstance(tag, str)})
         return {"libraryHash": library_hash, "drafts": drafts, "articles": articles, "characters": tags}

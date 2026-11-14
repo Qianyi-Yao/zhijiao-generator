@@ -57,6 +57,52 @@ class StoreTests(unittest.TestCase):
         self.assertEqual(article["paragraphs"][0]["runs"][0]["linkId"], "old")
         self.assertTrue(article["paragraphs"][0]["runs"][0]["strike"])
 
+    def test_media_row_rule_survives_reopen_and_publish(self):
+        self.draft()
+        png = base64.b64encode(b"\x89PNG\r\n\x1a\nexample").decode("ascii")
+        src = self.store.save_image(self.id, png)["src"]
+        saved = self.store.get_draft(self.id)
+        saved["doc"] = {"type": "doc", "content": [{"type": "mediaRow",
+            "attrs": {"images": [{"src": src}]}, "content": [
+                {"type": "paragraph", "content": [{"type": "text", "text": "上文"}]},
+                {"type": "horizontalRule"},
+                {"type": "paragraph", "content": [{"type": "text", "text": "下文"}]}
+            ]}]}
+        self.store.save_draft(saved)
+        self.assertEqual(self.store.get_draft(self.id)["doc"], saved["doc"])
+        self.store.publish(self.id, self.store.state()["libraryHash"])
+        article = next(a for a in self.store.library()[0]["articles"] if a["id"] == "editor-" + self.id)
+        self.assertEqual(len(article["paragraphs"]), 1)
+        blocks = article["paragraphs"][0]["mediaBlocks"]
+        self.assertEqual(blocks[1], {"type": "rule"})
+        self.assertEqual(blocks[2]["runs"][0]["text"], "下文")
+
+    def test_media_lists_survive_save_and_publish(self):
+        self.draft()
+        png = base64.b64encode(b"\x89PNG\r\n\x1a\nexample").decode("ascii")
+        src = self.store.save_image(self.id, png)["src"]
+        paragraph = lambda text: {"type": "paragraph", "content": [{"type": "text", "text": text}]}
+        nested = {"type": "orderedList", "content": [
+            {"type": "listItem", "content": [paragraph("子项")]}]}
+        doc = {"type": "doc", "content": [{"type": "mediaRow",
+            "attrs": {"images": [{"src": src}]},
+            "content": [{"type": "bulletList", "content": [
+                {"type": "listItem", "content": [paragraph("第一项"), nested]},
+                {"type": "listItem", "content": [paragraph("第二项")]}]},
+                paragraph("列表后的正文")]}]}
+        saved = self.store.get_draft(self.id)
+        saved["doc"] = doc
+        self.store.save_draft(saved)
+        self.assertEqual(self.store.get_draft(self.id)["doc"], doc)
+        self.store.publish(self.id, self.store.state()["libraryHash"])
+        article = next(a for a in self.store.library()[0]["articles"] if a["id"] == "editor-" + self.id)
+        self.assertEqual(len(article["paragraphs"]), 1)
+        blocks = article["paragraphs"][0]["mediaBlocks"]
+        self.assertEqual(blocks[0]["type"], "list")
+        self.assertFalse(blocks[0]["ordered"])
+        self.assertTrue(blocks[0]["items"][0][1]["ordered"])
+        self.assertEqual(blocks[1]["runs"][0]["text"], "列表后的正文")
+
     def test_table_merge_and_cell_image(self):
         self.draft()
         png = base64.b64encode(b"\x89PNG\r\n\x1a\nexample").decode("ascii")
