@@ -141,6 +141,18 @@ def document_blocks(doc, draft_id, asset_path):
     if not isinstance(doc, dict) or doc.get("type") != "doc":
         raise EditorError("正文文档格式无效")
 
+    figure_number = 0
+
+    def figure_meta(attrs):
+        nonlocal figure_number
+        if attrs.get('numbered') is not True:
+            return None
+        caption = attrs.get('caption', '')
+        if not isinstance(caption, str) or len(caption) > 500:
+            raise EditorError('图片小标题须为 500 字以内的文字')
+        figure_number += 1
+        return {'number': figure_number, 'caption': caption}
+
     def convert(nodes):
         blocks = []
         for node in nodes or []:
@@ -175,16 +187,18 @@ def document_blocks(doc, draft_id, asset_path):
                 attrs = node.get("attrs") or {}
                 name = _asset_name(attrs.get("src"), draft_id)
                 blocks.append({"type": "image", "images": [asset_path(name)],
+                               "image_meta": [figure_meta(attrs)],
                                "alt": str(attrs.get("alt") or "考据配图")[:200]})
             elif kind == "mediaRow":
                 images = (node.get("attrs") or {}).get("images")
                 if not isinstance(images, list) or not 1 <= len(images) <= 50:
                     raise EditorError("图文段须包含 1 至 50 张图片")
-                paths = []
+                paths, metadata = [], []
                 for image in images:
                     if not isinstance(image, dict):
                         raise EditorError("图文段图片格式无效")
                     paths.append(asset_path(_asset_name(image.get("src"), draft_id)))
+                    metadata.append(figure_meta(image))
                 media_blocks, plain_parts = [], []
                 has_structured_content = False
                 for part in children:
@@ -211,7 +225,7 @@ def document_blocks(doc, draft_id, asset_path):
                     if index:
                         runs.append({"text": "\n\n"})
                     runs.extend(part_runs)
-                block = {"runs": runs, "images": paths}
+                block = {"runs": runs, "images": paths, "image_meta": metadata}
                 if has_structured_content:
                     block["mediaBlocks"] = media_blocks
                 blocks.append(block)
@@ -233,7 +247,7 @@ def document_blocks(doc, draft_id, asset_path):
                         colspan = int(attrs.get("colspan") or 1)
                         if not (1 <= rowspan <= 50 and 1 <= colspan <= 50):
                             raise EditorError("表格合并范围过大")
-                        parts, images = [], []
+                        parts, images, metadata = [], [], []
                         for part in cell.get("content") or []:
                             part_type = part.get("type")
                             if part_type == "paragraph":
@@ -244,10 +258,11 @@ def document_blocks(doc, draft_id, asset_path):
                             elif part_type == "image":
                                 name = _asset_name((part.get("attrs") or {}).get("src"), draft_id)
                                 images.append(asset_path(name))
+                                metadata.append(figure_meta(part.get('attrs') or {}))
                             else:
                                 raise EditorError("表格中只支持文字与图片")
                         result.append({"runs": parts, "rowspan": rowspan,
-                                       "colspan": colspan, "align": None, "images": images})
+                                       "colspan": colspan, "align": None, "images": images, "image_meta": metadata})
                         for ri in range(row_index, row_index + rowspan):
                             for ci in range(column, column + colspan):
                                 if (ri, ci) != (row_index, column):
@@ -283,7 +298,10 @@ def iter_runs(blocks):
             yield from block.get("runs", [])
 
 
-class LibraryEditorStore:
+from covers import CoverStoreMixin
+
+
+class LibraryEditorStore(CoverStoreMixin):
     def __init__(self, root=ROOT):
         self.root = Path(root)
         self.data = self.root / "library" / "data" / "library.json"
@@ -399,6 +417,9 @@ class LibraryEditorStore:
                  "pair_card_ids": sorted(pair),
                  "doc": doc, "published_hash": existing.get("published_hash") if existing else None,
                  "updated_at": datetime.now().isoformat(timespec="seconds")}
+        for key in ('image_names', 'image_next', 'image_prefix'):
+            if existing and key in existing:
+                draft[key] = existing[key]
         atomic_write(self.draft_path(draft_id), json_bytes(draft))
         return draft
 
@@ -408,8 +429,6 @@ class LibraryEditorStore:
             start = date.fromisoformat(value)
         except (TypeError, ValueError):
             raise EditorError("请选择有效的期开始日期") from None
-        if start.weekday() != 6:
-            raise EditorError("每期须从周日开始")
         return start, start + timedelta(days=6)
 
     def save_image(self, draft_id, encoded):
@@ -506,16 +525,52 @@ class LibraryEditorStore:
                and a.get("title") == title for a in library["articles"]):
             raise EditorError("本期已有同名文章，请换标题或检查图书馆。", HTTPStatus.CONFLICT)
         copied = {}
+        numbered_assets = set()
+        def collect_images(node):
+            attrs = node.get('attrs') or {}
+            entries = [attrs] if node.get('type') == 'image' else attrs.get('images', []) if node.get('type') == 'mediaRow' else []
+            for item in entries:
+                if item.get('numbered') is True:
+                    numbered_assets.add(_asset_name(item.get('src'), draft_id))
+            for child in node.get('content') or []:
+                collect_images(child)
+        collect_images(draft['doc'])
+        image_names = dict(draft.get('image_names') or {})
+        next_image = draft.get('image_next', 1)
+        if 'image_prefix' not in draft:
+            short = digest(article_id.encode())
+            length = 8
+            prefix = (start.strftime('%Y%m%d') if start else 'qiyu') + '-' + short[:length]
+            while any(self.images.glob(prefix + '-img*')):
+                length += 2
+                if length > len(short):
+                    raise EditorError('图片命名发生冲突')
+                prefix = (start.strftime('%Y%m%d') if start else 'qiyu') + '-' + short[:length]
+            draft['image_prefix'] = prefix
 
         def published_image(name):
+            nonlocal next_image
             source = self.drafts / "assets" / draft_id / name
             if not source.is_file():
                 raise EditorError(f"图片不存在：{name}")
-            filename = f"editor_{draft_id}_{name}"
+            legacy = f"editor_{draft_id}_{name}"
+            if name not in image_names:
+                if name not in numbered_assets or (self.images / legacy).exists():
+                    image_names[name] = legacy
+                else:
+                    filename = f"{draft['image_prefix']}-img{next_image:02d}{Path(name).suffix}"
+                    while (self.images / filename).exists() or filename in image_names.values():
+                        next_image += 1
+                        filename = f"{draft['image_prefix']}-img{next_image:02d}{Path(name).suffix}"
+                    image_names[name] = filename
+                    next_image += 1
+            filename = image_names[name]
             copied[filename] = source
             return "images/" + filename
 
         blocks = document_blocks(draft["doc"], draft_id, published_image)
+        draft['image_names'] = image_names
+        draft['image_next'] = next_image
         if not blocks or not any(block.get("type") != "paragraph" or block.get("runs") for block in blocks):
             raise EditorError("正文不能为空")
         target_ids = {a.get("id") for a in library["articles"]}
@@ -662,6 +717,8 @@ def handler_for(store, token, session=None):
                     self.end_headers()
                     self.wfile.write(body)
                     return
+                if route.path == "/api/covers":
+                    return self._json(store.cover_state())
                 if route.path == "/api/state":
                     return self._json(store.state())
                 if route.path == "/api/draft":
@@ -697,6 +754,8 @@ def handler_for(store, token, session=None):
                 if route == "/api/browser-close" and session is not None:
                     session.leave(_id(payload.get("document")))
                     result = {"ok": True}
+                elif route.startswith('/api/covers/'):
+                    result = store.cover_action(route.rsplit('/', 1)[-1], payload)
                 elif route == "/api/draft":
                     result = store.save_draft(payload)
                 elif route == "/api/image":
@@ -748,4 +807,6 @@ def main():
 
 
 if __name__ == "__main__":
+    import sys
+    sys.modules['server'] = sys.modules[__name__]
     main()

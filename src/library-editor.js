@@ -82,6 +82,59 @@ function renderEncounterList() {
       ${!item.draftId ? '<small>本机没有可编辑草稿</small>' : ''}</article>`).join('') || '<p class="draft-empty">没有符合条件的奇遇。</p>');
 }
 
+function editImageCaption(attrs, apply) {
+  const dialog = $('imageCaptionDialog');
+  $('imageCaptionInput').value = attrs.caption || '';
+  $('imageCaptionApply').onclick = () => { apply($('imageCaptionInput').value); dialog.close(); };
+  dialog.showModal();
+  $('imageCaptionInput').focus();
+}
+let figureRefreshPending = false;
+function scheduleFigureNumbers() {
+  if (figureRefreshPending) return;
+  figureRefreshPending = true;
+  requestAnimationFrame(() => {
+    figureRefreshPending = false;
+    if (!editor.isDestroyed) refreshFigureNumbers();
+  });
+}
+function refreshFigureNumbers() {
+  let number = 0;
+  editor.view.dom.querySelectorAll('[data-figure-caption]').forEach(label => {
+    const text = `图${++number}${label.dataset.caption ? ' ' + label.dataset.caption : ''}`;
+    if (label.textContent !== text) label.textContent = text;
+  });
+}
+const CaptionedImage = Image.extend({
+  addAttributes() {
+    return {...this.parent?.(),
+      numbered: {default: false, parseHTML: el => el.getAttribute('data-numbered') === 'true', renderHTML: attrs => ({'data-numbered': String(attrs.numbered)})},
+      caption: {default: '', parseHTML: el => el.getAttribute('data-caption') || '', renderHTML: attrs => ({'data-caption': attrs.caption})}};
+  },
+  addNodeView() {
+    return ({node, getPos, editor: instance}) => {
+      const dom = document.createElement('figure'); dom.className = 'editor-captioned-image';
+      const img = document.createElement('img'), caption = document.createElement('figcaption');
+      dom.append(img, caption);
+      const paint = current => {
+        img.src = current.attrs.src; img.alt = current.attrs.alt || '考据配图';
+        caption.hidden = !current.attrs.numbered;
+        if (current.attrs.numbered) caption.setAttribute('data-figure-caption', '');
+        else caption.removeAttribute('data-figure-caption');
+        caption.dataset.caption = current.attrs.caption || '';
+        scheduleFigureNumbers();
+      };
+      caption.addEventListener('click', () => editImageCaption(node.attrs, value => {
+        const pos = getPos();
+        if (typeof pos === 'number') instance.view.dispatch(instance.state.tr.setNodeMarkup(pos, undefined, {...node.attrs, caption: value, numbered: true}));
+      }));
+      paint(node);
+      return {dom, update(current) { if (current.type.name !== 'image') return false; const changed = current.attrs !== node.attrs; node = current; if (changed) paint(current); return true; },
+        stopEvent: event => caption.contains(event.target), ignoreMutation: () => true};
+    };
+  }
+});
+
 const MediaRow = Node.create({
   name: 'mediaRow',
   group: 'block',
@@ -131,13 +184,21 @@ const MediaRow = Node.create({
           const controls = document.createElement('div');
           controls.className = 'editor-media-image-actions';
           controls.append(
+            button('小标题', () => editImageCaption(item, caption => modify(images.map((entry, i) => i === index ? {...entry, caption, numbered: true} : entry)))),
             button('上移', () => { const next = [...images]; [next[index - 1], next[index]] = [next[index], next[index - 1]]; modify(next); }, index === 0),
             button('下移', () => { const next = [...images]; [next[index], next[index + 1]] = [next[index + 1], next[index]]; modify(next); }, index === images.length - 1),
             button('移除', () => images.length === 1
               ? convertMediaToImages(getPos(), true)
               : modify(images.filter((_, i) => i !== index)))
           );
-          slot.append(img, controls);
+          slot.append(img);
+          if (item.numbered) {
+            const caption = document.createElement('div'); caption.className = 'editor-figure-caption';
+            caption.setAttribute('data-figure-caption', ''); caption.dataset.caption = item.caption || '';
+            slot.append(caption);
+          }
+          img.addEventListener('click', () => editImageCaption(item, caption => modify(images.map((entry, i) => i === index ? {...entry, caption, numbered: true} : entry))));
+          slot.append(controls);
           imageColumn.append(slot);
         });
         const actions = document.createElement('div');
@@ -147,6 +208,7 @@ const MediaRow = Node.create({
           button('转为独立图片', () => convertMediaToImages(getPos()))
         );
         imageColumn.append(actions);
+        scheduleFigureNumbers();
       };
       paint(node);
       return { dom, contentDOM, update(updated) {
@@ -154,7 +216,10 @@ const MediaRow = Node.create({
         if (updated.attrs.images !== node.attrs.images) paint(updated);
         node = updated;
         return true;
-      }, stopEvent(event) { return imageColumn.contains(event.target); } };
+      }, stopEvent(event) { return imageColumn.contains(event.target); },
+      ignoreMutation(mutation) {
+        return mutation.type !== 'selection' && imageColumn.contains(mutation.target);
+      } };
     };
   }
 });
@@ -431,7 +496,7 @@ const editor = new Editor({
     StarterKit.configure({ code: false, codeBlock: false, underline: false,
       heading: { levels: [5, 6] },
       link: { openOnClick: false, autolink: false, linkOnPaste: false } }),
-    Image.configure({ inline: false, allowBase64: false }),
+    CaptionedImage.configure({ inline: false, allowBase64: false }),
     MathBlock, MathShortcut, MediaRow, MediaRowTrailingParagraph,
     TableKit.configure({ table: { resizable: true } }),
     TextStyle, Color, FontFamily, Highlight.configure({ multicolor: true })
@@ -545,13 +610,14 @@ function renderRuns(runs) {
   }
   return parts.join('');
 }
-function imageHtml(path, alt = '考据配图') {
+function imageHtml(path, alt = '考据配图', meta = null) {
   const src = path.startsWith('/') ? path : `/library/${path}`;
-  return `<img src="${esc(src)}" alt="${esc(alt)}">`;
+  const image = `<img src="${esc(src)}" alt="${esc(alt)}">`;
+  return meta?.number ? `<figure class="captioned-image">${image}<figcaption>图${Number(meta.number)}${meta.caption ? ' ' + esc(meta.caption) : ''}</figcaption></figure>` : image;
 }
 function renderBlock(block) {
   const type = block.type;
-  if (type === 'image') return `<div class="img-only">${(block.images || []).map(x => imageHtml(x, block.alt)).join('')}</div>`;
+  if (type === 'image') return `<div class="img-only">${(block.images || []).map((x, i) => imageHtml(x, block.alt, block.image_meta?.[i])).join('')}</div>`;
   if (type === 'math') return `<div class="markdown-math" data-latex="${esc(block.latex || '')}"></div>`;
   if (type === 'quote') return `<blockquote class="markdown-quote">${(block.blocks || []).map(renderBlock).join('')}</blockquote>`;
   if (type === 'list') {
@@ -559,11 +625,11 @@ function renderBlock(block) {
     return `<${tag} class="markdown-list">${(block.items || []).map(item => `<li>${item.map(renderBlock).join('')}</li>`).join('')}</${tag}>`;
   }
   if (type === 'table') return `<div class="markdown-table-wrap"><table class="markdown-table"><tbody>${(block.rows || []).map(row =>
-    `<tr>${row.map(cell => cell ? `<td${cell.rowspan > 1 ? ` rowspan="${cell.rowspan}"` : ''}${cell.colspan > 1 ? ` colspan="${cell.colspan}"` : ''}><span class="rich-text">${renderRuns(cell.runs)}</span>${(cell.images || []).map(x => imageHtml(x, '表格配图')).join('')}</td>` : '').join('')}</tr>`).join('')}</tbody></table></div>`;
+    `<tr>${row.map(cell => cell ? `<td${cell.rowspan > 1 ? ` rowspan="${cell.rowspan}"` : ''}${cell.colspan > 1 ? ` colspan="${cell.colspan}"` : ''}><span class="rich-text">${renderRuns(cell.runs)}</span>${(cell.images || []).map((x, i) => imageHtml(x, '表格配图', cell.image_meta?.[i])).join('')}</td>` : '').join('')}</tr>`).join('')}</tbody></table></div>`;
   if (type === 'heading') return `<h${block.level} class="markdown-heading">${renderRuns(block.runs)}</h${block.level}>`;
   if (type === 'rule') return '<hr class="markdown-rule">';
   if ((block.images || []).length) {
-    const pictures = block.images.map(x => imageHtml(x)).join('');
+    const pictures = block.images.map((x, i) => imageHtml(x, '考据配图', block.image_meta?.[i])).join('');
     if (block.mediaBlocks || (block.runs || []).some(run => (run.text || '').trim())) {
       const body = block.mediaBlocks
         ? block.mediaBlocks.map(renderBlock).join('')
@@ -1018,6 +1084,14 @@ function updateContextToolbar() {
   active.style.top = `${Math.max(0, rect.top - container.top + $('editor').scrollTop - active.offsetHeight - 5)}px`;
 }
 editor.on('selectionUpdate', updateContextToolbar);
+editor.on('transaction', ({transaction}) => { if (transaction.docChanged) scheduleFigureNumbers(); });
+$('editImageCaption').onclick = () => {
+  const selection = editor.state.selection;
+  if (selection.node?.type.name !== 'image') return;
+  editImageCaption(selection.node.attrs, caption => {
+    editor.view.dispatch(editor.state.tr.setNodeMarkup(selection.from, undefined, {...selection.node.attrs, caption, numbered: true}));
+  });
+};
 editor.on('update', updateContextToolbar);
 window.addEventListener('resize', updateContextToolbar);
 function normalizeHexColor(value) {
@@ -1084,7 +1158,7 @@ function convertMediaToImages(position, dropImages = false) {
 $('convertImage').addEventListener('click', () => {
   const selection = editor.state.selection;
   if (selection.node?.type.name !== 'image') return;
-  const image = { src: selection.node.attrs.src, alt: selection.node.attrs.alt || '考据配图' };
+  const image = { ...selection.node.attrs };
   const following = editor.state.doc.nodeAt(selection.to);
   const hasFollowingText = following?.type.name === 'paragraph';
   const content = hasFollowingText ? [following.toJSON()] : [{ type: 'paragraph' }];
@@ -1114,7 +1188,7 @@ $('imageFile').addEventListener('change', async event => {
         reader.readAsDataURL(file);
       });
       const uploaded = await api('/api/image', { id: draft.id, data });
-      images.push({ src: uploaded.src, alt: file.name });
+      images.push({ src: uploaded.src, alt: file.name, numbered: true, caption: '' });
     }
     if (request.mode === 'appendMedia') {
       const node = editor.state.doc.nodeAt(request.position);
@@ -1140,14 +1214,6 @@ $('hasErrors').addEventListener('click', () => {
 });
 ['title', 'dateStart', 'characters'].forEach(id => $(id).addEventListener('input', changed));
 $('source').addEventListener('change', () => { updateSourceFields(); changed(); });
-$('dateStart').addEventListener('change', () => {
-  const normalized = currentWeek($('dateStart').value);
-  if (normalized && normalized !== $('dateStart').value) {
-    $('dateStart').value = normalized;
-    message('所属期已调整为当周周日。');
-    changed();
-  }
-});
 $('newArticle').addEventListener('click', () => newArticle().catch(error => message(error.message, true)));
 $('newEaster').addEventListener('click', () => encounterAction(() => newEaster()));
 $('currentWeek').addEventListener('click', () => selectWeek(todayWeek()));

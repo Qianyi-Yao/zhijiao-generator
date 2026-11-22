@@ -1,0 +1,32 @@
+.featured-badge {
+  display: inline-flex; align-items: center; justify-content: center;
+  color: #9B4038; background: #F5E7E2; border: 1px solid #9B4038;
+  border-radius: 3px; padding: 0 6px; font: 400 11px/21px "HuiwenMincho", "SimSun", serif;
+  white-space: nowrap; vertical-align: middle;
+}
+.article-card.has-cover { position: relative; }
+.featured-badge[data-featured-filter] { cursor: pointer; }
+.featured-badge[data-featured-filter]:hover { background: #EED5CE; }
+.featured-badge:focus-visible { outline: 2px solid #9B4038; outline-offset: 3px; }
+.featured-filter-status { grid-column: 1 / -1; color: #9B4038; font-size: 13px; }
+.featured-filter-status[hidden] { display: none; }
+.share-export .featured-badge { cursor: default; }
+.cover-bubble { display: none; width: 88px; padding: 4px; background: #FAFAF6; border: 1px solid #C9D8D2; border-radius: 8px; box-shadow: 0 2px 7px rgba(28,30,35,.12); cursor: pointer; flex: none; }
+.cover-bubble img { display: block; width: 100%; height: auto; border-radius: 4px; }
+.article-card.open .cover-bubble { display: block; }
+.article-card.open.has-cover { overflow: visible; }
+.article-card.open.has-cover .article-head { border-radius: 11px 11px 0 0; }
+.article-card.open .cover-bubble { position: absolute; left: -104px; top: var(--cover-top, 90px); }
+.cover-bubble:focus-visible { outline: 2px solid #2E6A67; outline-offset: 3px; }
+.issue-cover-dialog { margin: auto; padding: 0; width: min(820px, calc(100% - 28px)); max-height: 92vh; border: 1px solid #C9D8D2; border-radius: 12px; background: #FAFAF6; color: #1C1E23; }
+.issue-cover-dialog::backdrop { background: rgba(28,30,35,.55); }
+.issue-cover-panel { padding: 18px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.issue-cover-header { display: flex; align-items: center; gap: 16px; width: 100%; }
+.issue-cover-header h2 { font: 18px/1.5 "Jinling", serif; flex: 1; margin: 0; }
+.issue-cover-close { color: #2E6A67; border: 1px solid #C9D8D2; border-radius: 6px; padding: 5px 12px; background: #FAFAF6; font: inherit; cursor: pointer; }
+.issue-cover-image { display: block; max-width: 100%; max-height: calc(92vh - 160px); width: auto; height: auto; object-fit: contain; }
+.issue-cover-video { display: inline-block; color: #FAFAF6; background: #2E6A67; border-radius: 6px; padding: 6px 20px; text-decoration: none; }
+@media (max-width: 1080px) {
+  .article-card.open .cover-bubble { position: static; width: 48px; padding: 2px; }
+}
+.share-export .cover-bubble { display: none !important; }

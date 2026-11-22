@@ -21,6 +21,7 @@
       <input id="weekPicker" type="text" aria-label="选择日期，查看所在周篇目" placeholder="点击日历选择一周" readonly>
       <div class="week-filter-status"><span id="weekLabel" role="status" aria-live="polite"></span><button id="currentWeek" type="button">回到本周</button></div>
       <button id="newArticle" type="button" class="primary">＋ 新建篇目</button>
+      <button id="coverManagerOpen" type="button">每期封面</button>
       <div id="draftList" class="draft-list" aria-label="所选周的编辑器篇目"></div>
       <section class="easter-manager-entry"><button id="easterManagerOpen" type="button">奇遇管理</button><p id="easterCount"></p></section>
       <p class="sidebar-note">草稿和图片只存在本机。发布后的篇目仍可回来修改；已有 PPT 篇目不能在这里编辑。</p>
@@ -33,7 +34,7 @@
           <label>篇目标题<input id="title" type="text" maxlength="200" placeholder="例如：关于……"></label>
           <label id="regularSourceField">分类<select id="source"><option value="main">正篇</option><option value="extra">番外</option></select></label>
           <div id="easterSourceField" class="source-readonly" hidden>分类<strong>奇遇</strong></div>
-          <label id="dateField">所属期（周日）<input id="dateStart" type="date"></label>
+          <label id="dateField">所属期起始日期<input id="dateStart" type="date"></label>
           <div id="pairFields" class="pair-fields wide" hidden>
             <div class="pair-search"><label for="pairFirstSearch">人物一</label><input id="pairFirst" type="hidden"><input id="pairFirstSearch" type="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="pairFirstResults" placeholder="搜索姓名或编号" autocomplete="off"><div id="pairFirstResults" class="pair-results" role="listbox" hidden></div></div>
             <div class="pair-search"><label for="pairSecondSearch">人物二</label><input id="pairSecond" type="hidden"><input id="pairSecondSearch" type="search" role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="pairSecondResults" placeholder="搜索姓名或编号" autocomplete="off"><div id="pairSecondResults" class="pair-results" role="listbox" hidden></div></div>
@@ -95,7 +96,7 @@
             <button data-command="deleteTable" type="button">删除表格</button>
           </div>
           <div id="imageToolbar" class="context-toolbar" role="toolbar" aria-label="图片操作" hidden>
-            <span>图片</span><button id="convertImage" type="button">转为左图右文</button>
+            <span>图片</span><button id="editImageCaption" type="button">小标题</button><button id="convertImage" type="button">转为左图右文</button>
           </div>
         </div>
         <div id="bottomToolbarMount"></div>
@@ -168,6 +169,31 @@
       </div>
     </div>
   </div>
+  <dialog id="coverManager" class="cover-manager" aria-labelledby="coverManagerTitle">
+    <section class="cover-manager-inner">
+      <div class="cover-manager-heading"><h2 id="coverManagerTitle">每期封面</h2><button id="coverClose" type="button">关闭</button></div>
+      <label>已有期次<select id="coverIssueSelect" aria-label="选择已有期次及发布状态"></select></label>
+      <label>期次起始日期（按原始期次，不换算自然周）<input id="coverWeek" type="date" min="2026-08-23" list="coverWeeks"><datalist id="coverWeeks"></datalist></label>
+      <label>封面图片<input id="coverFile" type="file" accept="image/png,image/jpeg,image/webp,image/gif"></label>
+      <img id="coverPreview" alt="本期封面预览" hidden>
+      <label>视频链接<input id="coverVideo" type="url" placeholder="https://…"></label>
+      <fieldset><legend>对应精选篇目（选择 1—2 篇）</legend><div id="coverArticles"></div></fieldset>
+      <div class="cover-manager-actions"><button id="coverSave" type="button">保存草稿</button><button id="coverDeleteDraft" type="button">删除草稿</button><button id="coverPublish" class="primary" type="button">发布本期封面</button><button id="coverWithdraw" type="button">撤下</button><button id="coverRefresh" type="button">重新读取</button></div>
+      <p id="coverStatus" role="status" aria-live="polite"></p>
+    </section>
+  </dialog>
+  <dialog id="imageCaptionDialog" class="cover-manager" aria-labelledby="imageCaptionHeading">
+    <div class="cover-manager-inner">
+      <h2 id="imageCaptionHeading">图片小标题</h2>
+      <p>图号按本篇图片顺序自动生成；留空时只显示图号。</p>
+      <label>小标题<input id="imageCaptionInput" maxlength="500" type="text"></label>
+      <div class="image-caption-actions">
+        <button type="button" onclick="this.closest('dialog').close()">取消</button>
+        <button id="imageCaptionApply" class="primary" type="button">保存</button>
+      </div>
+    </div>
+  </dialog>
+  <script src="/editor/covers.js"></script>
   <script src="/vendor/flatpickr/flatpickr.min.js"></script>
   <script src="/vendor/flatpickr/zh.js"></script>
   <script src="/characters.js"></script>

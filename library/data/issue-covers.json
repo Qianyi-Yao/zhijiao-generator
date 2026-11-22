@@ -1,0 +1,86 @@
+{
+  "version": 1,
+  "issues": {
+    "2026-11-08": {
+      "week": "2026-11-08",
+      "cover": "library/covers/8eb7739adec541469db637d9d72d32f9.png",
+      "video_url": "https://www.bilibili.com/video/BV1NTsV6VE4m",
+      "article_ids": [
+        "editor-d5ddcaa4d9554e25acc252a1bd514be4",
+        "editor-a03ec33f51a5494ebd715cd9fe45f829"
+      ]
+    },
+    "2026-11-01": {
+      "week": "2026-11-01",
+      "cover": "library/covers/b9136d70e2c54b438183f1ee22052508.png",
+      "video_url": "https://www.bilibili.com/video/BV1vz4n6nE3J",
+      "article_ids": [
+        "editor-e8a2611033f34a59a502e291c3094dfa"
+      ]
+    },
+    "2026-10-18": {
+      "week": "2026-10-18",
+      "cover": "library/covers/5b29267c73b042a58868fc41fef97607.png",
+      "video_url": "https://www.bilibili.com/video/BV1zrHN6KEKw",
+      "article_ids": [
+        "editor-a31616ff52024836a0564555e5c67cdb"
+      ]
+    },
+    "2026-10-11": {
+      "week": "2026-10-11",
+      "cover": "library/covers/68d54760d3be4eaaa6284f92a6d5a631.png",
+      "video_url": "https://www.bilibili.com/video/BV1RmJi6yEyw",
+      "article_ids": [
+        "editor-b007cbced9454ac69a438ae269245449"
+      ]
+    },
+    "2026-10-04": {
+      "week": "2026-10-04",
+      "cover": "library/covers/c9f97837732b47a385c00d3e5172b75b.png",
+      "video_url": "https://www.bilibili.com/video/BV1UkpG6rE8s",
+      "article_ids": [
+        "2026-10-04-6"
+      ]
+    },
+    "2026-09-24": {
+      "week": "2026-09-24",
+      "cover": "library/covers/e9dbebfc652848dc959d95ecc8f4e352.png",
+      "video_url": "https://www.bilibili.com/video/BV1fGHe6mE5J",
+      "article_ids": [
+        "2026-09-24-1"
+      ]
+    },
+    "2026-09-20": {
+      "week": "2026-09-20",
+      "cover": "library/covers/097e3b861cd34ce5b0009a2026cd43b7.png",
+      "video_url": "https://www.bilibili.com/video/BV1g2ab6jENB",
+      "article_ids": [
+        "2026-09-20-7"
+      ]
+    },
+    "2026-09-13": {
+      "week": "2026-09-13",
+      "cover": "library/covers/98a00fd26a5848aa805ae68046091f38.png",
+      "video_url": "https://www.bilibili.com/video/BV1hre86xEQF",
+      "article_ids": [
+        "2026-09-13-11"
+      ]
+    },
+    "2026-09-06": {
+      "week": "2026-09-06",
+      "cover": "library/covers/66a62e4cf6bf4b0180e936645424ae79.png",
+      "video_url": "https://www.bilibili.com/video/BV1frYR6BEp3",
+      "article_ids": [
+        "2026-09-06-4"
+      ]
+    },
+    "2026-08-23": {
+      "week": "2026-08-23",
+      "cover": "library/covers/e4111aec577942bca05fdf8f6c25e8d8.png",
+      "video_url": "https://www.bilibili.com/video/BV1Se426SE1",
+      "article_ids": [
+        "2026-08-23-4"
+      ]
+    }
+  }
+}

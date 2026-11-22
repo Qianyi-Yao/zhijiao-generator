@@ -2241,5 +2241,22 @@ const characters = [
     role: "辅助",
     avatar: "avatars/xiean_a.png",
     portrait: "portraits/xiean_a.png"
+  },
+  {
+    id: "chuzhuangwang",
+    cardId: 2179,
+    name: "楚庄王",
+    dynasty: "先秦",
+    rarity: "天",
+    role: "输出",
+    avatar: "avatars/chuzhuangwang_a.png",
+    portrait: "portraits/chuzhuangwang_a.png",
+    skins: [
+      {
+        id: "b",
+        avatar: "avatars/chuzhuangwang_b.png",
+        portrait: "portraits/chuzhuangwang_b.png"
+      }
+    ]
   }
 ];

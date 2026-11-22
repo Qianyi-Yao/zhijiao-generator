@@ -8,6 +8,7 @@
   <link rel="icon" type="image/png" href="ui/zhijiaoquan-icon.png" />
   <link rel="stylesheet" href="vendor/flatpickr/flatpickr.min.css" />
   <link rel="stylesheet" href="vendor/katex/katex.min.css" />
+  <link rel="stylesheet" href="library/covers.css" />
   <style>
     @font-face { font-family: "Jinling"; src: url("fonts/BWKS.woff2") format("woff2"); font-display: swap; }
     @font-face { font-family: "ShengshiKai"; src: url("fonts/FZSHENGSKSJW_CU.woff2") format("woff2"); font-display: swap; }
@@ -106,6 +107,16 @@
     .media-text { flex: 1; min-width: 0; }
     .media-text p { margin: 0 0 10px; }
     .img-only img { width: 180px; margin: 12px 0; display: block; border-radius: 8px; border: 1px solid var(--line); background: #fff; }
+    .captioned-image { margin: 12px 0; width: fit-content; max-width: 100%; }
+    .img-only .captioned-image { width: 180px; }
+    .captioned-image figcaption { color: #666666; font-size: 85%; text-align: center; line-height: 1.6; margin-top: 5px; overflow-wrap: anywhere; contain: inline-size; }
+    .article-body .captioned-image img { margin-bottom: 0; max-width: 100%; box-sizing: border-box; }
+    .img-only .captioned-image img, .media-imgs .captioned-image img { width: 100%; }
+    .media-imgs .captioned-image { width: 100%; }
+    .markdown-table .captioned-image { margin-left: auto; margin-right: auto; }
+    @media (max-width: 560px) { .img-only .captioned-image { width: 100%; } }
+    .share-export.mobile .img-only .captioned-image { width: 100%; }
+    .share-export.desktop .img-only .captioned-image { width: 180px; }
     .rich-text { white-space: pre-wrap; word-break: break-word; }
     .article-link { color: var(--green-dark); text-decoration: underline; text-underline-offset: 2px; cursor: pointer; }
     .article-link:hover { color: var(--green); }
@@ -387,6 +398,7 @@
       <input id="weekPicker" type="text" aria-label="选择日期，按周筛选" placeholder="点击日历选择一周" readonly />
       <span id="weekLabel" class="filter-label" aria-live="polite">未限定日期</span>
       <button id="clearFilters" class="clear-btn" type="button" disabled>清除筛选</button>
+      <div id="featuredFilterStatus" class="featured-filter-status" hidden>正在查看精选篇目 <button id="featuredFilterExit" class="clear-btn" type="button">返回全部篇目</button></div>
     </div>
 
     <div id="articleList"></div>
@@ -420,8 +432,10 @@
   <script src="vendor/flatpickr/flatpickr.min.js"></script>
   <script src="vendor/flatpickr/zh.js"></script>
   <script src="vendor/katex/katex.min.js"></script>
+  <script src="library/covers.js"></script>
   <script>
     let articles = [];
+    let featuredOnly = false;
     let drawPool = characters.filter(item => Number.isInteger(item.cardId));
     let encounterMatches = [];
     let encounterCurrent = null;
@@ -541,9 +555,12 @@
       return output.join('');
     }
 
+    function figureHtml(img, alt, meta) {
+      const image = '<img src="library/' + esc(img) + '" alt="' + esc(alt || '考据配图') + '" loading="lazy">';
+      return meta?.number ? '<figure class="captioned-image">' + image + '<figcaption>图' + Number(meta.number) + (meta.caption ? ' ' + esc(meta.caption) : '') + '</figcaption></figure>' : image;
+    }
     function renderParagraph(p) {
-      const imgs = (p.images || []).map(img =>
-        '<img src="library/' + esc(img) + '" alt="' + esc(p.alt || '考据配图') + '" loading="lazy">');
+      const imgs = (p.images || []).map((img, i) => figureHtml(img, p.alt, p.image_meta?.[i]));
       if (p.type === 'image') return '<div class="img-only">' + imgs.join('') + '</div>';
       if (p.type === 'math') return '<div class="markdown-math" data-latex="' + esc(p.latex || '') + '"></div>';
       if (p.type === 'quote') {
@@ -570,8 +587,7 @@
               ? ' style="text-align:' + cellAlign + '"' : '';
             const span = (richCell.rowspan > 1 ? ' rowspan="' + Number(richCell.rowspan) + '"' : '') +
                          (richCell.colspan > 1 ? ' colspan="' + Number(richCell.colspan) + '"' : '');
-            const cellImages = (richCell.images || []).map(img =>
-              '<img src="library/' + esc(img) + '" alt="表格配图" loading="lazy">').join('');
+            const cellImages = (richCell.images || []).map((img, i) => figureHtml(img, '表格配图', richCell.image_meta?.[i])).join('');
             return '<' + cellTag + alignment + span + '><span class="rich-text">' + renderRuns(richCell.runs, pptTable) +
                    '</span>' + cellImages + '</' + cellTag + '>';
           }).join('');
@@ -642,6 +658,7 @@
         titleQuery: titleInput.trim().toLowerCase(),
         source: sourceFilter.value,
         hasErrors: errorFilter.getAttribute('aria-pressed') === 'true',
+        featuredOnly,
         character: selectedChar,
         year: selectedYear,
         month: selectedMonth,
@@ -660,6 +677,7 @@
       }
       return articles.filter(a => {
         if (a.source === 'easter') return false;
+        if (filters.featuredOnly && !LibraryCovers.has(a.id)) return false;
         if (filters.hasErrors && !a.has_errors) return false;
         const articleSource = a.source === 'extra' ? 'extra' : 'main';
         if (filters.source !== 'all' && filters.source !== articleSource) return false;
@@ -812,6 +830,7 @@
     sourceFilter.onchange = renderFromFirstPage;
 
     clearFilters.onclick = () => {
+      featuredOnly = false;
       searchInput.value = '';
       characterSearch.value = '';
       setSearchError(searchInput, titleSearchError, false);
@@ -827,12 +846,15 @@
       weekLabel.textContent = '未限定日期';
       renderFromFirstPage();
     };
+    document.getElementById('featuredFilterExit').onclick = () => clearFilters.onclick();
 
     function updateFilterBar(filters) {
+      document.getElementById('featuredFilterStatus').hidden = !filters.featuredOnly;
       errorFilter.textContent = filters.hasErrors ? '看所有篇目' : '只看有谬误';
       sourceFilter.dataset.filled = String(filters.source !== 'all');
       weekPicker.dataset.filled = String(Boolean(filters.week));
       const active =
+        filters.featuredOnly ||
         filters.hasErrors ||
         filters.titleInput ||
         filters.character ||
@@ -914,10 +936,12 @@
       const meta = isEaster ? '双人奇遇 · 隐藏彩蛋' : `${a.date_start} 至 ${a.date_end}${isExtra ? '' : ' · ' + episodeLabel(a)}`;
       const sourceBadge = isEaster ? '<span class="source-badge">奇遇</span>' : '<button type="button" class="source-badge" data-source-filter="' + (isExtra ? 'extra' : 'main') + '">' + (isExtra ? '番外' : '正篇') + '</button>';
       const body = a.paragraphs.map(renderParagraph).join('');
-      return `<article class="article-card${a.origin === 'editor' ? ' editor-article' : ''}${expanded ? ' open' : ''}" data-article-id="${esc(a.id)}">
+      return `<article class="article-card${LibraryCovers.has(a.id) ? ' has-cover' : ''}${a.origin === 'editor' ? ' editor-article' : ''}${expanded ? ' open' : ''}" data-article-id="${esc(a.id)}">
         <div class="article-head">
           <div class="article-heading-row">
           <span class="article-title">${esc(a.title)}</span>
+          ${LibraryCovers.badge(a.id)}
+          ${LibraryCovers.bubble(a.id)}
           ${sourceBadge}
           ${a.has_errors ? '<button type="button" class="error-badge" data-error-filter>有谬误</button>' : ''}
           <span class="article-tags">${tags}</span>
@@ -1166,11 +1190,16 @@
       render();
     });
     function applyBadgeFilter(event) {
-      const badge = event.target.closest('[data-source-filter], [data-error-filter]');
+      const badge = event.target.closest('[data-source-filter], [data-error-filter], [data-featured-filter]');
       if (!badge) return false;
       event.preventDefault();
       event.stopPropagation();
-      if (badge.hasAttribute('data-source-filter')) sourceFilter.value = badge.dataset.sourceFilter;
+      if (badge.hasAttribute('data-featured-filter')) {
+        clearFilters.onclick();
+        featuredOnly = true;
+        mode = 'paged';
+      }
+      else if (badge.hasAttribute('data-source-filter')) sourceFilter.value = badge.dataset.sourceFilter;
       else errorFilter.setAttribute('aria-pressed', 'true');
       if (articleIdFromHash()) {
         history.pushState({ libraryRoute: true, articleId: null, scrollY: 0 }, '', articleRouteUrl(null));
@@ -1310,7 +1339,7 @@
       preview.style.zoom = Math.min(1, (shareDialog.clientWidth - 50) / width);
       const card = shareArticle.cloneNode(true);
       card.classList.add('open');
-      card.querySelectorAll('.share-btn').forEach(button => button.remove());
+      card.querySelectorAll('.share-btn, .cover-bubble').forEach(button => button.remove());
       card.querySelectorAll('img').forEach(img => img.loading = 'eager');
       preview.appendChild(card);
       const footer = document.createElement('p');
@@ -1435,7 +1464,7 @@
       host.setAttribute('aria-hidden', 'true');
       const card = shareArticle.cloneNode(true);
       card.classList.add('open');
-      card.querySelectorAll('.share-btn').forEach(button => button.remove());
+      card.querySelectorAll('.share-btn, .cover-bubble').forEach(button => button.remove());
       host.appendChild(card);
       const footer = document.createElement('p');
       footer.className = 'foot-note';
@@ -1560,6 +1589,7 @@
             title: (article.title || '').replace(/【(?:此处|此条)?有谬误】|（有谬误）/g, '').trim() };
         }).sort((a, b) =>
           (a.date_start || '').localeCompare(b.date_start || ''));
+        await LibraryCovers.load(articles);
         try {
           const response = await fetch('library/data/抽选人物名单.csv', { cache: 'no-store' });
           if (!response.ok) throw new Error('名单读取失败');
