@@ -81,6 +81,22 @@
       "article_ids": [
         "2026-08-23-4"
       ]
+    },
+    "2026-11-15": {
+      "week": "2026-11-15",
+      "cover": "library/covers/a6a7d8181a0b4ebf89331304680d4e73.png",
+      "video_url": "https://www.bilibili.com/video/BV1fuyYznEYJ",
+      "article_ids": [
+        "editor-49b8c60079074328ad1ef2120c64dda8"
+      ]
+    },
+    "2026-11-22": {
+      "week": "2026-11-22",
+      "cover": "library/covers/55b34024fe5c442abe99048cc0ed8ed3.png",
+      "video_url": "https://www.bilibili.com/video/BV13a1uzGEa6",
+      "article_ids": [
+        "editor-6c2c82e8389248de96297d7b2df82e1f"
+      ]
     }
   }
 }

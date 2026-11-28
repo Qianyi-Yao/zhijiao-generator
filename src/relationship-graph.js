@@ -78,6 +78,10 @@ function positionsFor(data) {
 
 export function createRelationshipView(container, data, { onSelect, onHover }) {
   const positions = positionsFor(data);
+  const topology = JSON.stringify({
+    nodes: data.nodes.map(node => String(node.id)).sort(),
+    edges: data.edges.map(edge => [String(edge.source), String(edge.target)].sort().join('-')).sort()
+  });
   const cy = cytoscape({
     container,
     elements: [
@@ -116,12 +120,14 @@ export function createRelationshipView(container, data, { onSelect, onHover }) {
       const node = cy.getElementById(String(id));
       if (!node.empty()) { select(node); cy.animate({ center: { eles: node }, zoom: Math.max(cy.zoom(), 1.2) }, { duration: 250 }); }
     },
-    snapshot() { return { zoom: cy.zoom(), pan: { ...cy.pan() }, positions: cy.nodes().map(node => ({ id: node.id(), position: { ...node.position() } })) }; },
+    snapshot() { return { topology, zoom: cy.zoom(), pan: { ...cy.pan() }, positions: cy.nodes().map(node => ({ id: node.id(), position: { ...node.position() } })) }; },
     restore(saved, selectedId) {
       cy.resize();
-      if (saved) {
+      if (saved?.topology === topology) {
         for (const node of saved.positions) cy.getElementById(node.id).position(node.position);
         cy.zoom(saved.zoom); cy.pan(saved.pan);
+      } else {
+        cy.fit(cy.elements(), 45);
       }
       if (selectedId && !cy.getElementById(selectedId).empty()) select(cy.getElementById(selectedId));
     },

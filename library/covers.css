@@ -1,12 +1,12 @@
 .featured-badge {
   display: inline-flex; align-items: center; justify-content: center;
-  color: #9B4038; background: #F5E7E2; border: 1px solid #9B4038;
+  color: #9B4038; background: transparent; border: 1px solid #9B4038;
   border-radius: 3px; padding: 0 6px; font: 400 11px/21px "HuiwenMincho", "SimSun", serif;
   white-space: nowrap; vertical-align: middle;
 }
 .article-card.has-cover { position: relative; }
 .featured-badge[data-featured-filter] { cursor: pointer; }
-.featured-badge[data-featured-filter]:hover { background: #EED5CE; }
+.featured-badge[data-featured-filter]:hover { background: transparent; }
 .featured-badge:focus-visible { outline: 2px solid #9B4038; outline-offset: 3px; }
 .featured-filter-status { grid-column: 1 / -1; color: #9B4038; font-size: 13px; }
 .featured-filter-status[hidden] { display: none; }
